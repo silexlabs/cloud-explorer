@@ -1,0 +1,9 @@
+<div>
+	<h1>Files</h1>
+    <span>{{files.length}}</span>
+    <ul>
+      <li ng-repeat="file in files" class="link" ng-click="doEnterDir({{file}});">
+        <div>{{file.name}} ({{file.bytes}})</div>
+      </li>
+    </ul>
+</div>

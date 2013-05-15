@@ -1,0 +1,14 @@
+[
+  {
+    "display_name": "Dropbox",
+    "name": "dropbox",
+    "description": "This service let you use Dropbox cloud storage.",
+    "visible": true
+  },
+  {
+    "display_name": "Google Drive",
+    "name": "gdrive",
+    "description": "This service let you use google drive cloud storage.",
+    "visible": true
+  }
+]
