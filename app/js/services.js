@@ -12,9 +12,10 @@ angular.module('phonecatServices', ['ngResource']).
 /* Services */
 
 angular.module('ceFileService', ['ngResource']).
-  factory('ceFile', function($resource){
-    // workaround: "?" is to keep a "/" at the end of the URL
-    return $resource(CEConfig.serverUrl+':service/:method/:command/?:path/', {}, { 
+  factory('ceFile', function($resource) {
+
+    //return $resource(CEConfig.serverUrl+':service/:method/:command/?:path/', {}, {  // workaround: "?" is to keep a "/" at the end of the URL
+    return $resource(CEConfig.serverUrl+':service/:method/:command/:path/ ', {}, {  // *very ugly* FIXME add space to keep the '/' at the end of the url
       listServices: {method:'GET', params:{service:'services', method:'list'}, isArray:true},
       connect: {method:'GET', params:{method:'connect'}, isArray:false},
       login: {method:'GET', params:{method:'login'}, isArray:false},

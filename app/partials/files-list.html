@@ -1,9 +1,24 @@
 <div>
-	<h1>Files</h1>
-    <span>{{files.length}}</span>
-    <ul>
-      <li ng-repeat="file in files" class="link" ng-click="doEnterDir({{file}});">
-        <div>{{file.name}} ({{file.bytes}})</div>
-      </li>
-    </ul>
+	<script type="text/ng-template" id="tree_item_renderer.html">
+	    <button ng-click="doEnterDir(data,rp)">{{data.name}}</button>
+	    <ul>
+	        <li ng-repeat="data in data.children | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name"></li>
+	    </ul>
+	</script>
+
+	<span>Files in root path {{ tree.length }}</span>
+	<ul>
+		<!-- <li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li> -->
+		<li ng-repeat="data in tree | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=data.name"></li>
+	</ul>
+
+	<!--
+	<ul>
+		<li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li>
+		<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)" ng-click="doEnterDir(file)">
+			{{file.name}}
+
+		</li>
+	</ul>
+	-->
 </div>
