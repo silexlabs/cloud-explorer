@@ -17,8 +17,9 @@ describe('CE controllers', function() {
 
 
 
-/*  describe('CEBrowseController', function(){
-    var scope, $httpBackend, ctrl,
+  describe( 'CEConnectionController', function() {
+  	
+/*    var scope, $httpBackend, ctrl,
         xyzPhoneData = function() {
           return {
             name: 'phone xyz',
@@ -42,8 +43,8 @@ describe('CE controllers', function() {
       $httpBackend.flush();
 
       expect(scope.phone).toEqualData(xyzPhoneData());
-    });
-  });*/
+    });*/
+  });
 
 
   describe('CEBrowseController', function(){

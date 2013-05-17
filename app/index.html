@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <div ng-controller="CESidebar">
+    <div ng-controller="CESidebarCtrl">
         <ul>
           <li ng-repeat="service in services">
             <a href="#/{{service.name}}/connected/">{{service.name}}</a>
