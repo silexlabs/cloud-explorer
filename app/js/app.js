@@ -3,7 +3,7 @@
 /* App Module */
 
 angular.module('CEApp', ['ceFilters', 'ceFileService', 'ceControllers']).
-	constant( 'serverUrl', 'http://unifile.herokuapp.com/v1.0/' ).
+	constant( 'server.url', 'http://unifile.herokuapp.com/v1.0/' ).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
 			when('/:service/', {templateUrl: 'partials/connection.html',   controller: 'CEConnectionCtrl'}).

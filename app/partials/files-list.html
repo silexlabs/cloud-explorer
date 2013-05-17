@@ -2,7 +2,7 @@
 	<div class="span4 panel">
 
 		<script type="text/ng-template" id="tree_item_renderer.html">
-		    <a ng-click="doEnterDir(data,rp)">{{data.name}}</a>
+		    <a ng-click="doEnter(data,rp)">{{data.name}}</a>
 		    <ul>
 		        <li ng-class="fileClass(data)" ng-repeat="data in data.children | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name"></li>
 		    </ul>
@@ -16,7 +16,7 @@
 		<!--
 		<ul>
 			<li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li>
-			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)" ng-click="doEnterDir(file)">
+			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)" ng-click="doEnter(file)">
 				{{file.name}}
 			</li>
 		</ul>
@@ -28,7 +28,7 @@
 		<ul>
 			<li class="is-dir-true" ng-hide="isRootPath()"><a ng-click="enterParentDir()">..</a></li>
 			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)">
-				<a ng-click="doEnterDir(file, path+'/'+file.name)">{{file.name}}</a>
+				<a ng-click="doEnter(file, path+'/'+file.name)">{{file.name}}</a>
 			</li>
 		</ul>
 

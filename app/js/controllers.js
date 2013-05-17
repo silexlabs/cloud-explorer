@@ -60,7 +60,7 @@ console.log('authPopup opened ');
 		}
 
 	}]).
-	controller('CEBrowseCtrl', [ '$scope', '$window', '$routeParams', 'ceFile' , function( $scope, $window, $routeParams, ceFile )
+	controller('CEBrowseCtrl', [ '$scope', '$window', '$routeParams', 'ceFile', 'server.url' , function( $scope, $window, $routeParams, ceFile, serverUrl )
 	{
 		// user status
 		$scope.isLoggedin = false;
@@ -194,6 +194,24 @@ console.log(res);
 			}
 		}
 		/**
+		 * get command
+		 */
+/*		function get()
+		{
+console.log('get ' + $scope.path);
+			if ($scope.isLoggedin)
+			{
+				var res = ceFile.get({service:$routeParams.service, path:$scope.path}, function (status) {
+
+					});
+			}
+			else
+			{
+				console.error('Not logged in');
+				throw(Error('Not logged in'));
+			}
+		}*/
+		/**
 		 * change path callback
 		 */
 		$scope.doSetPath = function(path)
@@ -205,19 +223,26 @@ console.log('doSetPath '+path);
 		/**
 		 * enter directory callback
 		 */
-		$scope.doEnterDir = function(file, path)
+		$scope.doEnter = function(file, path)
 		{
-console.log('doEnterDir file='+file+'  path='+path);
+console.log('doEnter file='+file+'  path='+path);
 			if (!path)
 			{
-console.log('doEnterDir no path set  path='+path);
+console.log('doEnter no path set  path='+path);
 				path = '';
 			}
 			if (file.is_dir == true)
 			{
-console.log('doEnterDir file is a dir');
+console.log('doEnter file is a dir');
 				cd(path);
 				ls();
+			}
+			else
+			{
+				// get the file
+				var filePopup = $window.open( serverUrl+$routeParams.service+'/exec/get/'+path, 'filePopup', 'height=800,width=800');
+				filePopup.owner = $window;
+				if ($window.focus) { filePopup.focus() }
 			}
 		}
 		/**
