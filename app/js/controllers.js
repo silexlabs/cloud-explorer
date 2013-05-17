@@ -76,9 +76,8 @@ console.log('authPopup opened ');
     // current path 
     $scope.path = ''; 
     // current files list
-    //$scope.files = []; //ceFile.ls($routeParams.service, $routeParams.path, function(res) {
-
-    // the tree structure
+    $scope.files = [];
+    // the entire tree structure
     $scope.tree = [];
 
     /**
@@ -113,7 +112,6 @@ console.log('user logged in');
 console.log('cd '+path);
       if ($scope.isLoggedin)
       {
-console.log('cd '+path+' in '+$scope.path);
         //if (path.charAt(0) == '/')
        // {
           $scope.path = path; //.substr(1); //
@@ -135,7 +133,7 @@ console.log('path= '+$scope.path+'  tree= '+$scope.tree);
       }
     }
     /**
-     *
+     * Creates or updates the tree
      */
     function appendToTree( tree, path, res )
     {
@@ -167,7 +165,7 @@ console.log("appendToTree path="+path);
       }
       if (ci == tree.length || ci == -1)
       {
-        throw(Error('No jump allowed yet :'+ci));
+        throw(Error('No jump allowed yet : at ci='+ci));
       }
       tree[ci]['children'] = appendToTree( tree[ci]['children'], path, res );
 
@@ -184,7 +182,7 @@ console.log('ls ' + $scope.path+ '  scope.tree= '+ $scope.tree);
         var res = ceFile.ls({service:$routeParams.service, path:$scope.path}, function (status) {
 console.log('ls result: '+res.length+ '  scope.tree= '+ $scope.tree);
 console.log(res);
-          //$scope.files = res;
+          $scope.files = res;
           var path = $scope.path;
           if ( path.charAt(0) == '/' )
           {
@@ -221,11 +219,12 @@ console.log('doSetPath '+path);
 console.log('doEnterDir file='+file+'  path='+path);
       if (!path)
       {
+console.log('doEnterDir no path set  path='+path);
         path = '';
       }
-      console.log('doEnterDir '+file);
       if (file.is_dir == true)
       {
+console.log('doEnterDir file is a dir');
         cd(path);
         ls();
       }

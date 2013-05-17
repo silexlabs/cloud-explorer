@@ -66,3 +66,8 @@ li.is-dir-false
 {
 	display: none;
 }
+
+.panel
+{
+	border:1px solid #DDDDDD;padding:5px;padding-left:0px;min-height:500px;
+}

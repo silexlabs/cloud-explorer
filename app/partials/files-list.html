@@ -1,24 +1,36 @@
-<div>
-	<script type="text/ng-template" id="tree_item_renderer.html">
-	    <button ng-click="doEnterDir(data,rp)">{{data.name}}</button>
-	    <ul>
-	        <li ng-repeat="data in data.children | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name"></li>
-	    </ul>
-	</script>
+<div class="row">
+	<div class="span4 panel">
 
-	<span>Files in root path {{ tree.length }}</span>
-	<ul>
-		<!-- <li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li> -->
-		<li ng-repeat="data in tree | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=data.name"></li>
-	</ul>
+		<script type="text/ng-template" id="tree_item_renderer.html">
+		    <a ng-click="doEnterDir(data,rp)">{{data.name}}</a>
+		    <ul>
+		        <li ng-class="fileClass(data)" ng-repeat="data in data.children | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name"></li>
+		    </ul>
+		</script>
 
-	<!--
-	<ul>
-		<li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li>
-		<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)" ng-click="doEnterDir(file)">
-			{{file.name}}
+		<!-- <span>Files in root path {{ tree.length }}</span> -->
+		<ul>
+			<!-- <li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li> -->
+			<li ng-class="fileClass(data)" ng-repeat="data in tree | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=data.name"></li>
+		</ul>
+		<!--
+		<ul>
+			<li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li>
+			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)" ng-click="doEnterDir(file)">
+				{{file.name}}
+			</li>
+		</ul>
+		-->
 
-		</li>
-	</ul>
-	-->
+	</div>
+	<div class="span8 panel">
+
+		<ul>
+			<li class="is-dir-true" ng-hide="isRootPath()"><a ng-click="enterParentDir()">..</a></li>
+			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)">
+				<a ng-click="doEnterDir(file, path+'/'+file.name)">{{file.name}}</a>
+			</li>
+		</ul>
+
+	</div>
 </div>
