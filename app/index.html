@@ -1,46 +1,29 @@
 <!doctype html>
 <html ng-app="CEApp">
-  <head>
-    <link rel="stylesheet" href="css/bootstrap.css">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/config.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.1/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.1/angular-resource.min.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/controllers.js"></script>
-    <script src="js/filters.js"></script>
-    <script src="js/services.js"></script>
-  </head>
-  <body>
-    <div ng-controller="CESidebar">
-        <ul>
-          <li ng-repeat="service in services">
-            <a href="#/{{service.name}}/connected/">{{service.name}}</a>
-          </li>
-        </ul>
-    </div>
-    <hr>
-    <div ng-view></div>
-
-<!--
-    <div ng-controller="CEController" >
-      <div class="loggedin-hide-{{isLoggedin}}">
-        [ <a href="" ng-click="doRefresh()">refresh</a> | <a href="" ng-click="doConnectDropbox()">Connect to Dropbox</a> | <a href="" ng-click="doConnectGDrive()">Connect to Google drive</a> | <a href="" ng-click="doLogin()">Login</a> ]
-      </div>
-      <div class="loggedin-show-{{isLoggedin}}">
-        <span>{{files.length}} files</span>
-        <ul>
-          <li ng-repeat="file in files" class="link is-dir-{{file.is_dir}}" ng-click="doEnterDir({{file}});">
-            <div>{{file.name}} ({{file.bytes}})</div>
-          </li>
-        </ul>
-        <form ng-submit="doSetPath('{{path}}')">
-          <input type="text" ng-model="path"  size="30"
-                 placeholder="Current URL" >
-          <input class="btn-primary" type="submit" value="Go">
-        </form>
-      </div>
-    </div>
--->
-  </body>
+	<head>
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<div ng-controller="CESidebarCtrl">
+			<ul>
+				<li ng-repeat="service in services">
+					<a href="#/{{service.name}}/connected/">{{service.name}}</a>
+				</li>
+			</ul>
+		</div>
+		<hr>
+		<div ng-view></div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.1/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.1/angular-resource.min.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/app.js"></script>
+		<script src="js/controllers.js"></script>
+		<script src="js/directives.js"></script>
+		<script src="js/filters.js"></script>
+		<script src="js/services.js"></script>
+		<script src="http://code.jquery.com/jquery.js"></script>
+		<script src="lib/bootstrap.js"></script>
+	</body>
 </html>
