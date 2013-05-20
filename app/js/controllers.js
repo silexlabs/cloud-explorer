@@ -59,8 +59,8 @@ console.log('authPopup opened ');
 			}
 		}
 
-	}]).
-	controller('CEBrowseCtrl', [ '$scope', '$window', '$routeParams', 'ceFile', 'server.url' , function( $scope, $window, $routeParams, ceFile, serverUrl )
+	}])
+	.controller('CEBrowseCtrl', [ '$scope', '$window', '$routeParams', 'ceFile', 'server.url' , function( $scope, $window, $routeParams, ceFile, serverUrl )
 	{
 		// user status
 		$scope.isLoggedin = false;
@@ -69,7 +69,7 @@ console.log('authPopup opened ');
 		// current files list
 		$scope.files = [];
 		// the entire tree structure
-		$scope.tree = [];
+		$scope.tree = {};
 
 		/**
 		 * login
@@ -103,6 +103,10 @@ console.log('user logged in');
 console.log('cd '+path);
 			if ($scope.isLoggedin)
 			{
+				if ( path.length > 1 && path.charAt(path.length - 1) != '/' )
+				{
+					path += '/';
+				}
 				//if (path.charAt(0) == '/')
 				// {
 				$scope.path = path; //.substr(1); //

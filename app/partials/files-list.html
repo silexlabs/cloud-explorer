@@ -4,14 +4,14 @@
 		<script type="text/ng-template" id="tree_item_renderer.html">
 		    <a ng-click="doEnter(data,rp)">{{data.name}}</a>
 		    <ul>
-		        <li ng-class="fileClass(data)" ng-repeat="data in data.children | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name"></li>
+		        <li ng-class="fileClass(data)" ng-repeat="data in data.children | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name"></li>
 		    </ul>
 		</script>
 
 		<!-- <span>Files in root path {{ tree.length }}</span> -->
 		<ul>
 			<!-- <li class="dir" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li> -->
-			<li ng-class="fileClass(data)" ng-repeat="data in tree | orderBy:'is_dir':true" ng-include="'tree_item_renderer.html'" onload="rp=data.name"></li>
+			<li ng-class="fileClass(data)" ng-repeat="data in tree | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="rp=data.name"></li>
 		</ul>
 		<!--
 		<ul>
@@ -27,7 +27,7 @@
 
 		<ul>
 			<li class="is-dir-true" ng-hide="isRootPath()"><a ng-click="enterParentDir()">..</a></li>
-			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)">
+			<li ng-repeat="file in files | filter:{'is_dir':false}" ng-class="fileClass(file)">
 				<a ng-click="doEnter(file, path+'/'+file.name)">{{file.name}}</a>
 			</li>
 		</ul>
