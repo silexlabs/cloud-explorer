@@ -2,7 +2,7 @@
 <div class="row-fluid">
 	<div class="span12">
 		<div class="btn-group">
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+			<a class="btn dropdown-toggle" data-toggle="dropdown">
 				Connect
 				<span class="caret"></span>
 			</a>
@@ -33,6 +33,9 @@
 	</div>
 	<div class="span8">
 		<ul>
+			<li ng-show="isLoggedin" class="upload">
+				Télécharge un ou plusieurs fichiers: <div file-uploader></div>
+			</li>
 			<li class="is-dir-true" ng-hide="isRootPath()"><a ng-click="enterParentDir()">..</a></li>
 			<li ng-repeat="file in files | orderBy:'is_dir':true" ng-class="fileClass(file)">
 				<a ng-click="doEnter(file, path+file.name)">{{file.name}}</a>

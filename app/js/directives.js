@@ -2,7 +2,7 @@
 
 /* Config */
 angular.module('ceConf', [])
-	.constant( 'server.url', 'http://unifile.herokuapp.com/v1.0/' )
+	.constant( 'server.url', 'http://127.0.0.1\\:15000/v1.0/' )
 	.config(['$httpProvider', function($httpProvider)
 	{
 		delete $httpProvider.defaults.headers.common["X-Requested-With"];
@@ -23,10 +23,66 @@ angular.module('ceFileService', ['ngResource'])
 				ls: {method:'GET', params:{method:'exec', command:'ls'}, isArray:true}
 				//get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
 			});
+	}])
+	.service('$fileUpload', ['$http', function($http)
+	{
+		this.upload = function(uploadFiles)
+		{
+			//Not really sure why we have to use FormData().  Oh yeah, browsers suck.
+			var formData = new FormData();
+			for(var i in uploadFiles)
+			{
+				formData.append('data', uploadFiles[i], uploadFiles[i].name);
+			}
+console.log(formData);
+			$http({
+					method: 'POST',
+					url: 'http://127.0.0.1:15000/v1.0/dropbox/exec/put/' + uploadFiles[0].name, // test version FIXME
+					data: formData,
+					headers: {'Content-Type': undefined},
+					transformRequest: angular.identity
+				})
+				.success(function(data, status, headers, config) {
+					alert("file successfully sent");
+				});
+		}
 	}]);
 
 /* Directives */
 angular.module('ceDirectives', [ 'ceConf', 'ceFileService' ])
+	.directive('fileUploader', function()
+	{
+		return {
+			restrict: 'A',
+			transclude: true,
+			template: '<div><input type="file" multiple /><button ng-click="upload()">Upload</button><ul><li ng-repeat="uploadFile in uploadFiles">{{uploadFile.name}} - {{uploadFile.type}}</li></ul></div>',
+			replace: true,
+			controller: function($scope, $fileUpload)
+			{
+				$scope.notReady = true;
+				$scope.upload = function() {
+					$fileUpload.upload($scope.uploadFiles);
+				};
+			},
+			link: function($scope, $element)
+			{
+				var fileInput = $element.find('input');
+				fileInput.bind('change', function(e)
+				{
+console.log('change $scope.uploadFiles = '+$scope.uploadFiles);
+					$scope.notReady = e.target.files.length == 0;
+					$scope.uploadFiles = [];
+					for(var i in e.target.files)
+					{
+	          			//Only push if the type is object for some stupid-ass reason browsers like to 
+	          			//include functions and other junk
+						if(typeof e.target.files[i] == 'object') $scope.uploadFiles.push(e.target.files[i]);
+					}
+console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
+				});
+			}
+		};
+	})
 	.directive('ceBrowser', [ 'ceFile', function( ceFile )
 	{
 		return {
@@ -135,6 +191,9 @@ console.log($scope.services);
 				$scope.files = [];
 				// the file tree structure
 				$scope.tree = {};
+
+				$scope.uploadCurrent = '';
+				$scope.uploadMax = '';
 
 				// EXECUTING
 console.log("EXECUTING ceBrowser directive controller...");
@@ -280,7 +339,7 @@ console.log('doEnter file is a dir');
 						filePopup.owner = $window;
 						if ($window.focus) { filePopup.focus() }
 					}
-				}
+				};
 				/**
 				 * get file item css class name
 				 */
@@ -295,7 +354,7 @@ console.log('doEnter file is a dir');
 					{
 						return 'is-dir-false';
 					}
-				}
+				};
 				$scope.isRootPath = function()
 				{
 console.log('isRootPath '+$scope.path);
@@ -306,7 +365,7 @@ console.log('isRootPath true');
 					}
 console.log('isRootPath false');
 					return false;
-				}
+				};
 				$scope.enterParentDir = function()
 				{
 console.log('isRootPath ');
@@ -324,7 +383,7 @@ console.log('isRootPath ');
 						cd('/');
 					}
 					ls();
-				}
+				};
 			}]
 		}
 	}]);

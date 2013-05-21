@@ -20,8 +20,13 @@ angular.module('ceFileService', ['ngResource'])
 				listServices: {method:'GET', params:{service:'services', method:'list'}, isArray:true},
 				connect: {method:'GET', params:{method:'connect'}, isArray:false},
 				login: {method:'GET', params:{method:'login'}, isArray:false},
-				ls: {method:'GET', params:{method:'exec', command:'ls'}, isArray:true}
+				ls: {method:'GET', params:{method:'exec', command:'ls'}, isArray:true},
 				//get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
+				mkdir: {method:'POST', params:{method:'exec', command:'mkdir'}, isArray:true},
+				rm: {method:'POST', params:{method:'exec', command:'rm'}, isArray:true},
+				cp: {method:'POST', params:{method:'exec', command:'cp'}, isArray:true},
+				mv: {method:'POST', params:{method:'exec', command:'mv'}, isArray:true},
+				put: {method:'PUT', params:{method:'exec', command:'put'}, isArray:true}
 			});
 	}]);
 
