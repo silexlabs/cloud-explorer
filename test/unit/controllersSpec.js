@@ -1,130 +1,100 @@
 'use strict';
 
 /* jasmine specs for controllers go here */
-describe('CE controllers', function() {
 
-/*  beforeEach(function(){
-    this.addMatchers({
-      toEqualData: function(expected) {
-        return angular.equals(this.actual, expected);
-      }
-    });
-  });*/
+describe('CE controllers', function()
+{
+	beforeEach(module('CEApp', function($provide) {
+		$provide.constant( 'server.url', 'http://unifile.herokuapp.com/v1.0/' );
+	}));
+	beforeEach(module('ceControllers'));
+	beforeEach(module('ceFileService'));
 
+	// compare objects method (from angular tutorial)
+	beforeEach( function() {
+		this.addMatchers( {
+			toEqualData: function(expected) {
+				return angular.equals(this.actual, expected);
+			}
+		});
+	});
 
-  beforeEach(module('ceFileService'));
+	describe('CESidebarCtrl', function(serverUrl)
+	{
+		var scope, ctrl, $httpBackend;
 
+		beforeEach( inject( function( _$httpBackend_, $rootScope, $controller )
+		{
+			$httpBackend = _$httpBackend_;
+			$httpBackend.expectGET('http://unifile.herokuapp.com/v1.0/services/list/').  // FIXME inject server.url and use it here
+				respond([
+						  {
+						    "display_name": "Dropbox",
+						    "name": "dropbox",
+						    "description": "This service let you use Dropbox cloud storage.",
+						    "visible": true
+						  },
+						  {
+						    "display_name": "Google Drive",
+						    "name": "gdrive",
+						    "description": "This service let you use google drive cloud storage.",
+						    "visible": true
+						  }
+						]);
 
+			scope = $rootScope.$new();
+			ctrl = $controller('CESidebarCtrl', { $scope: scope });
+		}));
 
+		it('should create "services" model with 2 services fetched from xhr', function()
+		{
+			expect(scope.services).toEqual([]);
+			$httpBackend.flush();
 
-  describe( 'CEConnectionController', function() {
-  	
-/*    var scope, $httpBackend, ctrl,
-        xyzPhoneData = function() {
-          return {
-            name: 'phone xyz',
-                images: ['image/url1.png', 'image/url2.png']
-          }
-        };
-
-
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $routeParams, $controller) {
-      $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('phones/xyz.json').respond(xyzPhoneData());
-
-      $routeParams.phoneId = 'xyz';
-      scope = $rootScope.$new();
-      ctrl = $controller(PhoneDetailCtrl, {$scope: scope});
-    }));
-
-
-    it('should fetch phone detail', function() {
-      expect(scope.phone).toEqualData({});
-      $httpBackend.flush();
-
-      expect(scope.phone).toEqualData(xyzPhoneData());
-    });*/
-  });
-
-
-  describe('CEBrowseController', function(){
-    var scope, ctrl, $httpBackend;
-
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-      $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET(CEConfig.serverUrl).
-          respond([
-			  {
-			    "name": "Photos",
-			    "bytes": 0,
-			    "modified": "Wed, 15 May 2013 15:59:51 +0000",
-			    "is_dir": true
-			  },
-			  {
-			    "name": "Premiers pas.pdf",
-			    "bytes": 148857,
-			    "modified": "Wed, 15 May 2013 15:59:51 +0000",
-			    "is_dir": false
-			  },
-			  {
-			    "name": "test.txt",
-			    "bytes": 0,
-			    "modified": "Thu, 16 May 2013 08:28:08 +0000",
-			    "is_dir": false
-			  },
-			  {
-			    "name": "toto",
-			    "bytes": 0,
-			    "modified": "Thu, 16 May 2013 09:42:38 +0000",
-			    "is_dir": true
-			  }
-			]);
-
-      scope = $rootScope.$new();
-      ctrl = $controller(CEBrowseController, {$scope: scope});
-    }));
+			expect(scope.services).toEqualData([
+						  {
+						    "display_name": "Dropbox",
+						    "name": "dropbox",
+						    "description": "This service let you use Dropbox cloud storage.",
+						    "visible": true
+						  },
+						  {
+						    "display_name": "Google Drive",
+						    "name": "gdrive",
+						    "description": "This service let you use google drive cloud storage.",
+						    "visible": true
+						  }
+						]);
+		});
+	});
 
 
-    it('should create "files" model with 4 files fetched from xhr', function() {
-      expect(scope.files).toEqual([]);
-
-      
-
-      $httpBackend.flush();
-
-      expect(scope.phones).toEqualData(
-          [
-			  {
-			    "name": "Photos",
-			    "bytes": 0,
-			    "modified": "Wed, 15 May 2013 15:59:51 +0000",
-			    "is_dir": true
-			  },
-			  {
-			    "name": "Premiers pas.pdf",
-			    "bytes": 148857,
-			    "modified": "Wed, 15 May 2013 15:59:51 +0000",
-			    "is_dir": false
-			  },
-			  {
-			    "name": "test.txt",
-			    "bytes": 0,
-			    "modified": "Thu, 16 May 2013 08:28:08 +0000",
-			    "is_dir": false
-			  },
-			  {
-			    "name": "toto",
-			    "bytes": 0,
-			    "modified": "Thu, 16 May 2013 09:42:38 +0000",
-			    "is_dir": true
-			  }
-			]);
-    });
+	/*describe('MyCtrl2', function()
+	{
+		var scope, $httpBackend, ctrl,
+				xyzProductData = function() {
+					return {
+						name: 'product xyz',
+								images: ['image/url1.png', 'image/url2.png']
+					}
+				};
 
 
-/*    it('should set the default value of orderProp model', function() {
-      expect(scope.orderProp).toBe('age');
-    });*/
-  });
+		beforeEach(inject(function(_$httpBackend_, $rootScope, $routeParams, $controller) {
+			$httpBackend = _$httpBackend_;
+			$httpBackend.expectGET('data/xyz.json').respond(xyzProductData());
 
+			$routeParams.productId = 'xyz';
+			scope = $rootScope.$new();
+			ctrl = $controller('MyCtrl2', {$scope: scope});
+		}));
+
+
+		it('should fetch product detail', function() {
+			expect(scope.product).toEqualData({});
+			$httpBackend.flush();
+
+			expect(scope.product).toEqualData(xyzProductData());
+		});
+	});*/
 });

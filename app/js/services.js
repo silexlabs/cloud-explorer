@@ -11,19 +11,24 @@ query: {method:'GET', params:{phoneId:'phones'}, isArray:true}
 
 /* Services */
 
-angular.module('ceFileService', ['ngResource']).
-	factory('ceFile', ['$resource', 'server.url', function($resource, serverUrl)
-		{
-			//return $resource(CEConfig.serverUrl+':service/:method/:command/?:path/', {}, {  // workaround: "?" is to keep a "/" at the end of the URL
-			return $resource( serverUrl + ':service/:method/:command/:path/ ', {},
-				{  // *very ugly* FIXME added space to keep the '/' at the end of the url
-					listServices: {method:'GET', params:{service:'services', method:'list'}, isArray:true},
-					connect: {method:'GET', params:{method:'connect'}, isArray:false},
-					login: {method:'GET', params:{method:'login'}, isArray:false},
-					ls: {method:'GET', params:{method:'exec', command:'ls'}, isArray:true}
-					//get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
-				});
-		}]);
+angular.module('ceFileService', ['ngResource'])
+	.factory('ceFile', ['$resource', 'server.url', function($resource, serverUrl)
+	{
+		//return $resource(CEConfig.serverUrl+':service/:method/:command/?:path/', {}, {  // workaround: "?" is to keep a "/" at the end of the URL
+		return $resource( serverUrl + ':service/:method/:command/:path ', {},
+			{  // *very ugly* FIXME added space to keep the '/' at the end of the url
+				listServices: {method:'GET', params:{service:'services', method:'list'}, isArray:true},
+				connect: {method:'GET', params:{method:'connect'}, isArray:false},
+				login: {method:'GET', params:{method:'login'}, isArray:false},
+				ls: {method:'GET', params:{method:'exec', command:'ls'}, isArray:true},
+				//get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
+				mkdir: {method:'POST', params:{method:'exec', command:'mkdir'}, isArray:true},
+				rm: {method:'POST', params:{method:'exec', command:'rm'}, isArray:true},
+				cp: {method:'POST', params:{method:'exec', command:'cp'}, isArray:true},
+				mv: {method:'POST', params:{method:'exec', command:'mv'}, isArray:true},
+				put: {method:'PUT', params:{method:'exec', command:'put'}, isArray:true}
+			});
+	}]);
 
 /* Services *
 
