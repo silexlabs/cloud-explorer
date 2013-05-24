@@ -38,3 +38,10 @@ li.gdrive
 {
 	list-style:square url('../assets/gdrive.png');
 }
+/* LOGS CONSOLE */
+.ce-log-console
+{
+	font-size:small;
+	height:50px; overflow-y:scroll;
+	list-style-type:none;
+}

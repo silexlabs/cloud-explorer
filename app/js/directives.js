@@ -1,8 +1,29 @@
 'use strict';
 
+/**
+ * Front-end component for the unifile node.js server ()
+ * @author Thomas Fétiveau, http://www.tokom.fr/  &  Alexandre Hoyau, http://www.intermedia-paris.fr/
+ * Copyrights SilexLabs 2013 - http://www.silexlabs.org/ -
+ * License MIT
+ */
+
+/**
+ * TODO
+ *
+ * console
+ *
+ * upload progress
+ *
+ * Delete, rename, move
+ * drag 'n drop
+ *
+ * bootstrap styling
+ */
+
 /* Config */
 angular.module('ceConf', [])
-	.constant( 'server.url', 'http://127.0.0.1\\:15000/v1.0/' )
+	.constant( 'server.url', 'http://127.0.0.1\\:5000/v1.0/' )
+	.constant( 'console.level', 0 ) // 0: DEBUG, 1: INFO, 2: WARNING, 3: ERROR, 4: NOTHING
 	.config(['$httpProvider', function($httpProvider)
 	{
 		delete $httpProvider.defaults.headers.common["X-Requested-With"];
@@ -10,9 +31,27 @@ angular.module('ceConf', [])
 		$httpProvider.defaults.withCredentials = true;
 	}]);
 
+/* Controllers */
+angular.module('ceCtrls', [])
+	.controller('CEConsoleCtrl', [ '$scope', '$element', function( $scope, $element )
+	{
+		function onLogEntry( event, msg, l )
+		{
+			event.stopPropagation();
+			$element.append("<li>"+l+": "+msg+"</li>"); // FIXME see if we can use some kind of template here...
+		}
+		$scope.$on("log", onLogEntry);
+	}]);
+
 /* Services */
-angular.module('ceFileService', ['ngResource'])
-	.factory('ceFile', ['$resource', 'server.url', function($resource, serverUrl)
+angular.module('ceServices', ['ngResource', 'ceCtrls'])
+	.factory('ceConsoleSrv', [ '$rootScope', 'console.level', function( $rootScope, level )
+	{
+		return { 
+			"log": function( msg, l ) { if ( l >= level ) $rootScope.$emit("log", msg, l); }
+		};
+	}])
+	.factory('ceFile', ['$resource', 'server.url', function( $resource, serverUrl )
 	{
 		//return $resource(CEConfig.serverUrl+':service/:method/:command/?:path/', {}, {  // workaround: "?" is to keep a "/" at the end of the URL
 		return $resource( serverUrl + ':service/:method/:command/:path ', {},
@@ -26,7 +65,7 @@ angular.module('ceFileService', ['ngResource'])
 	}])
 	.service('$fileUpload', ['$http', function($http)
 	{
-		this.upload = function(uploadFiles)
+		this.upload = function(uploadFiles, path)
 		{
 			//Not really sure why we have to use FormData().  Oh yeah, browsers suck.
 			var formData = new FormData();
@@ -37,19 +76,19 @@ angular.module('ceFileService', ['ngResource'])
 console.log(formData);
 			$http({
 					method: 'POST',
-					url: 'http://127.0.0.1:15000/v1.0/dropbox/exec/put/' + uploadFiles[0].name, // test version FIXME
+					url: 'http://127.0.0.1:5000/v1.0/dropbox/exec/put/' + path + uploadFiles[0].name,
 					data: formData,
 					headers: {'Content-Type': undefined},
 					transformRequest: angular.identity
 				})
 				.success(function(data, status, headers, config) {
-					alert("file successfully sent");
+					alert("file(s) successfully sent");
 				});
 		}
 	}]);
 
 /* Directives */
-angular.module('ceDirectives', [ 'ceConf', 'ceFileService' ])
+angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 	.directive('fileUploader', function()
 	{
 		return {
@@ -60,8 +99,8 @@ angular.module('ceDirectives', [ 'ceConf', 'ceFileService' ])
 			controller: function($scope, $fileUpload)
 			{
 				$scope.notReady = true;
-				$scope.upload = function() {
-					$fileUpload.upload($scope.uploadFiles);
+				$scope.upload = function() { console.log( "upload at "+$scope.path );
+					$fileUpload.upload($scope.uploadFiles, $scope.path);
 				};
 			},
 			link: function($scope, $element)
@@ -83,6 +122,15 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			}
 		};
 	})
+	.directive('ceConsole', function()
+	{
+		return {
+			restrict: 'A',
+			replace: true,
+			template: '<ul class="ce-log-console"></ul>',
+			controller: 'CEConsoleCtrl'
+		};
+	})
 	.directive('ceBrowser', [ 'ceFile', function( ceFile )
 	{
 		return {
@@ -96,7 +144,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			{
 
 			},
-			controller: [ '$scope', '$location', '$window', 'ceFile' , 'server.url', function( $scope, $location, $window, ceFile, serverUrl )
+			controller: [ '$scope', '$location', '$window', 'ceFile' , 'server.url', 'ceConsoleSrv', function( $scope, $location, $window, ceFile, serverUrl, ceConsole )
 			{
 				function authorize( url )
 				{
@@ -105,18 +153,19 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 					if ($window.focus) { authPopup.focus() }
 					if (authPopup)
 					{
-console.log('authPopup opened ');
+						ceConsole.log("Authorization popup opened", 0);
 						if ( confirm('Authorize the app in the popup window and click "ok"') )
 						{
-console.log('authPopup returned true ');
+							ceConsole.log("Authorization popup returned true", 0);
 							return true;
 						}
 					}
 					else
 					{
+						ceConsole.log("Authorization popup could not be opened", 0);
 						console.error('Popup could not be opened');
 					}
-console.log('authorize returned false ');
+					ceConsole.log("Authorization refused", 0);
 					return false;
 				}
 				/**
@@ -125,16 +174,18 @@ console.log('authorize returned false ');
 				 */
 				function connect( serviceName )
 				{
-console.log('connect ');
-					var res = ceFile.connect({service:serviceName}, function () {
-console.log('connect result: '+res.authorize_url);
+					ceConsole.log("Connecting to "+serviceName, 0);
+					var res = ceFile.connect({service:serviceName}, function ()
+					{
+						ceConsole.log("Connected. Auth url is: "+res.authorize_url, 0);
+
 						if ( authorize( res.authorize_url ) )
 						{
-console.log('authorized');
+							ceConsole.log("Authorized", 0);
+
 							if ( $scope.tree[ serviceName ] == null )
 							{
 								$scope.tree[ serviceName ] = [];
-console.log('scope.tree['+serviceName+'] initialized');
 							}
 							$scope.srv = serviceName;
 							login();
@@ -146,24 +197,27 @@ console.log('scope.tree['+serviceName+'] initialized');
 				 */
 				function login()
 				{
-console.log('login ');
+					ceConsole.log("Logging in", 0);
 					var res = ceFile.login({service:$scope.srv}, function (status)
 						{
-console.log('login result: ');
-console.log(status);
+							ceConsole.log("Login status is: "+status, 0);
+
 							if (res.success == true)
 							{
-console.log('user logged in');
+								ceConsole.log("Login success", 0);
+
 								$scope.isLoggedin = true;
 								$scope.path = '';
 								ls();
 							}
 						},
-						function (error)
+						function (obj) // FIXME
 						{
 							console.error('Could not login. Try connect first, then follow the auth URL and try login again.');
-							$scope.isLoggedin = false;
-							$window.location.hash = $scope.srv+'/';
+							console.error(obj.data); // FIXME
+							console.error(obj.status); // FIXME
+							$scope.isLoggedin = false; // FIXME
+							//$window.location.hash = $scope.srv+'/';
 						});
 				}
 
@@ -172,9 +226,8 @@ console.log('user logged in');
 				 */
 				function listServices()
 				{
+					ceConsole.log("Listing services...", 0);
 					$scope.services = ceFile.listServices();
-console.log('listServices ' + $scope.services);
-console.log($scope.services);
 				}
 
 				// INITIALIZING
@@ -195,8 +248,7 @@ console.log($scope.services);
 				$scope.uploadCurrent = '';
 				$scope.uploadMax = '';
 
-				// EXECUTING
-console.log("EXECUTING ceBrowser directive controller...");
+				// Starting
 				listServices();
 
 				/**
@@ -204,7 +256,8 @@ console.log("EXECUTING ceBrowser directive controller...");
 				 */
 				function cd (path, srv)
 				{
-console.log('cd '+path+'  srv='+srv);
+					ceConsole.log("Changing path "+path+" in "+srv, 0);
+
 					if ($scope.isLoggedin)
 					{
 						if ( path.length > 1 && path.charAt(path.length - 1) != '/' )
@@ -227,12 +280,13 @@ console.log('cd '+path+'  srv='+srv);
 						{
 							$scope.srv = srv;
 						}
-console.log('path= '+$scope.path+'  srv='+srv+'  tree= ');
-console.log( $scope.tree );
+//console.log('path= '+$scope.path+'  srv='+srv+'  tree= ');
+//console.log( $scope.tree );
 					}
 					else
 					{
 						console.error('Not logged in');
+						ceConsole.log("Not logged in", 3);
 						throw(Error('Not logged in'));
 					}
 				}
@@ -241,7 +295,7 @@ console.log( $scope.tree );
 				 */
 				function appendToTree( tree, path, res )
 				{
-console.log("appendToTree path="+path);
+//console.log("appendToTree path="+path);
 					if ( path == '' )
 					{
 						return res;
@@ -280,15 +334,18 @@ console.log("appendToTree path="+path);
 				 */
 				function ls()
 				{
+					ceConsole.log("Listing "+$scope.path+" for service "+$scope.srv, 0);
 /*console.log('ls ' + $scope.path+ '  scope.tree= '+ $scope.tree);*/
-console.log( 'ls srvName=' + $scope.srv + '   path=' + $scope.path + '   scope.tree= ' );
-console.log( $scope.tree );
+/*console.log( 'ls srvName=' + $scope.srv + '   path=' + $scope.path + '   scope.tree= ' );
+console.log( $scope.tree );*/
 					if ($scope.isLoggedin)
 					{
-						var res = ceFile.ls({service:$scope.srv, path:$scope.path}, function (status) {
-console.log( 'ls result: ' + res.length + '  scope.tree= ' );
+						var res = ceFile.ls({service:$scope.srv, path:$scope.path}, function (status)
+						{
+							ceConsole.log("Listing command returned "+status, 0);
+/*console.log( 'ls result: ' + res.length + '  scope.tree= ' );
 console.log( $scope.tree );
-console.log( res );
+console.log( res );*/
 							$scope.files = res;
 							var path = $scope.path;
 							
@@ -301,13 +358,14 @@ console.log( res );
 								path = path.substr(0, path.length-1);
 							}
 							$scope.tree[ $scope.srv ] = appendToTree( $scope.tree[ $scope.srv ], path, res );
-console.log( "scope tree is now " );
-console.log( $scope.tree );
+/*console.log( "scope tree is now " );
+console.log( $scope.tree );*/
 						});
 					}
 					else
 					{
 						console.error('Not logged in');
+						ceConsole.log("Not logged in!", 3);
 						throw(Error('Not logged in'));
 					}
 				}
@@ -316,10 +374,10 @@ console.log( $scope.tree );
 				 */
 				$scope.doEnter = function(file, path, srv)
 				{
-console.log('doEnter file='+file+'  path='+path+'  srv='+srv);
+//console.log('doEnter file='+file+'  path='+path+'  srv='+srv);
 					if (!path)
 					{
-console.log('doEnter no path set  path='+path);
+//console.log('doEnter no path set  path='+path);
 						path = '';
 					}
 					if (!srv)
@@ -328,7 +386,7 @@ console.log('doEnter no path set  path='+path);
 					}
 					if (file == '' && path == '' || file.is_dir == true)
 					{
-console.log('doEnter file is a dir');
+//console.log('doEnter file is a dir');
 						cd(path, srv);
 						ls();
 					}
@@ -357,18 +415,18 @@ console.log('doEnter file is a dir');
 				};
 				$scope.isRootPath = function()
 				{
-console.log('isRootPath '+$scope.path);
+//console.log('isRootPath '+$scope.path);
 					if ( $scope.path == '' || $scope.path == '/' )
 					{
-console.log('isRootPath true');
+//console.log('isRootPath true');
 						return true;
 					}
-console.log('isRootPath false');
+//console.log('isRootPath false');
 					return false;
 				};
 				$scope.enterParentDir = function()
 				{
-console.log('isRootPath ');
+//console.log('isRootPath ');
 					if ($scope.path.endsWith('/'))
 					{
 						$scope.path = $scope.path.substr(0, $scope.path.length-1);
