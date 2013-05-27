@@ -1,28 +1,21 @@
 <!doctype html>
-<html ng-app="CEApp">
+<html ng-app="ceDirectives">
 	<head>
 		<link rel="stylesheet" href="css/bootstrap.css">
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-		<div ng-controller="CESidebarCtrl">
-			<ul>
-				<li ng-repeat="service in services">
-					<a href="#/{{service.name}}/connected/">{{service.name}}</a>
-				</li>
-			</ul>
-		</div>
-		<hr>
-		<div ng-view></div>
-		
+
+		<div ce-browser></div>
+		<!--  -->
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.1/angular.min.js"></script>
+		<!--  -->
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.1/angular-resource.min.js"></script>
-		<script src="js/app.js"></script>
-		<script src="js/controllers.js"></script>
-		<script src="js/directives.js"></script>
-		<script src="js/filters.js"></script>
-		<script src="js/services.js"></script>
+		<!-- Cloud Explorer directive -->
+		<script src="js/cloud-explorer.js"></script>
+		<!-- necessary for bootstrap and for file uploads -->
 		<script src="http://code.jquery.com/jquery.js"></script>
+		<!-- bootsrap -->
 		<script src="lib/bootstrap.js"></script>
 	</body>
 </html>
