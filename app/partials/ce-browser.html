@@ -20,16 +20,16 @@
 <div class="row-fluid">
 	<div class="span4">
 		<script type="text/ng-template" id="tree_item_renderer.html">
-		    <a ng-click="doEnter(data,rp,srv)">{{data.name}}</a>
-		    <ul>
-		        <li ng-class="fileClass(data)" ng-repeat="data in data.children | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="rp=rp+'/'+data.name; srv=srv"></li>
+		    <a ce-folder class="is-dir-true" ng-click="enterDir()">{{file.name}}</a>
+		    <ul class="tree">
+		        <li ng-repeat="file in file.children | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="srv=srv"></li>
 		    </ul>
 		</script>
-		<ul>
-			<li ng-class="srvTreeK" ng-repeat="(srvTreeK, srvTreeV) in tree">
-				<a ng-click="doEnter('','',srvTreeK)">{{ srvTreeK }}</a>
-				<ul>
-					<li ng-class="fileClass(data)" ng-repeat="data in srvTreeV | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="rp=data.name; srv=srvTreeK"></li>
+		<ul class="tree">
+			<li ng-repeat="(srvTreeK, srvTreeV) in tree">
+				<a ce-folder ng-class="srvTreeK" ng-click="enterDir()">{{ srvTreeK }}</a>
+				<ul class="tree">
+					<li ng-repeat="file in srvTreeV | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="srv=srvTreeK"></li>
 				</ul>
 			</li>
 		</ul>
@@ -39,8 +39,10 @@
 			<li ng-show="isLoggedin" class="upload">
 				Télécharge un ou plusieurs fichiers: <div file-uploader></div>
 			</li>
-			<li ce-folder class="is-dir-true" ng-hide="isRootPath()" ng-click="enterParentDir()">..</li>
-			<li ce-file ng-repeat="file in files | orderBy:'is_dir':true" file="file" path="path" ></li>
+			<li ce-folder ng-init="setLinkToParent()" ng-hide="isRootPath()" class="is-dir-true" ng-click="enterDir()">..</li>
+			<!-- FIXME <li ce-folder ce-file ng-repeat="file in files | orderBy:'is_dir':true" ng-class="getClass()" >{{file.name}}</li> -->
+			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':true}" ng-class="getClass()" ng-click="enterDir()">{{file.name}}</li>
+			<li ce-file ng-repeat="file in files | filter:{'is_dir':false}" ng-class="getClass()">{{file.name}}</li>
 		</ul>
 	</div>
 </div>

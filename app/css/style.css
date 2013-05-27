@@ -5,7 +5,7 @@ body
 }
 ul
 {
-	margin:0;padding:0;padding-left:24px;
+	margin:0;padding:0;padding-left:10px;
 }
 a
 {
@@ -13,6 +13,10 @@ a
 	color:#61666c;text-decoration:none;
 }
 /* FILES TREE */
+ul.tree
+{
+	list-style:none;
+}
 /* Prevent the text contents of draggable elements from being selectable. */
 [draggable]
 {
@@ -21,9 +25,14 @@ a
   -khtml-user-drag:element; -webkit-user-drag:element;
   cursor:move;
 }
-.ce-folder-over
+.ce-folder-over /* TODO */
 {
 	border:1px solid red;
+}
+a.is-dir-true
+{
+	background:url('../assets/folder.png') no-repeat;
+	padding-left:20px;
 }
 li.is-dir-true
 {
@@ -42,13 +51,15 @@ li.is-dir-false
 	display: none;
 }
 /* SERVICES */
-li.dropbox
+a.dropbox
 {
-	list-style:square url('../assets/dropbox.png');
+	background:url('../assets/dropbox.png') no-repeat;
+	padding-left:20px;
 }
-li.gdrive
+a.gdrive
 {
-	list-style:square url('../assets/gdrive.png');
+	background:url('../assets/gdrive.png') no-repeat;
+	padding-left:20px;
 }
 /* LOGS CONSOLE */
 .ce-log-console
