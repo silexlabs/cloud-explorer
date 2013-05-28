@@ -35,14 +35,25 @@
 		</ul>
 	</div>
 	<div class="span8">
+		<script type="text/ng-template" id="file_template.html"><!-- add ng-pattern -->
+			<span ng-hide="renameOn">{{file.name}}</span>
+			<input ng-show="renameOn" type="text" ng-model="newName" ng-init="newName=file.name" />
+			<button ng-click="rename(newName)">rename</button>
+			<button ng-click="delete()">delete</button>
+			<menu id="{{fileSrv+'/'+filePath}}" type="context">
+				<menuitem onclick="alert('toto')" label="Delete"></menuitem> <!-- FIXME manage to make it work with ng-click ? -->
+				<menuitem onclick="alert('tata')" label="Rename"></menuitem>
+				<menuitem onclick="alert('titi')" label="Save as..."></menuitem>
+			</menu>
+		</script>
 		<ul>
-			<li ng-show="isLoggedin" class="upload">
+			<li ng-show="isLoggedin" class="upload"> <!--  show it only if drag and drop isn't available ? -->
 				Télécharge un ou plusieurs fichiers: <div file-uploader></div>
 			</li>
 			<li ce-folder ng-init="setLinkToParent()" ng-hide="isRootPath()" class="is-dir-true" ng-click="enterDir()">..</li>
 			<!-- FIXME <li ce-folder ce-file ng-repeat="file in files | orderBy:'is_dir':true" ng-class="getClass()" >{{file.name}}</li> -->
-			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':true}" ng-class="getClass()" ng-click="enterDir()">{{file.name}}</li>
-			<li ce-file ng-repeat="file in files | filter:{'is_dir':false}" ng-class="getClass()">{{file.name}}</li>
+			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':true}" ng-class="getClass()" ng-click="enterDir()" contextmenu={{fileSrv+filePath}} ng-include="'file_template.html'"></li>
+			<li ce-file ng-repeat="file in files | filter:{'is_dir':false}" ng-class="getClass()" contextmenu={{fileSrv+'/'+filePath}} ng-include="'file_template.html'"></li>
 		</ul>
 	</div>
 </div>
