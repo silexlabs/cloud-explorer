@@ -40,7 +40,7 @@
 			<input ng-show="renameOn" type="text" ng-model="newName" ng-init="newName=file.name" />
 			<button ng-click="rename(newName)">rename</button>
 			<button ng-click="delete()">delete</button>
-			<button ng-hide="file.is_dir" ng-click="download()">delete</button>
+			<a ng-hide="file.is_dir" ng-href="{{download()}}" download="{{file.name}}" target="blank">download</a> <!-- Won't work in FF20 if not same origin thus the blank target -->
 			<menu id="{{fileSrv+'/'+filePath}}" type="context">
 				<menuitem onclick="alert('toto')" label="Delete"></menuitem> <!-- FIXME manage to make it work with ng-click ? -->
 				<menuitem onclick="alert('tata')" label="Rename"></menuitem>

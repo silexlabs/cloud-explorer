@@ -20,7 +20,6 @@
  * hide file upload widget except upload button
  * drag from CE to desktop
  * move between services [need fix in unifile]
- * multi file upload [need fix in unifile]
  * upload progress
  * bootstrap styling
  */
@@ -79,7 +78,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 console.log(formData);
 			$http({
 					method: 'POST',
-					url: 'http://127.0.0.1:5000/v1.0/dropbox/exec/put/'+path+uploadFiles[0].name, // FIXME manage multi file upload...
+					url: 'http://127.0.0.1:5000/v1.0/dropbox/exec/put/'+path,
 					data: formData,
 					headers: {'Content-Type': undefined},
 					transformRequest: angular.identity
@@ -248,7 +247,8 @@ console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPat
 			 */
 			$scope.download = function()
 			{
-				
+console.log("downloading " + $scope.filePath);
+				return 'http://127.0.0.1:5000/v1.0/'+$scope.fileSrv+'/exec/get/'+$scope.filePath; // FIXME make it a conf param
 			}
 			/**
 			 * TODO comment
