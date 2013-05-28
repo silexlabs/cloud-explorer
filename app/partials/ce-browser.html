@@ -49,12 +49,13 @@
 		</script>
 		<ul>
 			<li ng-show="isLoggedin" class="upload"> <!--  show it only if drag and drop isn't available ? -->
-				Télécharge un ou plusieurs fichiers: <div file-uploader></div>
+				Télécharge un ou plusieurs fichiers: <div file-uploader></div> <div ce-mkdir-btn></div>
 			</li>
 			<li ce-folder ng-init="setLinkToParent()" ng-hide="isRootPath()" class="is-dir-true" ng-click="enterDir()">..</li>
 			<!-- FIXME <li ce-folder ce-file ng-repeat="file in files | orderBy:'is_dir':true" ng-class="getClass()" >{{file.name}}</li> -->
 			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':true}" ng-class="getClass()" ng-click="enterDir()" contextmenu={{fileSrv+filePath}} ng-include="'file_template.html'"></li>
 			<li ce-file ng-repeat="file in files | filter:{'is_dir':false}" ng-class="getClass()" contextmenu={{fileSrv+'/'+filePath}} ng-include="'file_template.html'"></li>
+			<li class="is-dir-true" ng-show="mkdirOn"><input type="text" ng-model="mkdirName" /><button ng-click="doMkdir(mkdirName)">valider</button></li>
 		</ul>
 	</div>
 </div>

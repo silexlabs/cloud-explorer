@@ -10,18 +10,18 @@
 
 /**
  * TODO
- * do get, 
- * do mkdir,
  * do cp & paste,
+ * hide file upload widget except upload button
  * unbind click and drag and drop when renaming
+ * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh view after delete
  * refresh after upload !!!!
  * console messages + display
- * hide file upload widget except upload button
  * drag from CE to desktop
  * move between services [need fix in unifile]
  * upload progress
  * bootstrap styling
+ * download link won't propose to save file in Firefox 20 if not same origin, we could force download from server side [unifile]
  */
 
 /* Config */
@@ -393,6 +393,8 @@ console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 			$scope.uploadCurrent = '';
 			$scope.uploadMax = '';
 
+			$scope.mkdirOn = false;
+
 			// Starting
 			listServices();
 
@@ -519,6 +521,20 @@ console.log( $scope.tree );*/
 			}
 			// share it to child ctrls
 			$scope.ls = ls;
+
+
+			/**
+			 * mkdir command
+			 */
+			$scope.doMkdir = function(mkdirName)
+			{
+				ceConsole.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path, 1);
+				$unifileSrv.mkdir({service:$scope.srv, path:$scope.path+mkdirName}, function () {
+					$scope.mkdirOn = false;
+					ceConsole.log("new "+mkdirName+" directory created.", 1);
+					ls();
+				});
+			}
 		}])
 
 	.controller('CEConsoleCtrl', [ '$scope', '$element', function( $scope, $element )
@@ -564,6 +580,23 @@ console.log('change $scope.uploadFiles = '+$scope.uploadFiles);
 					}
 console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 				});
+			}
+		};
+	})
+
+	// this is the CE browser log console
+	.directive('ceMkdirBtn', function()
+	{
+		return {
+			restrict: 'A',
+			template: '<button ng-click="mkdir()">New folder</button>',
+			replace: 'true',
+			controller: function($scope)
+			{
+				$scope.mkdir = function()
+				{
+					$scope.mkdirOn = true;
+				}
 			}
 		};
 	})
