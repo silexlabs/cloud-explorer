@@ -10,11 +10,9 @@
 
 /**
  * TODO
- * do cp & paste,
  * hide file upload widget except upload button
  * unbind click and drag and drop when renaming
  * each time we have a new input text (rename or mkdir), set focus on input text
- * refresh view after delete
  * refresh after upload !!!!
  * console messages + display
  * drag from CE to desktop
@@ -94,6 +92,33 @@ console.log(formData);
 angular.module('ceCtrls', ['ceServices'])
 
 	/**
+	 * TODO comment
+	 */
+	.controller('CEPasteCtrl', ['$scope', '$unifileSrv', function($scope, $unifileSrv)
+		{
+			$scope.isClipboardEmpty = function()
+			{
+console.log("is $scope.clipboard empty? "+$scope.clipboard);
+				return ($scope.clipboard === false);
+			}
+			$scope.paste = function()
+			{
+console.log("paste called with $scope.clipboard= "+$scope.clipboard);
+				if ($scope.clipboard === false)
+				{
+					return;
+				}
+				var fn = $scope.clipboard.substr($scope.clipboard.lastIndexOf('/')+1);
+console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
+				$unifileSrv.cp({service:$scope.srv, path:$scope.clipboard+':'+$scope.path+fn}, function(){
+					console.log("copy done");
+					$scope.clipboard = null;
+					$scope.ls();
+				});
+			};
+		}])
+
+	/**
 	 * This controller is shared by the ceFile and ceFolder directives. This allows them to share the same scope as 
 	 * sharing an isolated scope between directives doesn't seem to be allowed.
 	 */
@@ -121,7 +146,7 @@ angular.module('ceCtrls', ['ceServices'])
 						$scope.filePath = p.substr(0, p.lastIndexOf('/'));
 					}
 				});
-			}
+			};
 			/**
 			 * TODO comment
 			 */
@@ -154,7 +179,7 @@ angular.module('ceCtrls', ['ceServices'])
 					filePopup.owner = $window;
 					if ($window.focus) { filePopup.focus(); }
 				}*/
-			}
+			};
 
 			/**
 			 * TODO comment
@@ -166,7 +191,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				e.dataTransfer.setData('text', $scope.filePath);
 
 				$element.addClass("ce-file-drag"); // FIXME make it a param in conf?
-			}
+			};
 			/**
 			 * TODO comment
 			 */
@@ -174,7 +199,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			{
 //console.log( "ceFile => dragEnd  file= " + e.dataTransfer.getData('text') );
 				$element.removeClass("ce-file-drag"); // FIXME make it a param in conf?
-			}
+			};
 
 			/**
 			 * TODO comment
@@ -186,7 +211,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					return "is-dir-false";
 				}
 				return "is-dir-true";
-			}
+			};
 
 			/**
 			 * TODO comment
@@ -196,7 +221,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				e.preventDefault();
 //console.log("e.target= "+e.target);
 				$element.addClass("ce-folder-over"); // FIXME make it a param in conf?
-			}
+			};
 			/**
 			 * TODO comment
 			 */
@@ -204,7 +229,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			{
 //console.log("e.target= "+e.target);
 				$element.removeClass("ce-folder-over"); // FIXME make it a param in conf?
-			}
+			};
 			/**
 			 * TODO comment
 			 */
@@ -217,7 +242,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
 
 				return false;
-			}
+			};
 			/**
 			 * TODO comment
 			 */
@@ -240,16 +265,15 @@ console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPat
 //console.log(evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1));
 					$unifileSrv.mv({service:$scope.fileSrv, path:evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)});
 				}
-			}
+			};
 
 			/**
 			 * TODO comment
 			 */
 			$scope.download = function()
 			{
-console.log("downloading " + $scope.filePath);
 				return 'http://127.0.0.1:5000/v1.0/'+$scope.fileSrv+'/exec/get/'+$scope.filePath; // FIXME make it a conf param
-			}
+			};
 			/**
 			 * TODO comment
 			 */
@@ -271,7 +295,15 @@ console.log("please rename to " + newPath);
 							$scope.renameOn = false;
 						});
 				}
-			}
+			};
+			/**
+			 * TODO comment
+			 */
+			$scope.copy = function()
+			{
+				$scope.$parent.clipboard = $scope.filePath;
+console.log("$scope.$parent.clipboard now is "+$scope.$parent.clipboard);
+			};
 			/**
 			 * TODO comment
 			 * FIXME delete scope ?
@@ -281,15 +313,40 @@ console.log("please rename to " + newPath);
 console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 				$unifileSrv.rm({service:$scope.fileSrv, path:$scope.filePath}, function()
 					{
-
+						$scope.ls(); // FIXME we could also avoid doing a new request here and just delete the li
 					});
-			}
+			};
 		}
 	])
 
 	// FIXME can surely be exploded in several specialized ctrls
 	.controller('CEBrowserCtrl', [ '$scope', '$location', '$window', '$unifileSrv' , 'server.url', '$ceConsoleSrv', function( $scope, $location, $window, $unifileSrv, serverUrl, ceConsole )
 		{
+			// INITIALIZING
+			$scope.services = [];
+			$scope.connect = connect;
+
+			// user status
+			$scope.isLoggedin = false;
+			// current path 
+			$scope.path = ''; 
+			// current srv 
+			$scope.srv = null; 
+			// current files list
+			$scope.files = [];
+			// the file tree structure
+			$scope.tree = {};
+
+			$scope.uploadCurrent = '';
+			$scope.uploadMax = '';
+
+			$scope.mkdirOn = false;
+
+			$scope.clipboard = false;
+
+			/**
+			 * TODO comment
+			 */
 			function authorize( url )
 			{
 				var authPopup = $window.open( url, 'authPopup', 'height=800,width=900'); // FIXME parameterize size
@@ -374,26 +431,6 @@ console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 				ceConsole.log("Listing services...", 0);
 				$scope.services = $unifileSrv.listServices();
 			}
-
-			// INITIALIZING
-			$scope.services = [];
-			$scope.connect = connect;
-
-			// user status
-			$scope.isLoggedin = false;
-			// current path 
-			$scope.path = ''; 
-			// current srv 
-			$scope.srv = null; 
-			// current files list
-			$scope.files = [];
-			// the file tree structure
-			$scope.tree = {};
-
-			$scope.uploadCurrent = '';
-			$scope.uploadMax = '';
-
-			$scope.mkdirOn = false;
 
 			// Starting
 			listServices();
@@ -584,7 +621,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 		};
 	})
 
-	// this is the CE browser log console
+	// the "new folder" button
 	.directive('ceMkdirBtn', function()
 	{
 		return {
@@ -598,6 +635,17 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 					$scope.mkdirOn = true;
 				}
 			}
+		};
+	})
+
+	// the copy paste buttons
+	.directive('cePasteBtn', function()
+	{
+		return {
+			restrict: 'A',
+			replace: true,
+			template: '<button ng-hide="isClipboardEmpty()" ng-click="paste()">Paste</button>',
+			controller: 'CEPasteCtrl'
 		};
 	})
 
