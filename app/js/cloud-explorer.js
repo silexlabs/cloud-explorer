@@ -10,8 +10,6 @@
 
 /**
  * TODO
- * drag n drop on left pane between 2 folders from the pane doesn't work
- * bug on chromium : left pane elements do not appear
  * hide file upload widget except upload button
  * srv should not be draggables 
  * each time we have a new input text (rename or mkdir), set focus on input text

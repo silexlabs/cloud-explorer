@@ -20,14 +20,14 @@
 <div class="row-fluid">
 	<div class="span4">
 		<script type="text/ng-template" id="tree_item_renderer.html">
-				<a ce-folder class="is-dir-true">{{file.name}}</a>
+				<span ce-folder class="is-dir-true">{{file.name}}</span>
 				<ul class="tree">
 						<li ng-repeat="file in file.children | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="srv=srv"></li>
 				</ul>
 		</script>
 		<ul class="tree">
 			<li ng-repeat="(srvTreeK, srvTreeV) in tree">
-				<a ce-folder ng-class="srvTreeK">{{ srvTreeK }}</a>
+				<span ce-folder ng-class="srvTreeK">{{ srvTreeK }}</span>
 				<ul class="tree">
 					<li ng-repeat="file in srvTreeV | filter:{'is_dir':true}" ng-include="'tree_item_renderer.html'" onload="srv=srvTreeK"></li>
 				</ul>

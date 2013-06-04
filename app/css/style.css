@@ -18,7 +18,7 @@ ul.tree
 	list-style:none;
 }
 /* Prevent the text contents of draggable elements from being selectable. */
-[draggable]
+[draggable=true]
 {
   -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; user-select:none;
   /* Required to make elements draggable in old WebKit */
@@ -29,10 +29,11 @@ ul.tree
 {
 	border:1px solid red;
 }
-a.is-dir-true
+span.is-dir-true
 {
 	background:url('../assets/folder.png') no-repeat;
 	padding-left:20px;
+	cursor:pointer;
 }
 li.is-dir-true
 {
@@ -51,15 +52,17 @@ li.is-dir-false
 	display: none;
 }
 /* SERVICES */
-a.dropbox
+span.dropbox
 {
 	background:url('../assets/dropbox.png') no-repeat;
 	padding-left:20px;
+	cursor:pointer;
 }
-a.gdrive
+span.gdrive
 {
 	background:url('../assets/gdrive.png') no-repeat;
 	padding-left:20px;
+	cursor:pointer;
 }
 /* LOGS CONSOLE */
 .ce-log-console
