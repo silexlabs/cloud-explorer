@@ -10,8 +10,9 @@
 
 /**
  * TODO
+ * improve login popup to avoid needing the alert
  * hide file upload widget except upload button
- * unbind click and drag and drop when renaming
+ * srv should not be draggables 
  * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh after upload !!!!
  * console messages + display
@@ -127,6 +128,9 @@ console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
 			$scope.filePath = $scope.path; console.log('$scope.filePath= '+$scope.filePath);
 			$scope.fileSrv = $scope.srv; console.log('$scope.fileSrv= '+$scope.fileSrv);
 			$scope.renameOn = false;
+			// can be dir, file or both
+			$scope.isFile = false;
+			$scope.isDir = false;
 
 			if ($scope.file != null)
 			{
@@ -167,6 +171,7 @@ console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
 			 */
 			$scope.enterDir = function()
 			{
+console.log("Entering within "+$scope.filePath);
 				if ($scope.file != null && $scope.file.is_dir || $scope.file == null)
 				{
 					$scope.cd($scope.filePath, $scope.fileSrv);
@@ -281,6 +286,13 @@ console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPat
 			{
 				if (!$scope.renameOn)
 				{
+					$element.unbind('click', $scope.enterDir);
+					$element.unbind('dragenter', $scope.handleDragEnter);
+					$element.unbind('dragleave', $scope.handleDragLeave);
+					$element.unbind('dragover', $scope.handleDragOver);
+					$element.unbind('drop', $scope.handleDrop);
+					$element.unbind('dragstart', $scope.handleDragStart );
+					$element.unbind('dragend', $scope.handleDragEnd );
 					$scope.renameOn = true;
 				}
 				else
@@ -293,6 +305,19 @@ console.log("please rename to " + newPath);
 							$scope.filePath = newPath;
 							$scope.file.name = newName;
 							$scope.renameOn = false;
+							if ($scope.isDir)
+							{
+								$element.bind('click', $scope.enterDir);
+								$element.bind('dragenter', $scope.handleDragEnter);
+								$element.bind('dragleave', $scope.handleDragLeave);
+								$element.bind('dragover', $scope.handleDragOver);
+								$element.bind('drop', $scope.handleDrop);
+							}
+							if ($scope.isFile)
+							{
+								$element.bind('dragstart', $scope.handleDragStart);
+								$element.bind('dragend', $scope.handleDragEnd);
+							}
 						});
 				}
 			};
@@ -349,7 +374,7 @@ console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 			 */
 			function authorize( url )
 			{
-				var authPopup = $window.open( url, 'authPopup', 'height=800,width=900'); // FIXME parameterize size
+				var authPopup = $window.open( url, 'authPopup', 'height=600,width=600'); // FIXME parameterize size
 				authPopup.owner = $window;
 				if ($window.focus) { authPopup.focus() }
 				if (authPopup)
@@ -667,6 +692,8 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			restrict: 'A',
 			link: function(scope, element)
 			{
+				scope.isDir = true;
+				element.bind('click', scope.enterDir ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
 				element.bind('dragenter', scope.handleDragEnter );
 				element.bind('dragleave', scope.handleDragLeave );
 				element.bind('dragover', scope.handleDragOver );
@@ -683,6 +710,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			restrict: 'A',
 			link: function(scope, element, attrs)
 			{
+				scope.isFile = true;
 				attrs.$set('draggable', 'true');
 
 				element.bind('dragstart', scope.handleDragStart );
