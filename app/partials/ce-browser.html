@@ -53,7 +53,7 @@
 				Télécharge un ou plusieurs fichiers: <div file-uploader></div> <div ce-mkdir-btn></div> <div ce-paste-btn></div>
 			</li>
 			<li ce-folder ng-init="setLinkToParent()" ng-hide="isRootPath()" class="is-dir-true">..</li>
-			<!-- FIXME <li ce-folder ce-file ng-repeat="file in files | orderBy:'is_dir':true" ng-class="getClass()" >{{file.name}}</li> -->
+<!-- FIXME <li ce-folder ce-file ng-repeat="file in files | orderBy:'is_dir':true" ng-class="getClass()" >{{file.name}}</li> -->
 			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':true}" ng-class="getClass()" contextmenu={{fileSrv+filePath}} ng-include="'file_template.html'"></li>
 			<li ce-file ng-repeat="file in files | filter:{'is_dir':false}" ng-class="getClass()" contextmenu={{fileSrv+'/'+filePath}} ng-include="'file_template.html'"></li>
 			<li class="is-dir-true" ng-show="mkdirOn"><input type="text" ng-model="mkdirName" /><button ng-click="doMkdir(mkdirName)">valider</button></li>

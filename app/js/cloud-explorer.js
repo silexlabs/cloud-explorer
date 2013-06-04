@@ -10,7 +10,8 @@
 
 /**
  * TODO
- * improve login popup to avoid needing the alert
+ * drag n drop on left pane between 2 folders from the pane doesn't work
+ * bug on chromium : left pane elements do not appear
  * hide file upload widget except upload button
  * srv should not be draggables 
  * each time we have a new input text (rename or mkdir), set focus on input text
@@ -372,27 +373,23 @@ console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 			/**
 			 * TODO comment
 			 */
-			function authorize( url )
+			function authorize( url, serviceName )
 			{
-				var authPopup = $window.open( url, 'authPopup', 'height=600,width=600'); // FIXME parameterize size
+				var authPopup = $window.open( url, 'authPopup', 'height=600,width=600,dialog'); // FIXME parameterize size
 				authPopup.owner = $window;
 				if ($window.focus) { authPopup.focus() }
 				if (authPopup)
 				{
 					ceConsole.log("Authorization popup opened", 0);
-					if ( confirm('Authorize the app in the popup window and click "ok"') )
-					{
-						ceConsole.log("Authorization popup returned true", 0);
-						return true;
-					}
+					
+					// timer based solution until we find something better to listen to the child window events (close, url change...)
+					var timer = setInterval(function() { if (authPopup.closed) { clearInterval(timer); ceConsole.log("Authorized", 0); if ( $scope.tree[ serviceName ] == null ) { $scope.tree[ serviceName ] = []; } $scope.srv = serviceName; login(); } }, 500);
 				}
 				else
 				{
 					ceConsole.log("Authorization popup could not be opened", 0);
 					console.error('Popup could not be opened');
 				}
-				ceConsole.log("Authorization refused", 0);
-				return false;
 			}
 			/**
 			 * Connect to service
@@ -405,17 +402,7 @@ console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 				{
 					ceConsole.log("Connected. Auth url is: "+res.authorize_url, 0);
 
-					if ( authorize( res.authorize_url ) )
-					{
-						ceConsole.log("Authorized", 0);
-
-						if ( $scope.tree[ serviceName ] == null )
-						{
-							$scope.tree[ serviceName ] = [];
-						}
-						$scope.srv = serviceName;
-						login();
-					}
+					authorize( res.authorize_url, serviceName );
 				});
 			}
 			/**
@@ -689,10 +676,14 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 	.directive('ceFolder', function()
 	{
 		return {
+			priority: 1,
 			restrict: 'A',
-			link: function(scope, element)
+			link: function(scope, element, attrs)
 			{
 				scope.isDir = true;
+				attrs.$set('dropzone', 'move');
+				attrs.$set('draggable', 'false'); // necessary to avoid folders that aren't files to be draggable
+
 				element.bind('click', scope.enterDir ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
 				element.bind('dragenter', scope.handleDragEnter );
 				element.bind('dragleave', scope.handleDragLeave );
