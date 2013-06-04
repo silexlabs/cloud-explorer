@@ -552,7 +552,7 @@ console.log( res );*/
 						{
 							path = path.substring(1);
 						}
-						while ( path.endsWith('/') )
+						while ( path.charAt(path.length-1) == '/' )
 						{
 							path = path.substr(0, path.length-1);
 						}
