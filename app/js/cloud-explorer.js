@@ -12,7 +12,6 @@
  * TODO
  * grey/deactive the service link in the ceConnectBtn when connected to the corresponding service
  * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
- * fix server url constant
  * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh after upload ! (or update model)
  * refresh after moove ! (or update model)
@@ -31,6 +30,8 @@
 angular.module('ceConf', [])
 
 	.constant( 'server.url', 'http://127.0.0.1\\:5000/v1.0/' )
+
+	.constant( 'server.url.unescaped', 'http://127.0.0.1:5000/v1.0/' ) // Need to get rid of this as soon as we use an angular version that is not buggy on this
 
 	.constant( 'console.level', 0 ) // 0: DEBUG, 1: INFO, 2: WARNING, 3: ERROR, 4: NOTHING (no console)
 
@@ -69,7 +70,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			});
 	}])
 
-	.service('$unifileUploadSrv', ['$http', '$ceConsoleSrv', function($http, $ceConsoleSrv)
+	.service('$unifileUploadSrv', [ 'server.url.unescaped', '$http', '$ceConsoleSrv', function(serverUrl, $http, $ceConsoleSrv)
 	{
 		this.upload = function(uploadFiles, path)
 		{
@@ -81,7 +82,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 //console.log(formData);
 			$http({
 					method: 'POST',
-					url: 'http://127.0.0.1:5000/v1.0/dropbox/exec/put/'+path, // FIXME address as config value
+					url: serverUrl+'dropbox/exec/put/'+path, // FIXME address as config value
 					data: formData,
 					headers: {'Content-Type': undefined},
 					transformRequest: angular.identity
@@ -126,7 +127,7 @@ console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
 	/**
 	 * This controller is shared by the ceFile and ceFolder directives.
 	 */
-	.controller('CEFileEntryCtrl', ['$scope', '$element', '$attrs', '$transclude', '$unifileUploadSrv', '$unifileSrv', function($scope, $element, $attrs, $transclude, $unifileUploadSrv, $unifileSrv)
+	.controller('CEFileEntryCtrl', ['$scope', '$element', '$attrs', '$transclude', '$unifileUploadSrv', '$unifileSrv', 'server.url.unescaped', function($scope, $element, $attrs, $transclude, $unifileUploadSrv, $unifileSrv, serverUrl)
 		{
 			$scope.filePath = $scope.path; console.log('$scope.filePath= '+$scope.filePath);
 			$scope.fileSrv = $scope.srv; console.log('$scope.fileSrv= '+$scope.fileSrv);
@@ -284,7 +285,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			 */
 			$scope.download = function()
 			{
-				return 'http://127.0.0.1:5000/v1.0/'+$scope.fileSrv+'/exec/get/'+$scope.filePath; // FIXME make it a conf param
+				return serverUrl+$scope.fileSrv+'/exec/get/'+$scope.filePath; // FIXME make it a conf param
 			};
 			/**
 			 * TODO comment
