@@ -11,6 +11,12 @@ a
 {
 	z-index: 10;
 	color:#61666c;text-decoration:none;
+	cursor:pointer;
+}
+/* hide input file */
+input[type=file]
+{
+	width:0;height:0;overflow:hidden;
 }
 /* FILES TREE */
 ul.tree
@@ -43,6 +49,10 @@ li.is-dir-false
 {
 	list-style:square url('../assets/file.png');
 }
+li.folder-toolbar
+{
+	list-style-type:none;
+}
 .loggedin-hide-true
 {
 	display: none;
@@ -70,4 +80,9 @@ span.gdrive
 	font-size:small;
 	height:50px; overflow-y:scroll;
 	list-style-type:none;
+}
+/* file uploader directive */
+div.fileUploader
+{
+	display:inline-block;
 }

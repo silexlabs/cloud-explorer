@@ -10,10 +10,10 @@
 
 /**
  * TODO
- * hide file upload widget except upload button
- * srv should not be draggables 
+ * Prevent from droping a folder into itself
  * each time we have a new input text (rename or mkdir), set focus on input text
- * refresh after upload !!!!
+ * refresh after upload ! (or model update)
+ * refresh after moove ! (or model update)
  * console messages + display
  * drag from CE to desktop
  * move between services [need fix in unifile]
@@ -119,8 +119,7 @@ console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
 		}])
 
 	/**
-	 * This controller is shared by the ceFile and ceFolder directives. This allows them to share the same scope as 
-	 * sharing an isolated scope between directives doesn't seem to be allowed.
+	 * This controller is shared by the ceFile and ceFolder directives.
 	 */
 	.controller('CEFileEntryCtrl', ['$scope', '$element', '$attrs', '$transclude', '$unifileUploadSrv', '$unifileSrv', function($scope, $element, $attrs, $transclude, $unifileUploadSrv, $unifileSrv)
 		{
@@ -191,8 +190,8 @@ console.log("Entering within "+$scope.filePath);
 			$scope.handleDragStart = function(e)
 			{
 console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.filePath);
-				e.dataTransfer.effectAllowed = 'move';
-				e.dataTransfer.setData('text', $scope.filePath);
+				e.originalEvent.dataTransfer.effectAllowed = 'move';
+				e.originalEvent.dataTransfer.setData('text', $scope.filePath);
 
 				$element.addClass("ce-file-drag"); // FIXME make it a param in conf?
 			};
@@ -201,7 +200,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			 */
 			$scope.handleDragEnd = function(e)
 			{
-//console.log( "ceFile => dragEnd  file= " + e.dataTransfer.getData('text') );
+//console.log( "ceFile => dragEnd  file= " + e.originalEvent.dataTransfer.getData('text') );
 				$element.removeClass("ce-file-drag"); // FIXME make it a param in conf?
 			};
 
@@ -243,7 +242,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				{
 					e.preventDefault(); // Necessary. Allows us to drop.
 				}
-				e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+				e.originalEvent.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
 
 				return false;
 			};
@@ -256,14 +255,14 @@ console.log("drop ");
 				e.stopPropagation();
 				e.preventDefault();
 				
-				if ( e.dataTransfer.files && e.dataTransfer.files.length > 0 ) // case files from desktop
+				if ( e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files.length > 0 ) // case files from desktop
 				{
 console.log("files from desktop case upload to: " + $scope.filePath);
-					$unifileUploadSrv.upload( e.dataTransfer.files, $scope.filePath+'/' );
+					$unifileUploadSrv.upload( e.originalEvent.dataTransfer.files, $scope.filePath+'/' );
 				}
 				else // move case
 				{
-					var evPath = e.dataTransfer.getData('text');
+					var evPath = e.originalEvent.dataTransfer.getData('text');
 console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
 //console.log($scope.fileSrv);
 //console.log(evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1));
@@ -602,31 +601,32 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 		return {
 			restrict: 'A',
 			transclude: true,
-			template: '<div><input type="file" multiple /><button ng-click="upload()">Upload</button></div>',
+			template: '<div class="fileUploader"><input type="file" multiple /><button ng-click="upload()">Upload</button></div>',
 			replace: true,
 			controller: function($scope, $unifileUploadSrv)
 			{
 				$scope.notReady = true;
-				$scope.upload = function() { console.log( "upload at "+$scope.path );
-					$unifileUploadSrv.upload($scope.uploadFiles, $scope.path);
-				};
-			},
-			link: function($scope, $element)
-			{
-				var fileInput = $element.find('input');
-				fileInput.bind('change', function(e)
+
+				$scope.push = function(e)
 				{
 console.log('change $scope.uploadFiles = '+$scope.uploadFiles);
 					$scope.notReady = e.target.files.length == 0;
 					$scope.uploadFiles = [];
 					for(var i in e.target.files)
 					{
-	          			//Only push if the type is object for some stupid-ass reason browsers like to 
-	          			//include functions and other junk
 						if(typeof e.target.files[i] == 'object') $scope.uploadFiles.push(e.target.files[i]);
 					}
 console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
-				});
+					$unifileUploadSrv.upload($scope.uploadFiles, $scope.path);
+				}
+			},
+			link: function($scope, $element)
+			{
+				var fileInput = $element.find('input');
+
+				$scope.upload = function() { fileInput.trigger('click'); console.log( "browse called "); };
+
+				fileInput.bind('change', $scope.push);
 			}
 		};
 	})

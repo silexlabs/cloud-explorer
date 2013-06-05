@@ -40,7 +40,7 @@
 			<input ng-show="renameOn" type="text" ng-model="newName" ng-init="newName=file.name" />
 			<button ng-click="rename(newName)">rename</button>
 			<button ng-click="delete()">delete</button>
-			<a ng-hide="file.is_dir" ng-href="{{download()}}" download="{{file.name}}" target="blank">download</a> <!-- Won't work in FF20 if not same origin thus the blank target -->
+			<a ng-hide="file.is_dir" ng-href="{{download()}}" download="{{file.name}}" target="blank">download</a> <!-- Will not dl but open in FF20 if not same origin thus the blank target -->
 			<button ng-click="copy()">Copy</button>
 			<menu id="{{fileSrv+'/'+filePath}}" type="context">
 				<menuitem onclick="alert('toto')" label="Delete"></menuitem> <!-- FIXME manage to make it work with ng-click ? -->
@@ -49,13 +49,13 @@
 			</menu>
 		</script>
 		<ul>
-			<li ng-show="isLoggedin" class="upload"> <!--	show it only if drag and drop isn't available ? -->
-				Télécharge un ou plusieurs fichiers: <div file-uploader></div> <div ce-mkdir-btn></div> <div ce-paste-btn></div>
+			<li ng-show="isLoggedin" class="folder-toolbar">
+				<div file-uploader></div> <div ce-mkdir-btn></div> <div ce-paste-btn></div>
 			</li>
 			<li ce-folder ng-init="setLinkToParent()" ng-hide="isRootPath()" class="is-dir-true">..</li>
 <!-- FIXME <li ce-folder ce-file ng-repeat="file in files | orderBy:'is_dir':true" ng-class="getClass()" >{{file.name}}</li> -->
-			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':true}" ng-class="getClass()" contextmenu={{fileSrv+filePath}} ng-include="'file_template.html'"></li>
-			<li ce-file ng-repeat="file in files | filter:{'is_dir':false}" ng-class="getClass()" contextmenu={{fileSrv+'/'+filePath}} ng-include="'file_template.html'"></li>
+			<li ce-folder ce-file ng-repeat="file in files | filter:{'is_dir':'true'}" ng-class="getClass()" contextmenu={{fileSrv+filePath}} ng-include="'file_template.html'"></li>
+			<li ce-file ng-repeat="file in files | filter:{'is_dir':'false'}" ng-class="getClass()" contextmenu={{fileSrv+'/'+filePath}} ng-include="'file_template.html'"></li>
 			<li class="is-dir-true" ng-show="mkdirOn"><input type="text" ng-model="mkdirName" /><button ng-click="doMkdir(mkdirName)">valider</button></li>
 		</ul>
 	</div>
