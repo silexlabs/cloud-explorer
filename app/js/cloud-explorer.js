@@ -10,16 +10,20 @@
 
 /**
  * TODO
+ * forbid mkdir and rename with empty names !!! => create alert/error system or use console
  * fix server url constant
  * each time we have a new input text (rename or mkdir), set focus on input text
- * refresh after upload ! (or model update)
- * refresh after moove ! (or model update)
+ * refresh after upload ! (or update model)
+ * refresh after moove ! (or update model)
  * console messages + display
  * drag from CE to desktop
  * move between services [need fix in unifile]
  * upload progress
  * bootstrap styling
  * download link won't propose to save file in Firefox 20 if not same origin, we could force download from server side [unifile]
+ * rename should happen on simple click
+ * double click should enter/download
+ * checkboxes before items should allow mass deleting, copying, moving ?
  */
 
 /* Config */
@@ -73,10 +77,10 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			{
 				formData.append('data', uploadFiles[i], uploadFiles[i].name);
 			}
-console.log(formData);
+//console.log(formData);
 			$http({
 					method: 'POST',
-					url: 'http://127.0.0.1:5000/v1.0/dropbox/exec/put/'+path,
+					url: 'http://127.0.0.1:5000/v1.0/dropbox/exec/put/'+path, // FIXME address as config value
 					data: formData,
 					headers: {'Content-Type': undefined},
 					transformRequest: angular.identity
@@ -251,13 +255,13 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			 */
 			$scope.handleDrop = function(e)
 			{
-console.log("drop ");
+//console.log("drop ");
 				e.stopPropagation();
 				e.preventDefault();
 				
 				if ( e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files.length > 0 ) // case files from desktop
 				{
-console.log("files from desktop case upload to: " + $scope.filePath);
+//console.log("files from desktop case upload to: " + $scope.filePath);
 					$unifileUploadSrv.upload( e.originalEvent.dataTransfer.files, $scope.filePath+'/' );
 				}
 				else // move case
@@ -269,12 +273,11 @@ console.log("files from desktop case upload to: " + $scope.filePath);
 					}
 					else
 					{
-console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
+//console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
 						$unifileSrv.mv({service:$scope.fileSrv, path:evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)});
 					}
 				}
 			};
-
 			/**
 			 * TODO comment
 			 */
@@ -297,12 +300,13 @@ console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPat
 					$element.unbind('dragstart', $scope.handleDragStart );
 					$element.unbind('dragend', $scope.handleDragEnd );
 					$scope.renameOn = true;
+					//$element.children("input")[0].focus();
 				}
 				else
 				{
 					var newPath = $scope.filePath.substr(0, $scope.filePath.lastIndexOf('/') + 1) + newName;
 //console.log("newName= " + newName);
-console.log("please rename to " + newPath);
+//console.log("please rename to " + newPath);
 					$unifileSrv.mv({service: $scope.fileSrv, path: $scope.filePath + ':' + newPath}, function()
 						{
 							$scope.filePath = newPath;
@@ -330,7 +334,7 @@ console.log("please rename to " + newPath);
 			$scope.copy = function()
 			{
 				$scope.$parent.clipboard = $scope.filePath;
-console.log("$scope.$parent.clipboard now is "+$scope.$parent.clipboard);
+//console.log("$scope.$parent.clipboard now is "+$scope.$parent.clipboard);
 			};
 			/**
 			 * TODO comment
@@ -338,7 +342,7 @@ console.log("$scope.$parent.clipboard now is "+$scope.$parent.clipboard);
 			 */
 			$scope.delete = function()
 			{
-console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
+//console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
 				$unifileSrv.rm({service:$scope.fileSrv, path:$scope.filePath}, function()
 					{
 						$scope.ls(); // FIXME we could also avoid doing a new request here and just delete the li
@@ -711,6 +715,15 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 				element.bind('dragend', scope.handleDragEnd );
 			},
 			controller: 'CEFileEntryCtrl'
+		};
+	})
+
+	// this directive implements the Connect button
+	.directive('ceConnectBtn', function()
+	{
+		return {
+			restrict: 'A',
+			template: '<div class="btn-group"><a class="btn dropdown-toggle" data-toggle="dropdown">Connect <span class="caret"></span></a><ul class="dropdown-menu"><li ng-repeat="service in services"><a ng-click="connect(service.name)">{{service.display_name}}</a></li></ul></div>'
 		};
 	})
 
