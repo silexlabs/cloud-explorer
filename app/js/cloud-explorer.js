@@ -10,7 +10,8 @@
 
 /**
  * TODO
- * forbid mkdir and rename with empty names !!! => create alert/error system or use console
+ * grey/deactive the service link in the ceConnectBtn when connected to the corresponding service
+ * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * fix server url constant
  * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh after upload ! (or update model)
@@ -304,28 +305,36 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				}
 				else
 				{
-					var newPath = $scope.filePath.substr(0, $scope.filePath.lastIndexOf('/') + 1) + newName;
+					if (!$scope.isCorrectFileName(newName))
+					{
+						console.log("WARNING: won't rename, incorrect file/folder name given: "+newName);
+						// TODO show error somewhere in console or through a new alert service
+					}
+					else
+					{
+						var newPath = $scope.filePath.substr(0, $scope.filePath.lastIndexOf('/') + 1) + newName;
 //console.log("newName= " + newName);
 //console.log("please rename to " + newPath);
-					$unifileSrv.mv({service: $scope.fileSrv, path: $scope.filePath + ':' + newPath}, function()
-						{
-							$scope.filePath = newPath;
-							$scope.file.name = newName;
-							$scope.renameOn = false;
-							if ($scope.isDir)
+						$unifileSrv.mv({service: $scope.fileSrv, path: $scope.filePath + ':' + newPath}, function()
 							{
-								$element.bind('click', $scope.enterDir);
-								$element.bind('dragenter', $scope.handleDragEnter);
-								$element.bind('dragleave', $scope.handleDragLeave);
-								$element.bind('dragover', $scope.handleDragOver);
-								$element.bind('drop', $scope.handleDrop);
-							}
-							if ($scope.isFile)
-							{
-								$element.bind('dragstart', $scope.handleDragStart);
-								$element.bind('dragend', $scope.handleDragEnd);
-							}
-						});
+								$scope.filePath = newPath;
+								$scope.file.name = newName;
+								$scope.renameOn = false;
+								if ($scope.isDir)
+								{
+									$element.bind('click', $scope.enterDir);
+									$element.bind('dragenter', $scope.handleDragEnter);
+									$element.bind('dragleave', $scope.handleDragLeave);
+									$element.bind('dragover', $scope.handleDragOver);
+									$element.bind('drop', $scope.handleDrop);
+								}
+								if ($scope.isFile)
+								{
+									$element.bind('dragstart', $scope.handleDragStart);
+									$element.bind('dragend', $scope.handleDragEnd);
+								}
+							});
+					}
 				}
 			};
 			/**
@@ -579,16 +588,37 @@ console.log( $scope.tree );*/
 
 
 			/**
+			 * TODO comment
+			 * FIXME it is not ideal that this function is put in scope just to be usable in child scopes... Maybe it should be a service ?
+			 */
+			$scope.isCorrectFileName = function(name)
+			{
+				if (name === undefined || name == "")
+				{
+					return false;
+				}
+				//TODO other checks on characters used...
+				return true;
+			}
+			/**
 			 * mkdir command
 			 */
 			$scope.doMkdir = function(mkdirName)
 			{
-				ceConsole.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path, 1);
-				$unifileSrv.mkdir({service:$scope.srv, path:$scope.path+mkdirName}, function () {
-					$scope.mkdirOn = false;
-					ceConsole.log("new "+mkdirName+" directory created.", 1);
-					ls();
-				});
+				if (!$scope.isCorrectFileName(mkdirName))
+				{
+					console.log("WARNING: name given for new directory is not valid: "+mkdirName);
+					//TODO show this either in console or through a new alert service
+				}
+				else
+				{
+					ceConsole.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path, 1);
+					$unifileSrv.mkdir({service:$scope.srv, path:$scope.path+mkdirName}, function () {
+						$scope.mkdirOn = false;
+						ceConsole.log("new "+mkdirName+" directory created.", 1);
+						ls();
+					});
+				}
 			}
 		}])
 
