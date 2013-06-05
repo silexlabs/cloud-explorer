@@ -10,7 +10,7 @@
 
 /**
  * TODO
- * Prevent from droping a folder into itself
+ * fix server url constant
  * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh after upload ! (or model update)
  * refresh after moove ! (or model update)
@@ -263,10 +263,15 @@ console.log("files from desktop case upload to: " + $scope.filePath);
 				else // move case
 				{
 					var evPath = e.originalEvent.dataTransfer.getData('text');
+					if ( $scope.filePath == evPath )
+					{
+						console.log("NOTICE: cannot move a folder into itself!");
+					}
+					else
+					{
 console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
-//console.log($scope.fileSrv);
-//console.log(evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1));
-					$unifileSrv.mv({service:$scope.fileSrv, path:evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)});
+						$unifileSrv.mv({service:$scope.fileSrv, path:evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)});
+					}
 				}
 			};
 
