@@ -10,6 +10,7 @@
 
 /**
  * TODO
+ * BREAK THIS DAMN STINKY GLOBAL STATE
  * grey/deactive the service link in the ceConnectBtn when connected to the corresponding service
  * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * each time we have a new input text (rename or mkdir), set focus on input text
@@ -53,7 +54,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		};
 	}])
 
-	.factory('$unifileSrv', ['$resource', 'server.url', function( $resource, serverUrl )
+	.factory('$unifileStub', ['$resource', 'server.url', function( $resource, serverUrl )
 	{
 		//return $resource(CEConfig.serverUrl+':service/:method/:command/?:path/', {}, {  // workaround: "?" is to keep a "/" at the end of the URL
 		return $resource( serverUrl + ':service/:method/:command/:path ', {},
@@ -91,11 +92,145 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 					$ceConsoleSrv.log("file(s) successfully sent", 0);
 				});
 		}
+	}])
+
+	.factory('$unifileSrv', ['$unifileStub', function($unifileStub)
+	{
+		// array of available services from unifile
+		var services;
+
+		function listServices() { 
+			if (services == undefined)
+			{
+				services = []; // value used by data bindings while the response until the next call has arrived
+				$unifileStub.listServices({}, function(list){ services = list; });
+			}
+			return services;
+		}
+		function connect(srvName, cb) {
+			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
+			{
+				if (services[si]["name"]!=srvName)
+				{
+					continue;
+				}
+				if (!services[si]["isConnected"])
+				{
+					var res = $unifileStub.connect({service:srvName}, function ()
+						{ console.log("Connected. Auth url is: "+res.authorize_url);
+							cb(res.authorize_url);
+						},
+						function()
+						{
+							console.error("ERROR: Could not connect to "+srvName); // TODO extract some info about the error
+						}); console.log("Connected");
+				}
+				return;
+			}
+		}
+		function login(srvName) {
+			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
+			{
+				if (services[si]["name"]!=srvName)
+				{
+					continue;
+				}
+				if (!services[si]["isConnected"])
+				{
+					var res = $unifileStub.login({service:srvName}, function (status)
+						{
+							if (res.success == true)
+							{ console.log("Login success");
+								services[si]["isConnected"] = true;
+							}
+							else
+							{ console.log("Login failed");
+								services[si]["isConnected"] = false;
+							}
+						},
+						function (obj) // FIXME
+						{
+							console.error('Could not login. Try connect first, then follow the auth URL and try login again.');
+							console.error(obj.data); // FIXME
+							console.error(obj.status); // FIXME
+							services[si]["isConnected"] = false;
+						});
+				}
+				return;
+			}
+		}
+		function isConnected(srvName) {
+			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
+			{
+				if (services[si]["name"]!=srvName)
+				{
+					continue;
+				}
+				return services[si]["isConnected"] === true;
+			}
+			return false;
+		}
+		// return the exposed functions
+		return {
+			listServices: listServices,
+			connect: connect,
+			login: login,
+			isConnected: isConnected
+		};
 	}]);
 
 
 /* Controllers */
 angular.module('ceCtrls', ['ceServices'])
+
+	/**
+	 * Controls the "connect to service" button
+	 */
+	.controller('CEConnectBtnCtrl', ['$scope', '$window', '$unifileSrv', function($scope, $window, $unifileSrv)
+		{
+			// bind the services list
+			$scope.$watch( $unifileSrv.listServices, function (services) {
+				$scope.services = services;
+			});
+			/**
+			 * Opens the application authorization popup for the given service
+			 */
+			function authorize(url, serviceName)
+			{
+				var authPopup = $window.open(url, 'authPopup', 'height=500,width=700,dialog'); // FIXME parameterize size? per service ?
+				authPopup.owner = $window;
+				if ($window.focus) { authPopup.focus() }
+				if (authPopup)
+				{
+					// timer based solution until we find something better to listen to the child window events (close, url change...)
+					var timer = setInterval(function() 
+						{
+							if (authPopup.closed)
+							{
+								clearInterval(timer);
+								console.log("Authorized");
+								if ( $scope.tree[ serviceName ] == null )
+								{
+									$scope.tree[ serviceName ] = [];
+								}
+								$scope.srv = serviceName;
+								$unifileSrv.login(serviceName);
+							}
+						}, 500);
+				}
+				else
+				{
+					console.error('Popup could not be opened');
+				}
+			}
+			/**
+			 * Connect to service
+			 */
+			$scope.connect = function(serviceName)
+			{ console.log("Connecting to "+serviceName);
+				$unifileSrv.connect(serviceName, function(url){ authorize(url, serviceName); });
+			};
+		}])
 
 	/**
 	 * TODO comment
@@ -364,10 +499,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 	// FIXME can surely be exploded in several specialized ctrls
 	.controller('CEBrowserCtrl', [ '$scope', '$location', '$window', '$unifileSrv' , 'server.url', '$ceConsoleSrv', function( $scope, $location, $window, $unifileSrv, serverUrl, ceConsole )
 		{
-			// INITIALIZING
-			$scope.services = [];
-			$scope.connect = connect;
-
 			// user status
 			$scope.isLoggedin = false;
 			// current path 
@@ -385,83 +516,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			$scope.mkdirOn = false;
 
 			$scope.clipboard = false;
-
-			/**
-			 * TODO comment
-			 */
-			function authorize( url, serviceName )
-			{
-				var authPopup = $window.open( url, 'authPopup', 'height=600,width=600,dialog'); // FIXME parameterize size
-				authPopup.owner = $window;
-				if ($window.focus) { authPopup.focus() }
-				if (authPopup)
-				{
-					ceConsole.log("Authorization popup opened", 0);
-					
-					// timer based solution until we find something better to listen to the child window events (close, url change...)
-					var timer = setInterval(function() { if (authPopup.closed) { clearInterval(timer); ceConsole.log("Authorized", 0); if ( $scope.tree[ serviceName ] == null ) { $scope.tree[ serviceName ] = []; } $scope.srv = serviceName; login(); } }, 500);
-				}
-				else
-				{
-					ceConsole.log("Authorization popup could not be opened", 0);
-					console.error('Popup could not be opened');
-				}
-			}
-			/**
-			 * Connect to service
-			 * FIXME Do not open popup if already authorized/connected ?
-			 */
-			function connect( serviceName )
-			{
-				ceConsole.log("Connecting to "+serviceName, 0);
-				var res = $unifileSrv.connect({service:serviceName}, function ()
-				{
-					ceConsole.log("Connected. Auth url is: "+res.authorize_url, 0);
-
-					authorize( res.authorize_url, serviceName );
-				});
-			}
-			/**
-			 * login
-			 */
-			function login()
-			{
-				ceConsole.log("Logging in", 0);
-
-				var res = $unifileSrv.login({service:$scope.srv}, function (status)
-					{
-						ceConsole.log("Login status is: "+status, 0);
-
-						if (res.success == true)
-						{
-							ceConsole.log("Login success", 0);
-
-							$scope.isLoggedin = true;
-							$scope.path = '';
-							ls();
-						}
-					},
-					function (obj) // FIXME
-					{
-						console.error('Could not login. Try connect first, then follow the auth URL and try login again.');
-						console.error(obj.data); // FIXME
-						console.error(obj.status); // FIXME
-						$scope.isLoggedin = false; // FIXME
-						//$window.location.hash = $scope.srv+'/';
-					});
-			}
-
-			/**
-			 * 
-			 */
-			function listServices()
-			{
-				ceConsole.log("Listing services...", 0);
-				$scope.services = $unifileSrv.listServices();
-			}
-
-			// Starting
-			listServices();
 
 			/**
 			 * cd command
@@ -754,7 +808,9 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 	{
 		return {
 			restrict: 'A',
-			template: '<div class="btn-group"><a class="btn dropdown-toggle" data-toggle="dropdown">Connect <span class="caret"></span></a><ul class="dropdown-menu"><li ng-repeat="service in services"><a ng-click="connect(service.name)">{{service.display_name}}</a></li></ul></div>'
+			replace: true,
+			template: '<div class="btn-group"><a class="btn dropdown-toggle" data-toggle="dropdown">Connect <span class="caret"></span></a><ul class="dropdown-menu"><li ng-repeat="srv in services"><a ng-click="connect(srv.name)">{{srv.display_name}}</a></li></ul></div>',
+			controller: 'CEConnectBtnCtrl'
 		};
 	})
 
@@ -765,7 +821,6 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			restrict: 'A',
 			replace: true,
 			//transclude: false, // ?
-			//scope: true, // ?
 			templateUrl: 'partials/ce-browser.html',
 			controller: 'CEBrowserCtrl'
 		};
