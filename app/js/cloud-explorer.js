@@ -98,6 +98,8 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 	{
 		// array of available services from unifile
 		var services;
+		// the current navigation data
+		var currentNav; // looks like { "path": "...", "files": [...], "srv": "..." }
 
 		function listServices() { 
 			if (services == undefined)
@@ -117,13 +119,13 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				if (!services[si]["isConnected"])
 				{
 					var res = $unifileStub.connect({service:srvName}, function ()
-						{ console.log("Connected. Auth url is: "+res.authorize_url);
+						{ //console.log("Connected. Auth url is: "+res.authorize_url);
 							cb(res.authorize_url);
 						},
 						function()
 						{
 							console.error("ERROR: Could not connect to "+srvName); // TODO extract some info about the error
-						}); console.log("Connected");
+						}); //console.log("Connected");
 				}
 				return;
 			}
@@ -140,11 +142,11 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 					var res = $unifileStub.login({service:srvName}, function (status)
 						{
 							if (res.success == true)
-							{ console.log("Login success");
+							{
 								services[si]["isConnected"] = true;
 							}
 							else
-							{ console.log("Login failed");
+							{
 								services[si]["isConnected"] = false;
 							}
 						},
@@ -159,23 +161,20 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				return;
 			}
 		}
-		function isConnected(srvName) {
-			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
-			{
-				if (services[si]["name"]!=srvName)
+		function cd(srvName, path) {
+			$unifileStub.ls({service:srvName, path:path}, function (res)
 				{
-					continue;
-				}
-				return services[si]["isConnected"] === true;
-			}
-			return false;
+					console.log("cd command returned "+res.length+" elts for service "+srvName);
+					currentNav = { "srv": srvName, "path": path, "files": res };
+				});
 		}
-		// return the exposed functions
 		return {
+			services: function() { return services; },
+			currentNav: function() { return currentNav; },
 			listServices: listServices,
 			connect: connect,
 			login: login,
-			isConnected: isConnected
+			cd: cd
 		};
 	}]);
 
@@ -208,13 +207,7 @@ angular.module('ceCtrls', ['ceServices'])
 							if (authPopup.closed)
 							{
 								clearInterval(timer);
-								console.log("Authorized");
-								if ( $scope.tree[ serviceName ] == null )
-								{
-									$scope.tree[ serviceName ] = [];
-								}
-								$scope.srv = serviceName;
-								$unifileSrv.login(serviceName);
+								$scope.$apply( function($scope){$unifileSrv.login(serviceName);} ); // since 1.1.4, need to wrap call in $apply, not sure why...
 							}
 						}, 500);
 				}
@@ -230,6 +223,117 @@ angular.module('ceCtrls', ['ceServices'])
 			{ console.log("Connecting to "+serviceName);
 				$unifileSrv.connect(serviceName, function(url){ authorize(url, serviceName); });
 			};
+		}])
+
+	/**
+	 * Controls the browser left pane
+	 */
+	.controller('CELeftPaneCtrl', ['$scope', '$unifileSrv', '$unifileStub', function($scope, $unifileSrv, $unifileStub)
+		{
+			// the services folder tree
+			$scope.tree = {}; // { "dropbox" => [  ], "gdrive" => [  ] }
+			// scope contains the service + folders tree and need to be able to enable/disable a branch (service) id its isConnected flag changes
+			$scope.$watch( $unifileSrv.services, servicesChanged, true);
+			$scope.$watch( $unifileSrv.currentNav, currentNavChanged, true);
+			/**
+			 *
+			 */
+			function servicesChanged(services)
+			{
+				for (var s in services)
+				{
+					if (services[s]["isConnected"]===true && !$scope.tree.hasOwnProperty(services[s]["name"]))
+					{
+						//console.log(services[s]["name"]+" connected but no data found in tree. Performing ls()...");
+						var sname = services[s]["name"]; // cannot use s in cb functions below (don't know why...)
+						if ( $unifileSrv.currentNav() == undefined )
+						{
+							// if tree empty we set current dir
+							$unifileSrv.cd(sname, "");
+						}
+						else
+						{ console.log("$unifileSrv.currentNav already set so do not change it");
+							// if tree not empty, we do not want to change current dir automatically
+							$unifileStub.ls({service:sname, path:""}, function (res)
+							{
+								$scope.tree[ sname ] = res;
+							});
+						}
+					}
+					else if (!services[s]["isConnected"] && $scope.tree.hasOwnProperty(services[s]["name"]))
+					{
+						//TODO remove service from tree
+						console.log("TODO remove service from tree");
+					}
+				}
+			}
+			/**
+			 * 
+			 */
+			function currentNavChanged(currNav)
+			{ console.log("[CELeftPaneCtrl] change detected in currentNav and equals "+currNav);
+				if (currNav!=undefined)
+					$scope.tree[currNav.srv] = appendToTree( $scope.tree[currNav.srv], currNav.path, currNav.files );
+			}
+			/**
+			 * Creates or updates the tree
+			 */
+			function appendToTree( tree, path, files )
+			{
+				if ( path == '' )
+				{
+					return files;
+				}
+				var np;
+
+				if (path.indexOf('/') != -1)
+				{
+					np = path.substring( 0, path.indexOf('/') );
+					path = path.substring(path.indexOf('/') + 1);
+				}
+				else
+				{
+					np = path;
+					path = '';
+				}
+				var ci = -1;
+
+				for (ci = 0; ci < tree.length; ci++)
+				{
+					if (tree[ci].name == np && tree[ci].is_dir == true)
+					{
+						break;
+					}
+				}
+				if (ci == tree.length || ci == -1)
+				{
+					throw(Error('No jump allowed yet : at ci='+ci));
+				}
+				tree[ci]['children'] = appendToTree( tree[ci]['children'], path, files );
+
+				return tree;
+			}
+		}])
+
+	/**
+	 * Controls the browser right pane
+	 */
+	.controller('CERightPaneCtrl', ['$scope', '$unifileSrv', function($scope, $unifileSrv)
+		{
+			// scope contains the current path, the list of folders and files in the current path
+			$scope.$watch( $unifileSrv.currentNav, currentNavChanged, true);
+			/**
+			 *
+			 */
+			function currentNavChanged(currNav)
+			{ console.log("[CERightPaneCtrl] currentNavChanged in right pane and equals "+currNav);
+				if (currNav!==undefined)
+				{ console.log("right pane files set");
+					$scope.files = currNav.files;
+					$scope.path = currNav.path;
+					$scope.srv = currNav.srv;
+				}
+			}
 		}])
 
 	/**
@@ -304,7 +408,6 @@ console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
 //console.log('isRootPath false');
 				return false;
 			};
-
 			/**
 			 * TODO comment
 			 */
@@ -499,149 +602,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 	// FIXME can surely be exploded in several specialized ctrls
 	.controller('CEBrowserCtrl', [ '$scope', '$location', '$window', '$unifileSrv' , 'server.url', '$ceConsoleSrv', function( $scope, $location, $window, $unifileSrv, serverUrl, ceConsole )
 		{
-			// user status
-			$scope.isLoggedin = false;
-			// current path 
-			$scope.path = ''; 
-			// current srv 
-			$scope.srv = null; 
-			// current files list
-			$scope.files = [];
-			// the file tree structure
-			$scope.tree = {};
-
-			$scope.uploadCurrent = '';
-			$scope.uploadMax = '';
-
-			$scope.mkdirOn = false;
-
-			$scope.clipboard = false;
-
-			/**
-			 * cd command
-			 */
-			function cd (path, srv)
-			{
-				ceConsole.log("Changing path "+path+" in "+srv, 0);
-
-				if ($scope.isLoggedin)
-				{
-					if ( path.length > 1 && path.charAt(path.length - 1) != '/' )
-					{
-						path += '/';
-					}
-					//if (path.charAt(0) == '/')
-					// {
-					$scope.path = path; //.substr(1); //
-					//}
-					// else
-					//{
-					//   $scope.path += path;
-					//}
-					/*if($scope.path.substr(-1) != '/')
-					{
-					$scope.path += '/';
-					}*/
-					if ( $scope.tree[srv] )
-					{
-						$scope.srv = srv;
-					}
-//console.log('path= '+$scope.path+'  srv='+srv+'  tree= ');
-//console.log( $scope.tree );
-				}
-				else
-				{
-					console.error('Not logged in');
-					ceConsole.log("Not logged in", 3);
-					throw(Error('Not logged in'));
-				}
-			}
-			// share it to child ctrls
-			$scope.cd = cd;
-
-			/**
-			 * Creates or updates the tree
-			 */
-			function appendToTree( tree, path, res )
-			{
-//console.log("appendToTree path="+path);
-				if ( path == '' )
-				{
-					return res;
-				}
-				var np;
-
-				if (path.indexOf('/') != -1)
-				{
-					np = path.substring( 0, path.indexOf('/') );
-					path = path.substring(path.indexOf('/') + 1);
-				}
-				else
-				{
-					np = path;
-					path = '';
-				}
-				var ci = -1;
-
-				for (ci = 0; ci < tree.length; ci++)
-				{
-					if (tree[ci].name == np && tree[ci].is_dir == true)
-					{
-						break;
-					}
-				}
-				if (ci == tree.length || ci == -1)
-				{
-					throw(Error('No jump allowed yet : at ci='+ci));
-				}
-				tree[ci]['children'] = appendToTree( tree[ci]['children'], path, res );
-
-				return tree;
-			}
-			/**
-			 * ls command
-			 */
-			function ls()
-			{
-				ceConsole.log("Listing "+$scope.path+" for service "+$scope.srv, 0);
-/*console.log('ls ' + $scope.path+ '  scope.tree= '+ $scope.tree);*/
-/*console.log( 'ls srvName=' + $scope.srv + '   path=' + $scope.path + '   scope.tree= ' );
-console.log( $scope.tree );*/
-				if ($scope.isLoggedin)
-				{
-					var res = $unifileSrv.ls({service:$scope.srv, path:$scope.path}, function (status)
-					{
-						ceConsole.log("Listing command returned "+status, 0);
-/*console.log( 'ls result: ' + res.length + '  scope.tree= ' );
-console.log( $scope.tree );
-console.log( res );*/
-						$scope.files = res;
-						var path = $scope.path;
-						
-						while ( path.charAt(0) == '/' )
-						{
-							path = path.substring(1);
-						}
-						while ( path.charAt(path.length-1) == '/' )
-						{
-							path = path.substr(0, path.length-1);
-						}
-						$scope.tree[ $scope.srv ] = appendToTree( $scope.tree[ $scope.srv ], path, res );
-/*console.log( "scope tree is now " );
-console.log( $scope.tree );*/
-					});
-				}
-				else
-				{
-					console.error('Not logged in');
-					ceConsole.log("Not logged in!", 3);
-					throw(Error('Not logged in'));
-				}
-			}
-			// share it to child ctrls
-			$scope.ls = ls;
-
-
 			/**
 			 * TODO comment
 			 * FIXME it is not ideal that this function is put in scope just to be usable in child scopes... Maybe it should be a service ?
@@ -814,14 +774,89 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 		};
 	})
 
-	// this is the root directive that you should use in your projects
+	// the browser left pane directive
+	.directive('ceLeftPane',  function()
+	{
+		return {
+			restrict: 'A',
+			replace: true,
+			template: "<div> \
+						<script type=\"text/ng-template\" id=\"tree_item_renderer.html\"> \
+							<span ce-folder class=\"is-dir-true\">{{file.name}}</span> \
+							<ul class=\"tree\"> \
+								<li ng-repeat=\"file in file.children | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srv\"></li> \
+							</ul> \
+						</script> \
+						<ul class=\"tree\"> \
+							<li ng-repeat=\"(srvTreeK, srvTreeV) in tree\"> \
+								<span ce-folder ng-class=\"srvTreeK\">{{ srvTreeK }}</span> \
+								<ul class=\"tree\"> \
+									<li ng-repeat=\"file in srvTreeV | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srvTreeK\"></li> \
+								</ul> \
+							</li> \
+						</ul> \
+					</div>",
+			controller: 'CELeftPaneCtrl'
+		};
+	})
+
+	// the browser right pane directive
+	.directive('ceRightPane',  function()
+	{
+		return {
+			restrict: 'A',
+			replace: true,
+			template: "<div> \
+						<script type=\"text/ng-template\" id=\"file_template.html\"><!-- add ng-pattern --> \
+							<span ng-hide=\"renameOn\">{{file.name}}</span> \
+							<input ng-show=\"renameOn\" type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /> \
+							<button ng-click=\"rename(newName)\">rename</button> \
+							<button ng-click=\"delete()\">delete</button> \
+							<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> <!-- Will not dl but open in FF20 if not same origin thus the blank target --> \
+							<button ng-click=\"copy()\">Copy</button> \
+							<menu id=\"{{fileSrv+'/'+filePath}}\" type=\"context\"> \
+								<menuitem onclick=\"alert('toto')\" label=\"Delete\"></menuitem> <!-- FIXME manage to make it work with ng-click ? --> \
+								<menuitem onclick=\"alert('tata')\" label=\"Rename\"></menuitem> \
+								<menuitem onclick=\"alert('titi')\" label=\"Save as...\"></menuitem> \
+							</menu> \
+						</script> \
+						<ul> \
+							<li ng-show=\"isLoggedin\" class=\"folder-toolbar\"> \
+								<div file-uploader></div> <div ce-mkdir-btn></div> <div ce-paste-btn></div> \
+							</li> \
+							<li ce-folder ng-init=\"setLinkToParent()\" ng-hide=\"isRootPath()\" class=\"is-dir-true\">..</li> \
+<!-- FIXME <li ce-folder ce-file ng-repeat=\"file in files | orderBy:'is_dir':true\" ng-class=\"getClass()\" >{{file.name}}</li> --> \
+							<li ce-folder ce-file ng-repeat=\"file in files | filter:{'is_dir':'true'}\" ng-class=\"getClass()\" contextmenu=\"{{fileSrv+filePath}}\" ng-include=\"'file_template.html'\"></li> \
+							<li ce-file ng-repeat=\"file in files | filter:{'is_dir':'false'}\" ng-class=\"getClass()\" contextmenu=\"{{fileSrv+'/'+filePath}}\" ng-include=\"'file_template.html'\"></li> \
+							<li class=\"is-dir-true\" ng-show=\"mkdirOn\"><input type=\"text\" ng-model=\"mkdirName\" /><button ng-click=\"doMkdir(mkdirName)\">valider</button></li> \
+						</ul> \
+					</div>",
+			controller: 'CERightPaneCtrl'
+		};
+	})
+
+	// this is the root directive, the one you should use in your projects
 	.directive('ceBrowser',  function()
 	{
 		return {
 			restrict: 'A',
 			replace: true,
-			//transclude: false, // ?
-			templateUrl: 'partials/ce-browser.html',
+			template: "<div class=\"ceBrowser\"> \
+						<div class=\"row-fluid\"> \
+							<div class=\"span4\"> \
+								<div ce-connect-btn></div> \
+							</div> \
+						</div> \
+						<div class=\"row-fluid\"> \
+							<div class=\"span4\"> \
+								<div ce-left-pane></div> \
+							</div> \
+							<div class=\"span8\"> \
+								<div ce-right-pane></div> \
+							</div> \
+						</div> \
+						<div class=\"row-fluid\"><div class=\"span12\" ce-console></div></div> \
+					</div>",
 			controller: 'CEBrowserCtrl'
 		};
 	});
