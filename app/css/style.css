@@ -9,8 +9,7 @@ ul
 }
 a
 {
-	z-index: 10;
-	color:#61666c;text-decoration:none;
+	z-index: 10;text-decoration:none;
 	cursor:pointer;
 }
 /* hide input file */
@@ -60,6 +59,15 @@ li.folder-toolbar
 .loggedin-show-false
 {
 	display: none;
+}
+/* connect btn */
+a.ce-srv-connected
+{
+	font-style:italic;color:#e3e3e3;
+}
+a.ce-srv-not-connected
+{
+
 }
 /* SERVICES */
 span.dropbox

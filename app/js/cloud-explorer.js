@@ -10,8 +10,7 @@
 
 /**
  * TODO
- * BREAK THIS DAMN STINKY GLOBAL STATE
- * grey/deactive the service link in the ceConnectBtn when connected to the corresponding service
+ * fix # anchor part in url should not appear (since angular 1.1.4)
  * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh after upload ! (or update model)
@@ -188,7 +187,6 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			}
 			$unifileStub.cp({service:currentNav["srv"], path:clipboard+':'+nfp}, function(){
 				console.log("copy done");
-				//clipboard = null;
 				// TODO refresh model or view ?
 			});
 		}
@@ -267,10 +265,26 @@ angular.module('ceCtrls', ['ceServices'])
 			/**
 			 * Connect to service
 			 */
-			$scope.connect = function(serviceName)
-			{ console.log("Connecting to "+serviceName);
-				$unifileSrv.connect(serviceName, function(url){ authorize(url, serviceName); });
+			$scope.connect = function(srv)
+			{
+				if (!srv.isConnected)
+				{
+					//console.log("Connecting to "+srv.name);
+					$unifileSrv.connect(srv.name, function(url){ authorize(url, srv.name); });
+				}
+				else
+				{
+					console.log("Already connected to "+srv.name);
+				}
 			};
+			$scope.srvLinkClass = function (srv)
+			{ //console.log("srvLinkClass "+srv.isConnected);
+				if (srv.isConnected)
+				{
+					return "ce-srv-connected";
+				}
+				return "ce-srv-not-connected";
+			}
 		}])
 
 	/**
@@ -374,9 +388,9 @@ angular.module('ceCtrls', ['ceServices'])
 			 *
 			 */
 			function currentNavChanged(currNav)
-			{ console.log("[CERightPaneCtrl] currentNavChanged in right pane and equals "+currNav);
+			{ //console.log("[CERightPaneCtrl] currentNavChanged in right pane and equals "+currNav);
 				if (currNav!==undefined)
-				{ console.log("right pane files set");
+				{ //console.log("right pane files set");
 					$scope.path = currNav.path;
 					$scope.srv = currNav.srv;
 					$scope.files = currNav.files;
@@ -775,7 +789,12 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 		return {
 			restrict: 'A',
 			replace: true,
-			template: '<div class="btn-group"><a class="btn dropdown-toggle" data-toggle="dropdown">Connect <span class="caret"></span></a><ul class="dropdown-menu"><li ng-repeat="srv in services"><a ng-click="connect(srv.name)">{{srv.display_name}}</a></li></ul></div>',
+			template: '<div class="btn-group"> \
+							<a class="btn dropdown-toggle" data-toggle="dropdown">Connect <span class="caret"></span></a> \
+							<ul class="dropdown-menu"> \
+								<li ng-repeat="srv in services"><a ng-class="srvLinkClass(srv)" ng-click="connect(srv)">{{srv.display_name}}</a></li> \
+							</ul> \
+						</div>',
 			controller: 'CEConnectBtnCtrl'
 		};
 	})
