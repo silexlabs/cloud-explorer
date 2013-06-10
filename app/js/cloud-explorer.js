@@ -195,6 +195,20 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		function rm(srvName, path) {
 			$unifileStub.rm({service:srvName, path:path}); // FIXME update model
 		}
+		function isCorrectFileName(name)
+		{
+			if (name === undefined || name == "")
+			{
+				return false;
+			}
+			//TODO other checks on characters used...
+			return true;
+		}
+		function mkdir(mkdirName) {
+			$unifileStub.mkdir({service:currentNav.srv, path:currentNav.path+mkdirName}, function () {
+					console.log("new "+mkdirName+" directory created.");
+				});
+		}
 		return {
 			services: function() { return services; },
 			currentNav: function() { return currentNav; },
@@ -206,7 +220,9 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			mv: mv,
 			copy: copy,
 			paste: paste,
-			rm: rm
+			mkdir:mkdir,
+			rm: rm,
+			isCorrectFileName: isCorrectFileName
 		};
 	}]);
 
@@ -377,6 +393,23 @@ angular.module('ceCtrls', ['ceServices'])
 				}
 				return true;
 			};
+			/**
+			 * mkdir command
+			 */
+			$scope.doMkdir = function(mkdirName)
+			{
+				if (!$unifileSrv.isCorrectFileName(mkdirName))
+				{
+					console.log("WARNING: name given for new directory is not valid: "+mkdirName);
+					//TODO show this either in console or through a new alert service
+				}
+				else
+				{
+					console.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path);
+					$unifileSrv.mkdir(mkdirName);
+					$scope.mkdirOn = false; // fixme, should be set to false when server response received
+				}
+			}
 		}])
 
 	/**
@@ -561,7 +594,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				}
 				else
 				{
-					if (!$scope.isCorrectFileName(newName))
+					if (!$unifileSrv.isCorrectFileName(newName))
 					{
 						console.log("WARNING: won't rename, incorrect file/folder name given: "+newName);
 						// TODO show error somewhere in console or through a new alert service
@@ -609,44 +642,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			};
 		}
 	])
-
-	// FIXME can surely be exploded in several specialized ctrls
-	.controller('CEBrowserCtrl', [ '$scope', '$location', '$window', '$unifileSrv' , 'server.url', '$ceConsoleSrv', function( $scope, $location, $window, $unifileSrv, serverUrl, ceConsole )
-		{
-			/**
-			 * TODO comment
-			 * FIXME it is not ideal that this function is put in scope just to be usable in child scopes... Maybe it should be a service ?
-			 */
-			$scope.isCorrectFileName = function(name)
-			{
-				if (name === undefined || name == "")
-				{
-					return false;
-				}
-				//TODO other checks on characters used...
-				return true;
-			}
-			/**
-			 * mkdir command
-			 */
-			$scope.doMkdir = function(mkdirName)
-			{
-				if (!$scope.isCorrectFileName(mkdirName))
-				{
-					console.log("WARNING: name given for new directory is not valid: "+mkdirName);
-					//TODO show this either in console or through a new alert service
-				}
-				else
-				{
-					ceConsole.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path, 1);
-					$unifileSrv.mkdir({service:$scope.srv, path:$scope.path+mkdirName}, function () {
-						$scope.mkdirOn = false;
-						ceConsole.log("new "+mkdirName+" directory created.", 1);
-						ls();
-					});
-				}
-			}
-		}])
 
 	.controller('CEConsoleCtrl', [ '$scope', '$element', function( $scope, $element )
 	{
@@ -867,7 +862,6 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 							</div> \
 						</div> \
 						<div class=\"row-fluid\"><div class=\"span12\" ce-console></div></div> \
-					</div>",
-			controller: 'CEBrowserCtrl'
+					</div>"
 		};
 	});
