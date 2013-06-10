@@ -100,6 +100,8 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		var services;
 		// the current navigation data
 		var currentNav; // looks like { "path": "...", "files": [...], "srv": "..." }
+		// the clipboard var used for copy/paste 
+		var clipboard;
 
 		function listServices() { 
 			if (services == undefined)
@@ -161,20 +163,50 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				return;
 			}
 		}
-		function cd(srvName, path) {
+		function cd(srvName, path) { console.log("cd("+srvName+", "+path+")");
 			$unifileStub.ls({service:srvName, path:path}, function (res)
 				{
 					console.log("cd command returned "+res.length+" elts for service "+srvName);
 					currentNav = { "srv": srvName, "path": path, "files": res };
 				});
 		}
+		function mv(srvName, oldPath, newPath) {
+			$unifileStub.mv({service:srvName, path:oldPath+':'+newPath});
+		}
+		function copy(path) {
+			clipboard = path;
+		}
+		function paste() {
+			if (clipboard === undefined)
+			{
+				return;
+			}
+			var nfp = clipboard.substr(clipboard.lastIndexOf('/')+1);
+			if (currentNav["path"]!='' && currentNav["path"]!=undefined)
+			{
+				nfp = currentNav["path"] + '/' + nfp;
+			}
+			$unifileStub.cp({service:currentNav["srv"], path:clipboard+':'+nfp}, function(){
+				console.log("copy done");
+				//clipboard = null;
+				// TODO refresh model or view ?
+			});
+		}
+		function rm(srvName, path) {
+			$unifileStub.rm({service:srvName, path:path}); // FIXME update model
+		}
 		return {
 			services: function() { return services; },
 			currentNav: function() { return currentNav; },
+			clipboard: function() { return clipboard; },
 			listServices: listServices,
 			connect: connect,
 			login: login,
-			cd: cd
+			cd: cd,
+			mv: mv,
+			copy: copy,
+			paste: paste,
+			rm: rm
 		};
 	}]);
 
@@ -271,7 +303,7 @@ angular.module('ceCtrls', ['ceServices'])
 			 * 
 			 */
 			function currentNavChanged(currNav)
-			{ console.log("[CELeftPaneCtrl] change detected in currentNav and equals "+currNav);
+			{
 				if (currNav!=undefined)
 					$scope.tree[currNav.srv] = appendToTree( $scope.tree[currNav.srv], currNav.path, currNav.files );
 			}
@@ -280,7 +312,7 @@ angular.module('ceCtrls', ['ceServices'])
 			 */
 			function appendToTree( tree, path, files )
 			{
-				if ( path == '' )
+				if ( path == '' || path == undefined )
 				{
 					return files;
 				}
@@ -329,11 +361,22 @@ angular.module('ceCtrls', ['ceServices'])
 			{ console.log("[CERightPaneCtrl] currentNavChanged in right pane and equals "+currNav);
 				if (currNav!==undefined)
 				{ console.log("right pane files set");
-					$scope.files = currNav.files;
 					$scope.path = currNav.path;
 					$scope.srv = currNav.srv;
+					$scope.files = currNav.files;
 				}
 			}
+			$scope.isCtrlBtnsVisible = function() {
+				return ($unifileSrv.currentNav() !== undefined);
+			}
+			$scope.showLinkToParent = function()
+			{
+				if ( $scope.path == undefined || $scope.path == '' || $scope.path == '/' )
+				{
+					return false;
+				}
+				return true;
+			};
 		}])
 
 	/**
@@ -342,43 +385,39 @@ angular.module('ceCtrls', ['ceServices'])
 	.controller('CEPasteCtrl', ['$scope', '$unifileSrv', function($scope, $unifileSrv)
 		{
 			$scope.isClipboardEmpty = function()
-			{
-console.log("is $scope.clipboard empty? "+$scope.clipboard);
-				return ($scope.clipboard === false);
-			}
+			{ console.log("is clipboard empty? "+($unifileSrv.clipboard() === undefined));
+				return ($unifileSrv.clipboard() === undefined);
+			};
 			$scope.paste = function()
 			{
-console.log("paste called with $scope.clipboard= "+$scope.clipboard);
-				if ($scope.clipboard === false)
-				{
-					return;
-				}
-				var fn = $scope.clipboard.substr($scope.clipboard.lastIndexOf('/')+1);
-console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
-				$unifileSrv.cp({service:$scope.srv, path:$scope.clipboard+':'+$scope.path+fn}, function(){
-					console.log("copy done");
-					$scope.clipboard = null;
-					$scope.ls();
-				});
+				$unifileSrv.paste();
 			};
 		}])
 
 	/**
 	 * This controller is shared by the ceFile and ceFolder directives.
 	 */
-	.controller('CEFileEntryCtrl', ['$scope', '$element', '$attrs', '$transclude', '$unifileUploadSrv', '$unifileSrv', 'server.url.unescaped', function($scope, $element, $attrs, $transclude, $unifileUploadSrv, $unifileSrv, serverUrl)
+	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileUploadSrv', '$unifileSrv', 'server.url.unescaped', function($scope, $element, $unifileUploadSrv, $unifileSrv, serverUrl)
 		{
-			$scope.filePath = $scope.path; console.log('$scope.filePath= '+$scope.filePath);
+			function getFilePath() {
+				var fp = $scope.path;
+
+				if ($scope.file != null)
+				{
+					if (fp != '')
+					{
+						fp += '/';
+					}
+					fp += $scope.file.name;
+				}
+				return fp;
+			}
+			$scope.filePath = getFilePath(); console.log('$scope.filePath= '+$scope.filePath);
 			$scope.fileSrv = $scope.srv; console.log('$scope.fileSrv= '+$scope.fileSrv);
 			$scope.renameOn = false;
 			// can be dir, file or both
 			$scope.isFile = false;
 			$scope.isDir = false;
-
-			if ($scope.file != null)
-			{
-				$scope.filePath += $scope.file.name; console.log('finally $scope.filePath= '+$scope.filePath);
-			}
 
 			/**
 			 * TODO comment
@@ -397,35 +436,13 @@ console.log("copying file "+$scope.clipboard+" to "+$scope.path+fn);
 			/**
 			 * TODO comment
 			 */
-			$scope.isRootPath = function()
-			{
-//console.log('isRootPath '+$scope.path);
-				if ( $scope.path == undefined || $scope.path == '' || $scope.path == '/' )
-				{
-//console.log('isRootPath true');
-					return true;
-				}
-//console.log('isRootPath false');
-				return false;
-			};
-			/**
-			 * TODO comment
-			 */
 			$scope.enterDir = function()
 			{
-console.log("Entering within "+$scope.filePath);
+console.log("Entering within "+$scope.fileSrv+":"+$scope.filePath);
 				if ($scope.file != null && $scope.file.is_dir || $scope.file == null)
 				{
-					$scope.cd($scope.filePath, $scope.fileSrv);
-					$scope.ls();
+					$scope.$apply( function($scope){ $unifileSrv.cd($scope.fileSrv, $scope.filePath); } );
 				}
-				/*else TODO ?
-				{
-					// get the file
-					var filePopup = $window.open( serverUrl + $scope.srv+'/exec/get/'+path, 'filePopup', 'height=800,width=800');
-					filePopup.owner = $window;
-					if ($window.focus) { filePopup.focus(); }
-				}*/
 			};
 
 			/**
@@ -514,7 +531,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					else
 					{
 //console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
-						$unifileSrv.mv({service:$scope.fileSrv, path:evPath+':'+$scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)});
+						$scope.$apply( function($scope){ $unifileSrv.mv($scope.fileSrv, evPath, $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); } );
 					}
 				}
 			};
@@ -552,8 +569,8 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					else
 					{
 						var newPath = $scope.filePath.substr(0, $scope.filePath.lastIndexOf('/') + 1) + newName;
-//console.log("newName= " + newName);
-//console.log("please rename to " + newPath);
+
+						// FIXME
 						$unifileSrv.mv({service: $scope.fileSrv, path: $scope.filePath + ':' + newPath}, function()
 							{
 								$scope.filePath = newPath;
@@ -581,20 +598,14 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			 */
 			$scope.copy = function()
 			{
-				$scope.$parent.clipboard = $scope.filePath;
-//console.log("$scope.$parent.clipboard now is "+$scope.$parent.clipboard);
+				$unifileSrv.copy($scope.filePath);
 			};
 			/**
 			 * TODO comment
-			 * FIXME delete scope ?
 			 */
 			$scope.delete = function()
 			{
-//console.log("please delete "+$scope.fileSrv+"/"+$scope.filePath);
-				$unifileSrv.rm({service:$scope.fileSrv, path:$scope.filePath}, function()
-					{
-						$scope.ls(); // FIXME we could also avoid doing a new request here and just delete the li
-					});
+				$unifileSrv.rm($scope.fileSrv, $scope.filePath);
 			};
 		}
 	])
@@ -783,15 +794,15 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			template: "<div> \
 						<script type=\"text/ng-template\" id=\"tree_item_renderer.html\"> \
 							<span ce-folder class=\"is-dir-true\">{{file.name}}</span> \
-							<ul class=\"tree\"> \
-								<li ng-repeat=\"file in file.children | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srv\"></li> \
+							<ul class=\"tree\" ng-init=\"path=filePath;\"> \
+								<li ng-repeat=\"file in file.children | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\"></li> \
 							</ul> \
 						</script> \
 						<ul class=\"tree\"> \
-							<li ng-repeat=\"(srvTreeK, srvTreeV) in tree\"> \
+							<li ng-repeat=\"(srvTreeK, srvTreeV) in tree\" ng-init=\"srv=srvTreeK; path='';\"> \
 								<span ce-folder ng-class=\"srvTreeK\">{{ srvTreeK }}</span> \
 								<ul class=\"tree\"> \
-									<li ng-repeat=\"file in srvTreeV | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srvTreeK\"></li> \
+									<li ng-repeat=\"file in srvTreeV | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srvTreeK; path='';\"></li> \
 								</ul> \
 							</li> \
 						</ul> \
@@ -821,10 +832,10 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 							</menu> \
 						</script> \
 						<ul> \
-							<li ng-show=\"isLoggedin\" class=\"folder-toolbar\"> \
+							<li ng-show=\"isCtrlBtnsVisible()\" class=\"folder-toolbar\"> \
 								<div file-uploader></div> <div ce-mkdir-btn></div> <div ce-paste-btn></div> \
 							</li> \
-							<li ce-folder ng-init=\"setLinkToParent()\" ng-hide=\"isRootPath()\" class=\"is-dir-true\">..</li> \
+							<li ce-folder ng-init=\"setLinkToParent()\" ng-if=\"showLinkToParent()\" class=\"is-dir-true\">..</li> \
 <!-- FIXME <li ce-folder ce-file ng-repeat=\"file in files | orderBy:'is_dir':true\" ng-class=\"getClass()\" >{{file.name}}</li> --> \
 							<li ce-folder ce-file ng-repeat=\"file in files | filter:{'is_dir':'true'}\" ng-class=\"getClass()\" contextmenu=\"{{fileSrv+filePath}}\" ng-include=\"'file_template.html'\"></li> \
 							<li ce-file ng-repeat=\"file in files | filter:{'is_dir':'false'}\" ng-class=\"getClass()\" contextmenu=\"{{fileSrv+'/'+filePath}}\" ng-include=\"'file_template.html'\"></li> \
