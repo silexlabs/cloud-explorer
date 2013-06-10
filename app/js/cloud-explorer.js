@@ -10,6 +10,8 @@
 
 /**
  * TODO
+ * selectable items should allow mass deleting, copying, moving ?
+ * double click should enter/download
  * fix # anchor part in url should not appear (since angular 1.1.4)
  * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * each time we have a new input text (rename or mkdir), set focus on input text
@@ -22,8 +24,6 @@
  * bootstrap styling
  * download link won't propose to save file in Firefox 20 if not same origin, we could force download from server side [unifile]
  * rename should happen on simple click
- * double click should enter/download
- * checkboxes before items should allow mass deleting, copying, moving ?
  */
 
 /* Config */
@@ -172,26 +172,54 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		function mv(srvName, oldPath, newPath) {
 			$unifileStub.mv({service:srvName, path:oldPath+':'+newPath});
 		}
-		function copy(path) {
-			clipboard = path;
+		function copy() {
+			clipboard = [];
+			var rp = '';
+			if (currentNav["path"]!='' && currentNav["path"]!=undefined)
+			{
+				rp = currentNav["path"] + '/';
+			}
+			for(var fi in currentNav['files'])
+			{
+				if (currentNav['files'][fi]['isSelected']===true) { 
+					clipboard.push(rp+currentNav['files'][fi]['name']);
+				}
+			}
 		}
-		function paste() {
+		function remove() { // FIXME refresh model once done
+			for(var fi in currentNav.files)
+			{
+				if (currentNav.files[fi].isSelected===true)
+				{
+					var fp = currentNav.path;
+					if (fp != '')
+					{
+						fp += '/';
+					}
+					fp += currentNav.files[fi].name;
+					$unifileStub.rm({service:currentNav.srv, path:fp});
+				}
+			}
+		}
+		function paste() { // FIXME refresh model once done
 			if (clipboard === undefined)
 			{
 				return;
 			}
-			var nfp = clipboard.substr(clipboard.lastIndexOf('/')+1);
+			var rp = '';
 			if (currentNav["path"]!='' && currentNav["path"]!=undefined)
 			{
-				nfp = currentNav["path"] + '/' + nfp;
+				rp = currentNav["path"] + '/';
 			}
-			$unifileStub.cp({service:currentNav["srv"], path:clipboard+':'+nfp}, function(){
-				console.log("copy done");
-				// TODO refresh model or view ?
-			});
-		}
-		function rm(srvName, path) {
-			$unifileStub.rm({service:srvName, path:path}); // FIXME update model
+			for (var fi in clipboard)
+			{
+				var nfp = rp + clipboard[fi].substr(clipboard[fi].lastIndexOf('/')+1);
+				
+				$unifileStub.cp({service:currentNav["srv"], path:clipboard[fi]+':'+nfp}, function(){
+					console.log("copy done");
+					// TODO refresh model or view ?
+				});
+			}
 		}
 		function isCorrectFileName(name)
 		{
@@ -207,6 +235,18 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 					console.log("new "+mkdirName+" directory created.");
 				});
 		}
+		function togleSelect(file) {
+			for(var fi in currentNav.files)
+			{
+				if (currentNav.files[fi] == file)
+				{
+					if (currentNav.files[fi]["isSelected"])
+						currentNav.files[fi]["isSelected"] = !currentNav.files[fi]["isSelected"];
+					else
+						currentNav.files[fi]["isSelected"] = true;
+				}
+			}
+		}
 		return {
 			services: function() { return services; },
 			currentNav: function() { return currentNav; },
@@ -217,10 +257,11 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			cd: cd,
 			mv: mv,
 			copy: copy,
+			remove: remove,
 			paste: paste,
 			mkdir:mkdir,
-			rm: rm,
-			isCorrectFileName: isCorrectFileName
+			isCorrectFileName: isCorrectFileName,
+			togleSelect: togleSelect
 		};
 	}]);
 
@@ -394,6 +435,15 @@ angular.module('ceCtrls', ['ceServices'])
 					$scope.path = currNav.path;
 					$scope.srv = currNav.srv;
 					$scope.files = currNav.files;
+					$scope.isEmptySelection = true;
+					for(var fi in $scope.files)
+					{
+						if ($scope.files[fi].isSelected===true)
+						{
+							$scope.isEmptySelection = false;
+							break;
+						}
+					}
 				}
 			}
 			$scope.isCtrlBtnsVisible = function() {
@@ -424,16 +474,15 @@ angular.module('ceCtrls', ['ceServices'])
 					$scope.mkdirOn = false; // fixme, should be set to false when server response received
 				}
 			}
-		}])
-
-	/**
-	 * TODO comment
-	 */
-	.controller('CEPasteCtrl', ['$scope', '$unifileSrv', function($scope, $unifileSrv)
-		{
-			$scope.isClipboardEmpty = function()
-			{ console.log("is clipboard empty? "+($unifileSrv.clipboard() === undefined));
+			$scope.isEmptyClipboard = function() {
 				return ($unifileSrv.clipboard() === undefined);
+			}
+			$scope.remove = function() {
+				$unifileSrv.remove();
+			}
+			$scope.copy = function()
+			{
+				$unifileSrv.copy();
 			};
 			$scope.paste = function()
 			{
@@ -491,6 +540,11 @@ console.log("Entering within "+$scope.fileSrv+":"+$scope.filePath);
 					$scope.$apply( function($scope){ $unifileSrv.cd($scope.fileSrv, $scope.filePath); } );
 				}
 			};
+			$scope.select = function()
+			{
+console.log("simple click received");
+				$scope.$apply( function($scope){ $unifileSrv.togleSelect($scope.file); } );
+			};
 
 			/**
 			 * TODO comment
@@ -517,11 +571,20 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			 */
 			$scope.getClass = function()
 			{
+				var fic = [];
+				if ($scope.file != null && $scope.file.isSelected === true)
+				{
+					fic.push("ce-file-selected");
+				}
 				if ($scope.file != null && !$scope.file.is_dir)
 				{
-					return "is-dir-false";
+					fic.push("is-dir-false");
 				}
-				return "is-dir-true";
+				else
+				{
+					fic.push("is-dir-true");
+				}
+				return fic.join(" ");
 			};
 
 			/**
@@ -647,13 +710,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			{
 				$unifileSrv.copy($scope.filePath);
 			};
-			/**
-			 * TODO comment
-			 */
-			$scope.delete = function()
-			{
-				$unifileSrv.rm($scope.fileSrv, $scope.filePath);
-			};
 		}
 	])
 
@@ -722,17 +778,6 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 		};
 	})
 
-	// the copy paste buttons
-	.directive('cePasteBtn', function()
-	{
-		return {
-			restrict: 'A',
-			replace: true,
-			template: '<button ng-hide="isClipboardEmpty()" ng-click="paste()">Paste</button>',
-			controller: 'CEPasteCtrl'
-		};
-	})
-
 	// this is the CE browser log console
 	.directive('ceConsole', function()
 	{
@@ -756,7 +801,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 				attrs.$set('dropzone', 'move');
 				attrs.$set('draggable', 'false'); // necessary to avoid folders that aren't files to be draggable
 
-				element.bind('click', scope.enterDir ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
+				element.bind('dblclick', scope.enterDir ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
 				element.bind('dragenter', scope.handleDragEnter );
 				element.bind('dragleave', scope.handleDragLeave );
 				element.bind('dragover', scope.handleDragOver );
@@ -776,6 +821,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 				scope.isFile = true;
 				attrs.$set('draggable', 'true');
 
+				element.bind('click', scope.select );
 				element.bind('dragstart', scope.handleDragStart );
 				element.bind('dragend', scope.handleDragEnd );
 			},
@@ -836,23 +882,15 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 							<span ng-hide=\"renameOn\">{{file.name}}</span> \
 							<input ng-show=\"renameOn\" type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /> \
 							<button ng-click=\"rename(newName)\">rename</button> \
-							<button ng-click=\"delete()\">delete</button> \
 							<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> <!-- Will not dl but open in FF20 if not same origin thus the blank target --> \
-							<button ng-click=\"copy()\">Copy</button> \
-							<menu id=\"{{fileSrv+'/'+filePath}}\" type=\"context\"> \
-								<menuitem onclick=\"alert('toto')\" label=\"Delete\"></menuitem> <!-- FIXME manage to make it work with ng-click ? --> \
-								<menuitem onclick=\"alert('tata')\" label=\"Rename\"></menuitem> \
-								<menuitem onclick=\"alert('titi')\" label=\"Save as...\"></menuitem> \
-							</menu> \
 						</script> \
 						<ul> \
 							<li ng-show=\"isCtrlBtnsVisible()\" class=\"folder-toolbar\"> \
-								<div file-uploader></div> <div ce-mkdir-btn></div> <div ce-paste-btn></div> \
+								<div file-uploader></div> <div ce-mkdir-btn></div> <button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> <button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
 							</li> \
-							<li ce-folder ng-init=\"setLinkToParent()\" ng-if=\"showLinkToParent()\" class=\"is-dir-true\">..</li> \
-<!-- FIXME <li ce-folder ce-file ng-repeat=\"file in files | orderBy:'is_dir':true\" ng-class=\"getClass()\" >{{file.name}}</li> --> \
-							<li ce-folder ce-file ng-repeat=\"file in files | filter:{'is_dir':'true'}\" ng-class=\"getClass()\" contextmenu=\"{{fileSrv+filePath}}\" ng-include=\"'file_template.html'\"></li> \
-							<li ce-file ng-repeat=\"file in files | filter:{'is_dir':'false'}\" ng-class=\"getClass()\" contextmenu=\"{{fileSrv+'/'+filePath}}\" ng-include=\"'file_template.html'\"></li> \
+							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" ce-folder class=\"is-dir-true\">..</span></li> \
+							<li ce-folder ce-file ng-repeat=\"file in files | filter:{'is_dir':'true'}\" ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></li> \
+							<li ce-file ng-repeat=\"file in files | filter:{'is_dir':'false'}\" ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></li> \
 							<li class=\"is-dir-true\" ng-show=\"mkdirOn\"><input type=\"text\" ng-model=\"mkdirName\" /><button ng-click=\"doMkdir(mkdirName)\">valider</button></li> \
 						</ul> \
 					</div>",

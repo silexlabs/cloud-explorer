@@ -48,6 +48,10 @@ li.is-dir-false
 {
 	list-style:square url('../assets/file.png');
 }
+li.ce-file-selected
+{
+	background-color:blue;
+}
 li.folder-toolbar
 {
 	list-style-type:none;
