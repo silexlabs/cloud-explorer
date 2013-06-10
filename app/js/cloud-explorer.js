@@ -397,7 +397,7 @@ angular.module('ceCtrls', ['ceServices'])
 	/**
 	 * This controller is shared by the ceFile and ceFolder directives.
 	 */
-	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileUploadSrv', '$unifileSrv', 'server.url.unescaped', function($scope, $element, $unifileUploadSrv, $unifileSrv, serverUrl)
+	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileUploadSrv', '$unifileSrv', '$unifileStub', 'server.url.unescaped', function($scope, $element, $unifileUploadSrv, $unifileSrv, $unifileStub, serverUrl)
 		{
 			function getFilePath() {
 				var fp = $scope.path;
@@ -571,7 +571,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 						var newPath = $scope.filePath.substr(0, $scope.filePath.lastIndexOf('/') + 1) + newName;
 
 						// FIXME
-						$unifileSrv.mv({service: $scope.fileSrv, path: $scope.filePath + ':' + newPath}, function()
+						$unifileStub.mv({service: $scope.fileSrv, path: $scope.filePath + ':' + newPath}, function()
 							{
 								$scope.filePath = newPath;
 								$scope.file.name = newName;
