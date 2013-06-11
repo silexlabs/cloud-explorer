@@ -44,7 +44,7 @@ span.gdrive
 /* Prevent the text contents of draggable elements from being selectable. */
 [draggable=true]
 {
-  -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; user-select:none;
+  -moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;user-select:none;
   /* Required to make elements draggable in old WebKit */
   -khtml-user-drag:element; -webkit-user-drag:element;
   cursor:move;
@@ -68,6 +68,19 @@ span.is-dir-false, div.is-dir-false
 div.ce-file-selected
 {
 	background-color:blue;
+}
+.ce-item, .ce-new-item
+{
+	-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;user-select:none;
+}
+.ce-item form, .ce-new-item form
+{
+	padding:0;margin:0;
+}
+.ce-item input[type="text"], .ce-new-item input[type="text"]
+{
+	padding:0;margin:0;
+	height:20px;line-height:18px;
 }
 .loggedin-hide-true /* FIXME useful ? */
 {

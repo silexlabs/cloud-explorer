@@ -10,20 +10,18 @@
 
 /**
  * TODO
- * selectable items should allow mass deleting, copying, moving ?
- * double click should enter/download
- * fix # anchor part in url should not appear (since angular 1.1.4)
- * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * each time we have a new input text (rename or mkdir), set focus on input text
  * refresh after upload ! (or update model)
  * refresh after moove ! (or update model)
+ * fix # anchor part in url should not appear (since angular 1.1.4)
+ * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * console messages + display
- * drag from CE to desktop
- * move between services [need fix in unifile]
- * upload progress
  * bootstrap styling
+ * move between services [need fix in unifile]
+ * drag from CE to desktop
+ * upload progress
+ * selectable items should allow mass moving by drag n drop ?
  * download link won't propose to save file in Firefox 20 if not same origin, we could force download from server side [unifile]
- * rename should happen on simple click
  */
 
 /* Config */
@@ -893,9 +891,8 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 								<div ng-if=\"renameOn\" ng-class=\"getClass()\"><form ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form></div> \
 								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 							</li> \
-							<li class=\"is-dir-true\" ng-show=\"mkdirOn\"> \
-								<input type=\"text\" ng-model=\"mkdirName\" /> \
-								<button ng-click=\"doMkdir(mkdirName)\">valider</button> \
+							<li class=\"ce-new-item\" ng-if=\"mkdirOn\"> \
+								<div class=\"is-dir-true\"><form ng-submit=\"doMkdir(mkdirName)\"><input type=\"text\" ng-model=\"mkdirName\" /></form></div> \
 							</li> \
 						</ul> \
 					</div>",
