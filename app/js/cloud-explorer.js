@@ -10,7 +10,9 @@
 
 /**
  * TODO
+ * implement cut button
  * each time we have a new input text (rename or mkdir), set focus on input text
+ * unselect files when clicked somewhere else ?
  * refresh after upload ! (or update model)
  * refresh after moove ! (or update model)
  * fix # anchor part in url should not appear (since angular 1.1.4)
@@ -167,8 +169,21 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 					currentNav = { "srv": srvName, "path": path, "files": res };
 				});
 		}
-		function mv(srvName, oldPath, newPath) {
-			$unifileStub.mv({service:srvName, path:oldPath+':'+newPath});
+		function mv(srvName, oldPath, newPath) { // FIXME update model, manage errors
+			$unifileStub.mv({service:srvName, path:oldPath+':'+newPath}, function()
+				{
+					var op = oldPath.substring(0, oldPath.lastIndexOf('/')); console.log("OP="+op);
+					var np = newPath.substring(0, newPath.lastIndexOf('/')); console.log("NP="+np);
+					console.log("CP= "+ currentNav["path"])
+					if (np == currentNav["path"] || op == currentNav["path"])
+					{ // we refresh the view only if current nav would be impacted
+						cd(currentNav["srv"], currentNav["path"]);
+					}
+				}, function()
+				{
+					/* TODO */ 
+
+				});
 		}
 		function copy() {
 			clipboard = [];
@@ -184,7 +199,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				}
 			}
 		}
-		function remove() { // FIXME refresh model once done
+		function remove() { // FIXME update model, manage errors
 			for(var fi in currentNav.files)
 			{
 				if (currentNav.files[fi].isSelected===true)
@@ -199,7 +214,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				}
 			}
 		}
-		function paste() { // FIXME refresh model once done
+		function paste() { // FIXME update model, manage errors
 			if (clipboard === undefined)
 			{
 				return;
@@ -228,8 +243,13 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			//TODO other checks on characters used...
 			return true;
 		}
-		function mkdir(mkdirName) {
-			$unifileStub.mkdir({service:currentNav.srv, path:currentNav.path+mkdirName}, function () {
+		function mkdir(mkdirName) { // FIXME update model, manage errors
+			var rp = currentNav.path;
+			if (rp != '')
+			{
+				rp += '/';
+			}
+			$unifileStub.mkdir({service:currentNav.srv, path:rp+mkdirName}, function () {
 					console.log("new "+mkdirName+" directory created.");
 				});
 		}
