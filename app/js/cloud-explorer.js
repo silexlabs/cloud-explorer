@@ -875,7 +875,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 	.directive('ceRightPane',  function()
 	{
 		return {
-			restrict: 'A',
+			restrict: 'C',
 			replace: true,
 			template: "<div> \
 						<script type=\"text/ng-template\" id=\"file_template.html\"><!-- add ng-pattern --> \
@@ -889,9 +889,14 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 								<div file-uploader></div> <div ce-mkdir-btn></div> <button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> <button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
 							</li> \
 							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" ce-folder class=\"is-dir-true\">..</span></li> \
-							<li ce-folder ce-file ng-repeat=\"file in files | filter:{'is_dir':'true'}\" ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></li> \
-							<li ce-file ng-repeat=\"file in files | filter:{'is_dir':'false'}\" ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></li> \
-							<li class=\"is-dir-true\" ng-show=\"mkdirOn\"><input type=\"text\" ng-model=\"mkdirName\" /><button ng-click=\"doMkdir(mkdirName)\">valider</button></li> \
+							<li ng-repeat=\"file in files | orderBy:'is_dir':true\"> \
+								<div ng-if=\"file.is_dir\" ce-folder ce-file ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></div> \
+								<div ng-if=\"!file.is_dir\" ce-file ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></div> \
+							</li> \
+							<li class=\"is-dir-true\" ng-show=\"mkdirOn\"> \
+								<input type=\"text\" ng-model=\"mkdirName\" /> \
+								<button ng-click=\"doMkdir(mkdirName)\">valider</button> \
+							</li> \
 						</ul> \
 					</div>",
 			controller: 'CERightPaneCtrl'
@@ -915,7 +920,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 								<div ce-left-pane></div> \
 							</div> \
 							<div class=\"span8\"> \
-								<div ce-right-pane></div> \
+								<div class=\"ce-right-pane\"></div> \
 							</div> \
 						</div> \
 						<div class=\"row-fluid\"><div class=\"span12\" ce-console></div></div> \

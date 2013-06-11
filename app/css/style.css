@@ -18,61 +18,15 @@ input[type=file]
 	width:0;height:0;overflow:hidden;
 }
 /* FILES TREE */
-ul.tree
+ul.tree, .ce-right-pane ul
 {
 	list-style:none;
 }
-/* Prevent the text contents of draggable elements from being selectable. */
-[draggable=true]
-{
-  -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; user-select:none;
-  /* Required to make elements draggable in old WebKit */
-  -khtml-user-drag:element; -webkit-user-drag:element;
-  cursor:move;
-}
-.ce-folder-over /* TODO */
-{
-	border:1px solid red;
-}
-span.is-dir-true
-{
-	background:url('../assets/folder.png') no-repeat;
-	padding-left:20px;
-	cursor:pointer;
-}
-li.is-dir-true
-{
-	list-style:square url('../assets/folder.png');
-}
-li.is-dir-false
-{
-	list-style:square url('../assets/file.png');
-}
-li.ce-file-selected
-{
-	background-color:blue;
-}
-li.folder-toolbar
+li.folder-toolbar /* FIXME merge */
 {
 	list-style-type:none;
 }
-.loggedin-hide-true
-{
-	display: none;
-}
-.loggedin-show-false
-{
-	display: none;
-}
-/* connect btn */
-a.ce-srv-connected
-{
-	font-style:italic;color:#e3e3e3;
-}
-a.ce-srv-not-connected
-{
 
-}
 /* SERVICES */
 span.dropbox
 {
@@ -85,6 +39,52 @@ span.gdrive
 	background:url('../assets/gdrive.png') no-repeat;
 	padding-left:20px;
 	cursor:pointer;
+}
+/* FILES AND FOLDERS */
+/* Prevent the text contents of draggable elements from being selectable. */
+[draggable=true]
+{
+  -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; user-select:none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag:element; -webkit-user-drag:element;
+  cursor:move;
+}
+.ce-folder-over /* TODO */
+{
+	border:1px solid red;
+}
+span.is-dir-true, div.is-dir-true
+{
+	background:url('../assets/folder.png') no-repeat;
+	padding-left:20px;
+	cursor:pointer;
+}
+span.is-dir-false, div.is-dir-false
+{
+	background:url('../assets/file.png') no-repeat;
+	padding-left:20px;
+	cursor:pointer;
+}
+div.ce-file-selected
+{
+	background-color:blue;
+}
+.loggedin-hide-true /* FIXME useful ? */
+{
+	display: none;
+}
+.loggedin-show-false /* FIXME useful ? */
+{
+	display: none;
+}
+/* connect btn */
+a.ce-srv-connected
+{
+	font-style:italic;color:#e3e3e3; /* FIXME color not displayed */
+}
+a.ce-srv-not-connected
+{
+
 }
 /* LOGS CONSOLE */
 .ce-log-console
