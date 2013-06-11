@@ -22,9 +22,9 @@ ul.tree, .ce-right-pane ul
 {
 	list-style:none;
 }
-li.folder-toolbar /* FIXME merge */
+.ce-right-pane div
 {
-	list-style-type:none;
+	display:inline-block;
 }
 
 /* SERVICES */
@@ -96,5 +96,5 @@ a.ce-srv-not-connected
 /* file uploader directive */
 div.fileUploader
 {
-	display:inline-block;
+	
 }

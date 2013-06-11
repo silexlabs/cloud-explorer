@@ -543,14 +543,14 @@ angular.module('ceCtrls', ['ceServices'])
 console.log("Entering within "+$scope.fileSrv+":"+$scope.filePath);
 				if ($scope.file != null && $scope.file.is_dir || $scope.file == null)
 				{
-					$scope.$apply( function($scope){ $unifileSrv.cd($scope.fileSrv, $scope.filePath); } );
+					$unifileSrv.cd($scope.fileSrv, $scope.filePath);
 				}
 			};
 			$scope.select = function()
 			{
 console.log("simple click received");
 				var lastSel = $scope.file["lastSelectionDate"];
-				$scope.$apply( function($scope){ $unifileSrv.togleSelect($scope.file); } );
+				$unifileSrv.togleSelect($scope.file);
 				if (lastSel)
 				{
 					var diff = ($scope.file["lastSelectionDate"] - lastSel);
@@ -656,7 +656,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					else
 					{
 //console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
-						$scope.$apply( function($scope){ $unifileSrv.mv($scope.fileSrv, evPath, $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); } );
+						$unifileSrv.mv($scope.fileSrv, evPath, $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1));
 					}
 				}
 			};
@@ -674,16 +674,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			{
 				if (!$scope.renameOn)
 				{ console.log("rename called and now on");
-					$element.unbind('click', $scope.select );
-					$element.unbind('dblclick', $scope.enterDir);
-					$element.unbind('dragenter', $scope.handleDragEnter);
-					$element.unbind('dragleave', $scope.handleDragLeave);
-					$element.unbind('dragover', $scope.handleDragOver);
-					$element.unbind('drop', $scope.handleDrop);
-					$element.unbind('dragstart', $scope.handleDragStart );
-					$element.unbind('dragend', $scope.handleDragEnd );
-					$scope.$apply( function($scope){ $scope.renameOn = true; } );
-					//$element.children("input")[0].focus();
+					$scope.renameOn = true;
 				}
 				else
 				{ console.log("rename called and now off");
@@ -702,20 +693,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 								$scope.filePath = newPath;
 								$scope.file.name = newName;
 								$scope.renameOn = false;
-								if ($scope.isDir)
-								{
-									$element.bind('dblclick', $scope.enterDir);
-									$element.bind('dragenter', $scope.handleDragEnter);
-									$element.bind('dragleave', $scope.handleDragLeave);
-									$element.bind('dragover', $scope.handleDragOver);
-									$element.bind('drop', $scope.handleDrop);
-								}
-								if ($scope.isFile)
-								{
-									$element.bind('click', $scope.select );
-									$element.bind('dragstart', $scope.handleDragStart);
-									$element.bind('dragend', $scope.handleDragEnd);
-								}
 							});
 					}
 				}
@@ -807,6 +784,15 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 	})
 
 	// this directive implements the behavior of receiving a file/folder on drop
+	.directive('ceItem', function()
+	{
+		return {
+			restrict: 'C',
+			controller: 'CEFileEntryCtrl'
+		};
+	})
+
+	// this directive implements the behavior of receiving a file/folder on drop
 	.directive('ceFolder', function()
 	{
 		return {
@@ -818,13 +804,13 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 				attrs.$set('dropzone', 'move');
 				attrs.$set('draggable', 'false'); // necessary to avoid folders that aren't files to be draggable
 
-				element.bind('dblclick', scope.enterDir ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
-				element.bind('dragenter', scope.handleDragEnter );
-				element.bind('dragleave', scope.handleDragLeave );
-				element.bind('dragover', scope.handleDragOver );
-				element.bind('drop', scope.handleDrop );
-			},
-			controller: 'CEFileEntryCtrl'
+				//element.bind('dblclick', scope.enterDir ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
+				element.bind('dblclick', function(e) { scope.$apply(function(scope){scope.enterDir(e);}); } ); // not set with ng-click 'cause we need to be able to unbind it at some points (renaming, ...)
+				element.bind('dragenter', function(e) { scope.$apply(function(scope){scope.handleDragEnter(e);}); } );
+				element.bind('dragleave', function(e) { scope.$apply(function(scope){scope.handleDragLeave(e);}); } );
+				element.bind('dragover', function(e) { scope.$apply(function(scope){scope.handleDragOver(e);}); } );
+				element.bind('drop', function(e) { scope.$apply(function(scope){scope.handleDrop(e);}); } );
+			}
 		};
 	})
 
@@ -838,11 +824,11 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 				scope.isFile = true;
 				attrs.$set('draggable', 'true');
 
-				element.bind('click', scope.select );
-				element.bind('dragstart', scope.handleDragStart );
-				element.bind('dragend', scope.handleDragEnd );
-			},
-			controller: 'CEFileEntryCtrl'
+				//element.bind('click', scope.select );
+				element.bind('click', function(e) { scope.$apply(function(scope){scope.select(e);}); } );
+				element.bind('dragstart', function(e) { scope.$apply(function(scope){scope.handleDragStart(e);}); } );
+				element.bind('dragend', function(e) { scope.$apply(function(scope){scope.handleDragEnd(e);}); } );
+			}
 		};
 	})
 
@@ -870,14 +856,14 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			replace: true,
 			template: "<div> \
 						<script type=\"text/ng-template\" id=\"tree_item_renderer.html\"> \
-							<span ce-folder class=\"is-dir-true\">{{file.name}}</span> \
+							<span class=\"ce-item is-dir-true\" ce-folder ng-click=\"enterDir()\">{{file.name}}</span> \
 							<ul class=\"tree\" ng-init=\"path=filePath;\"> \
 								<li ng-repeat=\"file in file.children | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\"></li> \
 							</ul> \
 						</script> \
 						<ul class=\"tree\"> \
 							<li ng-repeat=\"(srvTreeK, srvTreeV) in tree\" ng-init=\"srv=srvTreeK; path='';\"> \
-								<span ce-folder ng-class=\"srvTreeK\">{{ srvTreeK }}</span> \
+								<span class=\"ce-item\" ce-folder ng-click=\"enterDir()\" ng-class=\"srvTreeK\">{{ srvTreeK }}</span> \
 								<ul class=\"tree\"> \
 									<li ng-repeat=\"file in srvTreeV | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srvTreeK; path='';\"></li> \
 								</ul> \
@@ -889,25 +875,23 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 	})
 
 	// the browser right pane directive
+	// FIXME: The download link will not dl but open in FF20 if not same origin thus the blank target
 	.directive('ceRightPane',  function()
 	{
 		return {
 			restrict: 'C',
 			replace: true,
 			template: "<div> \
-						<script type=\"text/ng-template\" id=\"file_template.html\"><!-- add ng-pattern --> \
-							<span ng-hide=\"renameOn\">{{file.name}}</span> \
-							<form ng-if=\"renameOn\" ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form> \
-							<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> <!-- Will not dl but open in FF20 if not same origin thus the blank target --> \
-						</script> \
 						<ul> \
-							<li ng-show=\"isCtrlBtnsVisible()\" class=\"folder-toolbar\"> \
+							<li ng-show=\"isCtrlBtnsVisible()\"> \
 								<div file-uploader></div> <div ce-mkdir-btn></div> <button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> <button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
 							</li> \
-							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" ce-folder class=\"is-dir-true\">..</span></li> \
-							<li ng-repeat=\"file in files | orderBy:'is_dir':true\"> \
-								<div ng-if=\"file.is_dir\" ce-folder ce-file ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></div> \
-								<div ng-if=\"!file.is_dir\" ce-file ng-class=\"getClass()\" ng-include=\"'file_template.html'\"></div> \
+							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" class=\"ce-item is-dir-true\" ce-folder>..</span></li> \
+							<li class=\"ce-item\" ng-repeat=\"file in files | orderBy:'is_dir':true\"> \
+								<div ng-hide=\"renameOn\" ng-if=\"file.is_dir\" ce-folder ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
+								<div ng-hide=\"renameOn\" ng-if=\"!file.is_dir\" ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
+								<div ng-if=\"renameOn\" ng-class=\"getClass()\"><form ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form></div> \
+								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 							</li> \
 							<li class=\"is-dir-true\" ng-show=\"mkdirOn\"> \
 								<input type=\"text\" ng-model=\"mkdirName\" /> \
