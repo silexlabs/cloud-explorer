@@ -241,9 +241,15 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				if (currentNav.files[fi] == file)
 				{
 					if (currentNav.files[fi]["isSelected"])
+					{
 						currentNav.files[fi]["isSelected"] = !currentNav.files[fi]["isSelected"];
+					}
 					else
+					{
 						currentNav.files[fi]["isSelected"] = true;
+					}
+					currentNav.files[fi]["lastSelectionDate"] = Date.now();
+					return;
 				}
 			}
 		}
@@ -543,7 +549,16 @@ console.log("Entering within "+$scope.fileSrv+":"+$scope.filePath);
 			$scope.select = function()
 			{
 console.log("simple click received");
+				var lastSel = $scope.file["lastSelectionDate"];
 				$scope.$apply( function($scope){ $unifileSrv.togleSelect($scope.file); } );
+				if (lastSel)
+				{
+					var diff = ($scope.file["lastSelectionDate"] - lastSel);
+					if (diff < 2000 && diff > 500) // FIXME those values should be config constants
+					{
+						$scope.rename("");
+					}
+				}
 			};
 
 			/**
@@ -658,19 +673,20 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			$scope.rename = function(newName)
 			{
 				if (!$scope.renameOn)
-				{
-					$element.unbind('click', $scope.enterDir);
+				{ console.log("rename called and now on");
+					$element.unbind('click', $scope.select );
+					$element.unbind('dblclick', $scope.enterDir);
 					$element.unbind('dragenter', $scope.handleDragEnter);
 					$element.unbind('dragleave', $scope.handleDragLeave);
 					$element.unbind('dragover', $scope.handleDragOver);
 					$element.unbind('drop', $scope.handleDrop);
 					$element.unbind('dragstart', $scope.handleDragStart );
 					$element.unbind('dragend', $scope.handleDragEnd );
-					$scope.renameOn = true;
+					$scope.$apply( function($scope){ $scope.renameOn = true; } );
 					//$element.children("input")[0].focus();
 				}
 				else
-				{
+				{ console.log("rename called and now off");
 					if (!$unifileSrv.isCorrectFileName(newName))
 					{
 						console.log("WARNING: won't rename, incorrect file/folder name given: "+newName);
@@ -688,7 +704,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 								$scope.renameOn = false;
 								if ($scope.isDir)
 								{
-									$element.bind('click', $scope.enterDir);
+									$element.bind('dblclick', $scope.enterDir);
 									$element.bind('dragenter', $scope.handleDragEnter);
 									$element.bind('dragleave', $scope.handleDragLeave);
 									$element.bind('dragover', $scope.handleDragOver);
@@ -696,6 +712,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 								}
 								if ($scope.isFile)
 								{
+									$element.bind('click', $scope.select );
 									$element.bind('dragstart', $scope.handleDragStart);
 									$element.bind('dragend', $scope.handleDragEnd);
 								}
@@ -880,8 +897,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			template: "<div> \
 						<script type=\"text/ng-template\" id=\"file_template.html\"><!-- add ng-pattern --> \
 							<span ng-hide=\"renameOn\">{{file.name}}</span> \
-							<input ng-show=\"renameOn\" type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /> \
-							<button ng-click=\"rename(newName)\">rename</button> \
+							<form ng-if=\"renameOn\" ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form> \
 							<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> <!-- Will not dl but open in FF20 if not same origin thus the blank target --> \
 						</script> \
 						<ul> \
