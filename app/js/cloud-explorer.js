@@ -100,7 +100,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		// the current navigation data
 		var currentNav; // looks like { "path": "...", "files": [...], "srv": "..." }
 		// the clipboard var used for copy/paste 
-		var clipboard;
+		var clipboard = { "mode":0, "pathes":[] }; // mode=0 => copy, mode=1 => cut
 
 		function listServices() { 
 			if (services == undefined)
@@ -185,8 +185,9 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 
 				});
 		}
-		function copy() {
-			clipboard = [];
+		function setClipboardContent(mode) {
+			clipboard["mode"] = mode;
+			clipboard["pathes"] = [];
 			var rp = '';
 			if (currentNav["path"]!='' && currentNav["path"]!=undefined)
 			{
@@ -195,7 +196,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			for(var fi in currentNav['files'])
 			{
 				if (currentNav['files'][fi]['isSelected']===true) { 
-					clipboard.push(rp+currentNav['files'][fi]['name']);
+					clipboard["pathes"].push(rp+currentNav['files'][fi]['name']);
 				}
 			}
 		}
@@ -215,7 +216,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			}
 		}
 		function paste() { // FIXME update model, manage errors
-			if (clipboard === undefined)
+			if (clipboard["pathes"].length == 0)
 			{
 				return;
 			}
@@ -224,14 +225,29 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			{
 				rp = currentNav["path"] + '/';
 			}
-			for (var fi in clipboard)
+			for (var fi in clipboard["pathes"])
 			{
-				var nfp = rp + clipboard[fi].substr(clipboard[fi].lastIndexOf('/')+1);
+				var nfp = rp + clipboard["pathes"][fi].substr(clipboard["pathes"][fi].lastIndexOf('/')+1);
 				
-				$unifileStub.cp({service:currentNav["srv"], path:clipboard[fi]+':'+nfp}, function(){
-					console.log("copy done");
-					// TODO refresh model or view ?
-				});
+				if (clipboard["mode"]==0)
+				{
+					$unifileStub.cp({service:currentNav["srv"], path:clipboard["pathes"][fi]+':'+nfp}, function() {
+						console.log("copy done");
+						// TODO refresh model or view ?
+					});
+				}
+				else
+				{
+					$unifileStub.mv({service:currentNav["srv"], path:clipboard["pathes"][fi]+':'+nfp}, function() {
+						console.log("cut done");
+						// TODO refresh model or view ?
+					});
+				}
+			}
+			if (clipboard["mode"]==1) // clear clipboard if cut mode
+			{
+				clipboard["mode"]=0;
+				clipboard["pathes"]=[];
 			}
 		}
 		function isCorrectFileName(name)
@@ -280,7 +296,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			login: login,
 			cd: cd,
 			mv: mv,
-			copy: copy,
+			setClipboardContent: setClipboardContent,
 			remove: remove,
 			paste: paste,
 			mkdir:mkdir,
@@ -499,14 +515,18 @@ angular.module('ceCtrls', ['ceServices'])
 				}
 			}
 			$scope.isEmptyClipboard = function() {
-				return ($unifileSrv.clipboard() === undefined);
+				return ($unifileSrv.clipboard()["pathes"].length === 0);
 			}
 			$scope.remove = function() {
 				$unifileSrv.remove();
 			}
 			$scope.copy = function()
 			{
-				$unifileSrv.copy();
+				$unifileSrv.setClipboardContent(0);
+			};
+			$scope.cut = function()
+			{
+				$unifileSrv.setClipboardContent(1);
 			};
 			$scope.paste = function()
 			{
@@ -715,13 +735,6 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					}
 				}
 			};
-			/**
-			 * TODO comment
-			 */
-			$scope.copy = function()
-			{
-				$unifileSrv.copy($scope.filePath);
-			};
 		}
 	])
 
@@ -902,7 +915,11 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 			template: "<div> \
 						<ul> \
 							<li ng-show=\"isCtrlBtnsVisible()\"> \
-								<div file-uploader></div> <div ce-mkdir-btn></div> <button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> <button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
+								<div file-uploader></div> \
+								<div ce-mkdir-btn></div> \
+								<button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> \
+								<button ng-hide=\"isEmptySelection\" ng-click=\"cut()\">Cut</button> \
+								<button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
 							</li> \
 							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" class=\"ce-item is-dir-true\" ce-folder>..</span></li> \
 							<li class=\"ce-item\" ng-repeat=\"file in files | orderBy:'is_dir':true\"> \
