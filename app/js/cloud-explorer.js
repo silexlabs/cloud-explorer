@@ -10,7 +10,7 @@
 
 /**
  * TODO
- * implement cut button
+ * manage cases when moving/pasting files where other files with same name exists...
  * each time we have a new input text (rename or mkdir), set focus on input text
  * unselect files when clicked somewhere else ?
  * refresh after upload ! (or update model)
@@ -93,7 +93,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		}
 	}])
 
-	.factory('$unifileSrv', ['$unifileStub', function($unifileStub)
+	.factory('$unifileSrv', ['$unifileStub', '$http', 'server.url.unescaped', function($unifileStub, $http, serverUrl)
 	{
 		// array of available services from unifile
 		var services;
@@ -203,15 +203,27 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		function remove() { // FIXME update model, manage errors
 			for(var fi in currentNav.files)
 			{
-				if (currentNav.files[fi].isSelected===true)
+				var cf = currentNav.files[fi];
+				if (cf.isSelected===true)
 				{
 					var fp = currentNav.path;
 					if (fp != '')
 					{
 						fp += '/';
 					}
-					fp += currentNav.files[fi].name;
-					$unifileStub.rm({service:currentNav.srv, path:fp});
+					fp += cf.name; console.log("calling rm with cf.name= "+cf.name);
+					(function(cf) {
+						$unifileStub.rm({service:currentNav.srv, path:fp}, function() { 
+							for(var fir in currentNav.files)
+							{
+								if (currentNav.files[fir] == cf)
+								{
+									var temp = currentNav.files.splice(fir,1); console.log("removed it at "+fir+"  named "+temp[0].name);
+									return;
+								}
+							}
+						});
+					})(cf);
 				}
 			}
 		}
