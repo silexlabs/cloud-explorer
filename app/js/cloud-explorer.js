@@ -10,6 +10,7 @@
 
 /**
  * TODO
+ * see what $timeout would add here instead of setTimeout
  * manage cases when moving/pasting files where other files with same name exists...
  * each time we have a new input text (rename or mkdir), set focus on input text
  * unselect files when clicked somewhere else ?
@@ -109,27 +110,6 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				$unifileStub.listServices({}, function(list){ services = list; });
 			}
 			return services;
-		}
-		function connect(srvName, cb) {
-			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
-			{
-				if (services[si]["name"]!=srvName)
-				{
-					continue;
-				}
-				if (!services[si]["isConnected"])
-				{
-					var res = $unifileStub.connect({service:srvName}, function ()
-						{ //console.log("Connected. Auth url is: "+res.authorize_url);
-							cb(res.authorize_url);
-						},
-						function()
-						{
-							console.error("ERROR: Could not connect to "+srvName); // TODO extract some info about the error
-						}); //console.log("Connected");
-				}
-				return;
-			}
 		}
 		function login(srvName) {
 			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
@@ -304,7 +284,6 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			currentNav: function() { return currentNav; },
 			clipboard: function() { return clipboard; },
 			listServices: listServices,
-			connect: connect,
 			login: login,
 			cd: cd,
 			mv: mv,
@@ -324,7 +303,7 @@ angular.module('ceCtrls', ['ceServices'])
 	/**
 	 * Controls the "connect to service" button
 	 */
-	.controller('CEConnectBtnCtrl', ['$scope', '$window', '$unifileSrv', function($scope, $window, $unifileSrv)
+	.controller('CEConnectBtnCtrl', ['$scope', '$window', '$unifileSrv', '$q', '$unifileStub', function($scope, $window, $unifileSrv, $q, $unifileStub)
 		{
 			// bind the services list
 			$scope.$watch( $unifileSrv.listServices, function (services) {
@@ -362,8 +341,19 @@ angular.module('ceCtrls', ['ceServices'])
 			{
 				if (!srv.isConnected)
 				{
-					//console.log("Connecting to "+srv.name);
-					$unifileSrv.connect(srv.name, function(url){ authorize(url, srv.name); });
+					$q.when(srv.name)
+					.then( function(sn) {
+						var deferred = $q.defer();
+						$unifileStub.connect({service:sn},
+							function (resp) {
+								deferred.resolve(resp);
+							}
+						);
+						return deferred.promise;
+					})
+					.then(function(cr) {
+						authorize(cr.authorize_url, srv.name);
+					});
 				}
 				else
 				{
