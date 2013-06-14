@@ -13,6 +13,7 @@
  * manage cases when moving/pasting files where other files with same name exists...
  * each time we have a new input text (rename or mkdir), set focus on input text
  * unselect files when clicked somewhere else ?
+ * abort rename or mkdir on clicked somewhere else or on escape
  * refresh after upload ! (or update model)
  * refresh after moove ! (or update model)
  * fix # anchor part in url should not appear (since angular 1.1.4)
@@ -227,7 +228,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			//TODO other checks on characters used...
 			return true;
 		}
-		function mkdir(mkdirName) { // FIXME update model, manage errors
+		function mkdir(mkdirName) { // FIXME manage errors
 			var rp = currentNav.path;
 			if (rp != '')
 			{
@@ -235,6 +236,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			}
 			$unifileStub.mkdir({service:currentNav.srv, path:rp+mkdirName}, function () {
 					console.log("new "+mkdirName+" directory created.");
+					currentNav.files.push({ 'name': mkdirName, 'is_dir': true }); // FIXME see if unifile couldn't send back the file json object
 				});
 		}
 		function togleSelect(file) {
@@ -515,7 +517,7 @@ angular.module('ceCtrls', ['ceServices'])
 			 * mkdir command
 			 */
 			$scope.doMkdir = function(mkdirName)
-			{
+			{ console.log("doMkdir("+mkdirName+") called");
 				if (!$unifileSrv.isCorrectFileName(mkdirName))
 				{
 					console.log("WARNING: name given for new directory is not valid: "+mkdirName);
@@ -792,6 +794,21 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 	})
 
 	// the "new folder" button
+	.directive('ceMkdir', function()
+	{
+		return {
+			restrict: 'C',
+			template: '<div class=\"is-dir-true \"><form ng-submit=\"doMkdir(mkdirName)\"><input type=\"text\" ng-model=\"mkdirName\" /></form></div>',
+			link: function($scope, $element)
+			{
+				var i = $element.find('input');
+				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.mkdirOn = false; }); } );
+				i.focus();
+			}
+		};
+	})
+
+	// the "new folder" button
 	.directive('ceMkdirBtn', function()
 	{
 		return {
@@ -933,9 +950,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 								<div ng-if=\"renameOn\" ng-class=\"getClass()\"><form ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form></div> \
 								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 							</li> \
-							<li class=\"ce-new-item\" ng-if=\"mkdirOn\"> \
-								<div class=\"is-dir-true\"><form ng-submit=\"doMkdir(mkdirName)\"><input type=\"text\" ng-model=\"mkdirName\" /></form></div> \
-							</li> \
+							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\" mkdirOn=\"mkdirOn\"></li> \
 						</ul> \
 					</div>",
 			controller: 'CERightPaneCtrl'
