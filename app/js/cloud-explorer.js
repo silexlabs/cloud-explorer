@@ -10,7 +10,6 @@
 
 /**
  * TODO
- * see what $timeout would add here instead of setTimeout
  * manage cases when moving/pasting files where other files with same name exists...
  * each time we have a new input text (rename or mkdir), set focus on input text
  * unselect files when clicked somewhere else ?
@@ -69,29 +68,6 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				mv: {method:'GET', params:{method:'exec', command:'mv'}, isArray:false},
 				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
 			});
-	}])
-
-	.service('$unifileUploadSrv', [ 'server.url.unescaped', '$http', '$ceConsoleSrv', function(serverUrl, $http, $ceConsoleSrv)
-	{
-		this.upload = function(uploadFiles, path)
-		{
-			var formData = new FormData();
-			for(var i in uploadFiles)
-			{
-				formData.append('data', uploadFiles[i], uploadFiles[i].name);
-			}
-//console.log(formData);
-			$http({
-					method: 'POST',
-					url: serverUrl+'dropbox/exec/put/'+path, // FIXME address as config value
-					data: formData,
-					headers: {'Content-Type': undefined},
-					transformRequest: angular.identity
-				})
-				.success(function(data, status, headers, config) {
-					$ceConsoleSrv.log("file(s) successfully sent", 0);
-				});
-		}
 	}])
 
 	.factory('$unifileSrv', ['$unifileStub', '$http', 'server.url.unescaped', function($unifileStub, $http, serverUrl)
@@ -279,6 +255,41 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				}
 			}
 		}
+		function upload(uploadFiles, path)
+		{
+			//enforce path as a folder path
+			if (path != "" && path.lastIndexOf('/') != path.length-1) // TODO check in unifile if it's not a bug
+			{
+				path += '/';
+			}
+			var formData = new FormData();
+			var fn = [];
+			for(var i in uploadFiles)
+			{
+				if(typeof uploadFiles[i] == 'object') // raw data from drop event or input[type=file] contains methods we need to filter
+				{
+					formData.append('data', uploadFiles[i], uploadFiles[i].name);
+					fn.push({ "name": uploadFiles[i].name });
+				}
+			}
+			return $http({
+					method: 'POST',
+					url: serverUrl+'dropbox/exec/put/'+path, // FIXME address as config value, srv as param
+					data: formData,
+					headers: {'Content-Type': undefined},
+					transformRequest: angular.identity
+				})
+				.success(function(data, status, headers, config) {
+					if (path == currentNav.path+'/') // FIXME that's ugly, check if we cannot do better
+					{
+						for(var i in fn)
+						{
+							currentNav.files.push({ 'name': fn[i].name, 'is_dir': false }); // FIXME see if unifile couldn't send back the file json objects
+						}
+					}
+					console.log("file(s) successfully sent");
+				});
+		}
 		return {
 			services: function() { return services; },
 			currentNav: function() { return currentNav; },
@@ -292,7 +303,8 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			paste: paste,
 			mkdir:mkdir,
 			isCorrectFileName: isCorrectFileName,
-			togleSelect: togleSelect
+			togleSelect: togleSelect,
+			upload: upload
 		};
 	}]);
 
@@ -539,7 +551,7 @@ angular.module('ceCtrls', ['ceServices'])
 	/**
 	 * This controller is shared by the ceFile and ceFolder directives.
 	 */
-	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileUploadSrv', '$unifileSrv', '$unifileStub', 'server.url.unescaped', function($scope, $element, $unifileUploadSrv, $unifileSrv, $unifileStub, serverUrl)
+	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileSrv', '$unifileStub', 'server.url.unescaped', function($scope, $element, $unifileSrv, $unifileStub, serverUrl)
 		{
 			function getFilePath() {
 				var fp = $scope.path;
@@ -684,7 +696,8 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 				if ( e.originalEvent.dataTransfer.files && e.originalEvent.dataTransfer.files.length > 0 ) // case files from desktop
 				{
 //console.log("files from desktop case upload to: " + $scope.filePath);
-					$unifileUploadSrv.upload( e.originalEvent.dataTransfer.files, $scope.filePath+'/' );
+//console.log("e.originalEvent.dataTransfer.files= "+JSON.stringify(e.originalEvent.dataTransfer.files));
+					$unifileSrv.upload( e.originalEvent.dataTransfer.files, $scope.filePath );
 				}
 				else // move case
 				{
@@ -760,21 +773,11 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			transclude: true,
 			template: '<div class="fileUploader"><input type="file" multiple /><button ng-click="upload()">Upload</button></div>',
 			replace: true,
-			controller: function($scope, $unifileUploadSrv)
+			controller: function($scope, $unifileSrv)
 			{
-				$scope.notReady = true;
-
 				$scope.push = function(e)
 				{
-console.log('change $scope.uploadFiles = '+$scope.uploadFiles);
-					$scope.notReady = e.target.files.length == 0;
-					$scope.uploadFiles = [];
-					for(var i in e.target.files)
-					{
-						if(typeof e.target.files[i] == 'object') $scope.uploadFiles.push(e.target.files[i]);
-					}
-console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
-					$unifileUploadSrv.upload($scope.uploadFiles, $scope.path);
+					$unifileSrv.upload(e.target.files, $scope.path);
 				}
 			},
 			link: function($scope, $element)
@@ -783,7 +786,7 @@ console.log('end change $scope.uploadFiles = '+$scope.uploadFiles);
 
 				$scope.upload = function() { fileInput.trigger('click'); console.log( "browse called "); };
 
-				fileInput.bind('change', $scope.push);
+				fileInput.bind('change', function(e) { $scope.$apply(function($scope){$scope.push(e);}); } );
 			}
 		};
 	})
