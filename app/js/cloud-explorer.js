@@ -12,7 +12,6 @@
  * TODO
  * manage cases when moving/pasting files where other files with same name exists...
  * unselect files when clicked somewhere else ?
- * refresh after moove ! (or update model)
  * fix # anchor part in url should not appear (since angular 1.1.4)
  * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
  * console messages + display
@@ -75,7 +74,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		// the current navigation data
 		var currentNav; // looks like { "path": "...", "files": [...], "srv": "..." }
 		// the clipboard var used for copy/paste 
-		var clipboard = { "mode":0, "pathes":[] }; // mode=0 => copy, mode=1 => cut
+		var clipboard = { "mode":0, "path":"", "files":[] }; // mode=0 => copy, mode=1 => cut
 
 		function listServices() { 
 			if (services == undefined)
@@ -123,38 +122,64 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 					currentNav = { "srv": srvName, "path": path, "files": res };
 				});
 		}
-		function mv(srvName, oldPath, newPath) { // FIXME update model, manage errors
-			$unifileStub.mv({service:srvName, path:oldPath+':'+newPath}, function()
+		//$unifileSrv.mv($scope.fileSrv, evData.path, $scope.filePath, evData.files);
+		function mv(oldSrv, newSrv, oldPath, newPath, files) { // FIXME manage errors
+			if (oldPath!='' && oldPath[oldPath.length-1]!='/')
+			{
+				oldPath+='/';
+			}
+			if (newPath!='' && newPath[newPath.length-1]!='/')
+			{
+				newPath+='/';
+			}
+			for (var fi in files)
+			{
+				(function(file)
 				{
-					var op = oldPath.substring(0, oldPath.lastIndexOf('/')); console.log("OP="+op);
-					var np = newPath.substring(0, newPath.lastIndexOf('/')); console.log("NP="+np);
-					console.log("CP= "+ currentNav["path"])
-					if (np == currentNav["path"] || op == currentNav["path"])
-					{ // we refresh the view only if current nav would be impacted
-						cd(currentNav["srv"], currentNav["path"]);
-					}
-				}, function()
-				{
-					/* TODO */ 
-
-				});
+					$unifileStub.mv({service:newSrv, path:oldPath+file.name+':'+newPath+file.name}, function()		// FIXME unifile should manage mv between srvs
+					{
+						var op = oldPath.substring(0, oldPath.lastIndexOf('/')); console.log("OP="+op);
+						var np = newPath.substring(0, newPath.lastIndexOf('/')); console.log("NP="+np);
+						console.log("CP= "+ currentNav["path"])
+						if (op == currentNav["path"])
+						{
+							for(var i in currentNav['files'])
+							{
+								if (currentNav['files'][i]['name']===file.name) { 
+									currentNav['files'].splice(i, 1);
+									break;
+								}
+							}
+						}
+						if (np == currentNav["path"])
+						{
+							currentNav['files'].push(file);
+						}
+					}, function()
+					{
+						/* TODO */ 
+						console.log("ERROR after mv");
+					});
+				})(files[fi]);
+			}
 		}
 		function setClipboardContent(mode) {
 			clipboard["mode"] = mode;
-			clipboard["pathes"] = [];
+			clipboard["files"] = [];
 			var rp = '';
 			if (currentNav["path"]!='' && currentNav["path"]!=undefined)
 			{
 				rp = currentNav["path"] + '/';
 			}
+			clipboard["path"] = rp;
 			for(var fi in currentNav['files'])
 			{
 				if (currentNav['files'][fi]['isSelected']===true) { 
-					clipboard["pathes"].push(rp+currentNav['files'][fi]['name']);
+					clipboard["files"].push(currentNav['files'][fi]);
 				}
 			}
 		}
-		function remove() { // FIXME update model, manage errors
+		function remove() { // FIXME manage errors
 			for(var fi in currentNav.files)
 			{
 				var cf = currentNav.files[fi];
@@ -181,8 +206,8 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				}
 			}
 		}
-		function paste() { // FIXME update model, manage errors
-			if (clipboard["pathes"].length == 0)
+		function paste() { // FIXME manage errors
+			if (clipboard["files"].length == 0 || currentNav["path"]==clipboard["path"])
 			{
 				return;
 			}
@@ -191,29 +216,33 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			{
 				rp = currentNav["path"] + '/';
 			}
-			for (var fi in clipboard["pathes"])
+			for (var fi in clipboard["files"])
 			{
-				var nfp = rp + clipboard["pathes"][fi].substr(clipboard["pathes"][fi].lastIndexOf('/')+1);
-				
-				if (clipboard["mode"]==0)
-				{
-					$unifileStub.cp({service:currentNav["srv"], path:clipboard["pathes"][fi]+':'+nfp}, function() {
-						console.log("copy done");
-						// TODO refresh model or view ?
-					});
-				}
-				else
-				{
-					$unifileStub.mv({service:currentNav["srv"], path:clipboard["pathes"][fi]+':'+nfp}, function() {
-						console.log("cut done");
-						// TODO refresh model or view ?
-					});
-				}
+				(function(file){
+					var nfp = rp + file['name'];
+					
+					if (clipboard["mode"]==0)
+					{
+						$unifileStub.cp({service:currentNav["srv"], path:clipboard["path"]+file.name+':'+nfp}, function() {
+							console.log("copy done");
+							file.isSelected = false;
+							currentNav["files"].push(file); // paste happens always in current directory
+						});
+					}
+					else
+					{
+						$unifileStub.mv({service:currentNav["srv"], path:clipboard["path"]+file.name+':'+nfp}, function() {
+							console.log("cut done");
+							file.isSelected = false;
+							currentNav["files"].push(file); // paste happens always in current directory
+						});
+					}
+				})(clipboard["files"][fi]);
 			}
 			if (clipboard["mode"]==1) // clear clipboard if cut mode
 			{
 				clipboard["mode"]=0;
-				clipboard["pathes"]=[];
+				clipboard["files"]=[];
 			}
 		}
 		function isCorrectFileName(name)
@@ -236,7 +265,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 					currentNav.files.push({ 'name': mkdirName, 'is_dir': true }); // FIXME see if unifile couldn't send back the file json object
 				});
 		}
-		function togleSelect(file) {
+		function togleSelect(file) { console.log("togleSelect "+file.name);
 			for(var fi in currentNav.files)
 			{
 				if (currentNav.files[fi] == file)
@@ -528,7 +557,7 @@ angular.module('ceCtrls', ['ceServices'])
 				}
 			}
 			$scope.isEmptyClipboard = function() {
-				return ($unifileSrv.clipboard()["pathes"].length === 0);
+				return ($unifileSrv.clipboard()["files"].length === 0);
 			}
 			$scope.remove = function() {
 				$unifileSrv.remove();
@@ -565,8 +594,8 @@ angular.module('ceCtrls', ['ceServices'])
 				}
 				return fp;
 			}
-			$scope.filePath = getFilePath(); console.log('$scope.filePath= '+$scope.filePath);
-			$scope.fileSrv = $scope.srv; console.log('$scope.fileSrv= '+$scope.fileSrv);
+			$scope.filePath = getFilePath(); console.log('$scope.filePath= '+$scope.filePath); // FIXME that should be necessary as this is a child scope !!!
+			$scope.fileSrv = $scope.srv; console.log('$scope.fileSrv= '+$scope.fileSrv); // FIXME that should be necessary as this is a child scope !!!
 			$scope.renameOn = false;
 			// can be dir, file or both
 			$scope.isFile = false;
@@ -619,7 +648,8 @@ console.log("simple click received");
 			{
 console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.filePath);
 				e.originalEvent.dataTransfer.effectAllowed = 'move';
-				e.originalEvent.dataTransfer.setData('text', $scope.filePath);
+				//e.originalEvent.dataTransfer.setData('text', $scope.filePath);
+				e.originalEvent.dataTransfer.setData('text', '{ "srv": "'+$scope.fileSrv+'", "path": "'+$scope.path+'", "files": ['+JSON.stringify($scope.file)+'] }' );
 
 				$element.addClass("ce-file-drag"); // FIXME make it a param in conf?
 			};
@@ -699,17 +729,20 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					$unifileSrv.upload( e.originalEvent.dataTransfer.files, $scope.filePath );
 				}
 				else // move case
-				{
-					var evPath = e.originalEvent.dataTransfer.getData('text');
-					if ( $scope.filePath == evPath )
+				{ //console.log("from drag event: "+e.originalEvent.dataTransfer.getData('text'));
+					var evData = JSON.parse(e.originalEvent.dataTransfer.getData('text'));
+					
+					for (var i in evData.files)
 					{
-						console.log("NOTICE: cannot move a folder into itself!");
+						if ( evData.path != '' && $scope.filePath == evData.path+'/'+evData.files[i].name || 
+							evData.path == '' && $scope.filePath == evData.file.name )
+						{
+							console.log("WARNING: cannot move a folder into itself!");
+							return; // FIXME could it be cleaner ?
+						}
 					}
-					else
-					{
 //console.log("move " + evPath + " to: " + $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1)); // NOTE: new path will probably need to be concatenated with file '/'+name
-						$unifileSrv.mv($scope.fileSrv, evPath, $scope.filePath+'/'+evPath.substr(evPath.lastIndexOf('/')+1));
-					}
+					$unifileSrv.mv(evData.srv, $scope.fileSrv, evData.path, $scope.filePath, evData.files);
 				}
 			};
 			/**
@@ -791,6 +824,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 	})
 
 	// the rename item form
+	// FIXME merge with ceMkdir ? Or should this be a directive at all ?
 	.directive('ceRename', function()
 	{
 		return {
@@ -806,6 +840,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 	})
 
 	// the "new folder" button
+	// FIXME merge with ceRename ? Or should this be a directive at all ?
 	.directive('ceMkdir', function()
 	{
 		return {
