@@ -9,18 +9,42 @@ ul
 }
 a
 {
-	z-index: 10;
-	color:#61666c;text-decoration:none;
+	z-index: 10;text-decoration:none;
+	cursor:pointer;
+}
+/* hide input file */
+input[type=file]
+{
+	width:0;height:0;overflow:hidden;
 }
 /* FILES TREE */
-ul.tree
+ul.tree, .ce-right-pane ul
 {
 	list-style:none;
 }
-/* Prevent the text contents of draggable elements from being selectable. */
-[draggable]
+.ce-right-pane div
 {
-  -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; user-select:none;
+	display:inline-block;
+}
+
+/* SERVICES */
+span.dropbox
+{
+	background:url('../assets/dropbox.png') no-repeat;
+	padding-left:20px;
+	cursor:pointer;
+}
+span.gdrive
+{
+	background:url('../assets/gdrive.png') no-repeat;
+	padding-left:20px;
+	cursor:pointer;
+}
+/* FILES AND FOLDERS */
+/* Prevent the text contents of draggable elements from being selectable. */
+[draggable=true]
+{
+  -moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;user-select:none;
   /* Required to make elements draggable in old WebKit */
   -khtml-user-drag:element; -webkit-user-drag:element;
   cursor:move;
@@ -29,37 +53,51 @@ ul.tree
 {
 	border:1px solid red;
 }
-a.is-dir-true
+span.is-dir-true, div.is-dir-true
 {
 	background:url('../assets/folder.png') no-repeat;
 	padding-left:20px;
+	cursor:pointer;
 }
-li.is-dir-true
+span.is-dir-false, div.is-dir-false
 {
-	list-style:square url('../assets/folder.png');
+	background:url('../assets/file.png') no-repeat;
+	padding-left:20px;
+	cursor:pointer;
 }
-li.is-dir-false
+div.ce-file-selected
 {
-	list-style:square url('../assets/file.png');
+	background-color:blue;
 }
-.loggedin-hide-true
+.ce-item, .ce-new-item
+{
+	-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;user-select:none;
+}
+.ce-item form, .ce-new-item form
+{
+	padding:0;margin:0;
+}
+.ce-item input[type="text"], .ce-new-item input[type="text"]
+{
+	padding:0;margin:0;
+	height:20px;line-height:18px;
+}
+.loggedin-hide-true /* FIXME useful ? */
 {
 	display: none;
 }
-.loggedin-show-false
+.loggedin-show-false /* FIXME useful ? */
 {
 	display: none;
 }
-/* SERVICES */
-a.dropbox
+/* connect btn */
+a.ce-srv-connected
 {
-	background:url('../assets/dropbox.png') no-repeat;
-	padding-left:20px;
+	font-style:italic;color:#e3e3e3; /* FIXME color not displayed */
 }
-a.gdrive
+a.ce-srv-not-connected
 {
-	background:url('../assets/gdrive.png') no-repeat;
-	padding-left:20px;
+
 }
 /* LOGS CONSOLE */
 .ce-log-console
@@ -67,4 +105,9 @@ a.gdrive
 	font-size:small;
 	height:50px; overflow-y:scroll;
 	list-style-type:none;
+}
+/* file uploader directive */
+div.fileUploader
+{
+	
 }
