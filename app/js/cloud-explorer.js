@@ -11,10 +11,7 @@
 /**
  * TODO
  * manage cases when moving/pasting files where other files with same name exists...
- * each time we have a new input text (rename or mkdir), set focus on input text
  * unselect files when clicked somewhere else ?
- * abort rename or mkdir on clicked somewhere else or on escape
- * refresh after upload ! (or update model)
  * refresh after moove ! (or update model)
  * fix # anchor part in url should not appear (since angular 1.1.4)
  * create alert/error system with focus on inputs for faulty uses (like: rename file to a invalid name, ...)
@@ -793,6 +790,21 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 		};
 	})
 
+	// the rename item form
+	.directive('ceRename', function()
+	{
+		return {
+			restrict: 'C',
+			template: '<form ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form>',
+			link: function($scope, $element)
+			{
+				var i = $element.find('input');
+				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.renameOn = false; }); } ); // FIXME find a cleaner solution not based on parent scope
+				i.focus();
+			}
+		};
+	})
+
 	// the "new folder" button
 	.directive('ceMkdir', function()
 	{
@@ -802,7 +814,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			link: function($scope, $element)
 			{
 				var i = $element.find('input');
-				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.mkdirOn = false; }); } );
+				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.mkdirOn = false; }); } ); // FIXME find a cleaner solution not based on parent scope
 				i.focus();
 			}
 		};
@@ -945,9 +957,9 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 							</li> \
 							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" class=\"ce-item is-dir-true\" ce-folder>..</span></li> \
 							<li class=\"ce-item\" ng-repeat=\"file in files | orderBy:'is_dir':true\"> \
-								<div ng-hide=\"renameOn\" ng-if=\"file.is_dir\" ce-folder ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
-								<div ng-hide=\"renameOn\" ng-if=\"!file.is_dir\" ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
-								<div ng-if=\"renameOn\" ng-class=\"getClass()\"><form ng-submit=\"rename(newName)\"><input type=\"text\" ng-model=\"newName\" ng-init=\"newName=file.name\" /></form></div> \
+								<div ng-if=\"file.is_dir && !renameOn\" ce-folder ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
+								<div ng-if=\"!file.is_dir && !renameOn\" ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
+								<div class=\"ce-rename\" ng-if=\"renameOn\" ng-class=\"getClass()\"></div> \
 								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 							</li> \
 							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\" mkdirOn=\"mkdirOn\"></li> \
