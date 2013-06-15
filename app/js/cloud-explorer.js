@@ -997,7 +997,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 								<div class=\"ce-rename\" ng-if=\"renameOn\" ng-class=\"getClass()\"></div> \
 								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 							</li> \
-							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\" mkdirOn=\"mkdirOn\"></li> \
+							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\"></li> \
 						</ul> \
 					</div>",
 			controller: 'CERightPaneCtrl'
