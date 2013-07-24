@@ -23,6 +23,102 @@
  * download link won't propose to save file in Firefox 20 if not same origin, we could force download from server side [unifile]
  */
 
+/**
+ * TODO create a "factory", a prototype ?
+ * 
+ * CEBlob.url
+ * The most critical part of the file, the url points to where the file is stored and acts as a sort of "file path". 
+ * The url is what is used when making the underlying GET and POST calls to Ink when you do a filepicker.read or filepicker.write call.
+ * 
+ * CEBlob.filename
+ * The name of the file, if available
+ * 
+ * CEBlob.mimetype
+ * The mimetype of the file, if available.
+ * 
+ * CEBlob.size
+ * The size of the file in bytes, if available. We will attach this directly to the InkBlob when we have it, otherwise you can always get the size by calling filepicker.stat
+ * 
+ * CEBlob.isWriteable
+ * This flag specifies whether the underlying file is writeable. In most cases this will be true, but if a user uploads a photo from facebook, 
+ * for instance, the original file cannot be written to. In these cases, you should use the filepicker.exportFile call as a way to give the user the ability to save their content.
+ */
+
+////////////
+// Internals
+////////////
+
+var ceInstance = null;
+/**
+ * out 	choseCb
+ * in 	mode
+ */
+var __ceInstance = {};
+
+var ONE_FILE_SEL_MODE = 1;
+
+function openCE()
+{
+	if (ceInstance == null)
+	{
+		ceInstance = document.getElementById("CE");
+		for (var ci in ceInstance.children)
+		{
+			if (ceInstance.children[ci].tagName == "BUTTON")
+			{
+				ceInstance.children[ci].addEventListener( "click", function() { ceInstance.style.display = "none"; }, false );
+			}
+		}
+	}
+	if (ceInstance.style.display != "block")
+	{
+		ceInstance.style.display = "block";
+	}
+}
+function closeCE()
+{
+	ceInstance.style.display = "none";
+}
+/**
+ * TODO pick([options], onSuccess(InkBlob){}, onError(FPError){})
+ * TODO force one file selection (forbid multi select and folder select)
+ * TODO manage onError
+ * TODO manage file upload
+ * TODO return CEBlob
+ */
+function ce_pick(onSuccess, onError) {
+	__ceInstance["mode"] = ONE_FILE_SEL_MODE;
+	__ceInstance["choseCb"] = function(data) {
+		closeCE();
+		onSuccess(data);
+	}
+	openCE();
+}
+function ce_exportFile(input, options, onSuccess, onError, onProgress) {
+
+}
+function ce_read(input, [options], onSuccess, onError, onProgress) {
+
+}
+function ce_write(target, data, options, onSuccess, onError, onProgress) {
+
+}
+
+
+//////////////
+// Exposed API
+//////////////
+
+var cloudExplorer = {};
+cloudExplorer.pick = ce_pick;
+cloudExplorer.exportFile = ce_exportFile;
+cloudExplorer.read = ce_read;
+cloudExplorer.write = ce_write;
+
+/////////////////////////
+// AngularJS CE component
+/////////////////////////
+
 /* Config */
 angular.module('ceConf', [])
 
@@ -132,7 +228,8 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				return;
 			}
 		}
-		function cd(srvName, path) { console.log("cd("+srvName+", "+path+")");
+		function cd(srvName, path) {
+//console.log("cd("+srvName+", "+path+")");
 			$unifileStub.ls({service:srvName, path:path}, function (res)
 				{
 					console.log("cd command returned "+res.length+" elts for service "+srvName);
@@ -271,32 +368,46 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			//TODO other checks on characters used...
 			return true;
 		}
-		function mkdir(mkdirName) { // FIXME manage errors
+		function mkdir(mkdirName)
+		{ // FIXME manage errors
 			var rp = currentNav.path;
 			if (rp != '')
 			{
 				rp += '/';
 			}
 			$unifileStub.mkdir({service:currentNav.srv, path:rp+mkdirName}, function () {
-					console.log("new "+mkdirName+" directory created.");
+//console.log("new "+mkdirName+" directory created.");
 					currentNav.files.push({ 'name': mkdirName, 'is_dir': true }); // FIXME see if unifile couldn't send back the file json object
 				});
 		}
-		function togleSelect(file) { console.log("togleSelect "+file.name);
+		function togleSelect(file)
+		{
+console.log("togleSelect "+file.name);
 			for(var fi in currentNav.files)
 			{
 				if (currentNav.files[fi] == file)
 				{
-					if (currentNav.files[fi]["isSelected"])
+					if (!__ceInstance || __ceInstance["mode"] === 1 && !currentNav.files[fi].is_dir)
 					{
-						currentNav.files[fi]["isSelected"] = !currentNav.files[fi]["isSelected"];
-					}
-					else
-					{
-						currentNav.files[fi]["isSelected"] = true;
+						if (currentNav.files[fi]["isSelected"])
+						{
+							currentNav.files[fi]["isSelected"] = !currentNav.files[fi]["isSelected"];
+						}
+						else
+						{
+							currentNav.files[fi]["isSelected"] = true;
+						}
 					}
 					currentNav.files[fi]["lastSelectionDate"] = Date.now();
-					return;
+
+					if (!__ceInstance)
+					{
+						return;
+					}
+				}
+				else if (__ceInstance && __ceInstance["mode"]===ONE_FILE_SEL_MODE)
+				{
+					currentNav.files[fi]["isSelected"] = false;
 				}
 			}
 		}
@@ -381,7 +492,7 @@ angular.module('ceCtrls', ['ceServices'])
 				{
 					if (services[s].hasOwnProperty("name") && !$scope.tree.hasOwnProperty(services[s]["name"]))
 					{
-console.log("services[s]= "+JSON.stringify(services[s]))
+//console.log("services[s]= "+JSON.stringify(services[s]))
 						$scope.tree[services[s]["name"]] = [];
 					}
 					if (services[s]["isConnected"]===true)
@@ -395,7 +506,7 @@ console.log("services[s]= "+JSON.stringify(services[s]))
 						}
 						else
 						{
-console.log("$unifileSrv.currentNav already set so do not change it");
+//console.log("$unifileSrv.currentNav already set so do not change it");
 							// if tree not empty, we do not want to change current dir automatically
 							$unifileStub.ls({service:sname, path:""}, function (res)
 							{
@@ -460,6 +571,22 @@ console.log("$unifileSrv.currentNav already set so do not change it");
 		{
 			// scope contains the current path, the list of folders and files in the current path
 			$scope.$watch( $unifileSrv.currentNav, currentNavChanged, true);
+
+			//$scope.$watch( __ceInstance["mode"], modeChanged );
+			/**
+			 *
+			 */
+			$scope.hideOKBtn = function()
+			{
+console.log("hideOKBtn called");
+				if (__ceInstance && __ceInstance["mode"] == ONE_FILE_SEL_MODE)
+				{
+console.log("hideOKBtn called return isEmptySelection= "+$scope.isEmptySelection);
+					return $scope.isEmptySelection;
+				}
+console.log("hideOKBtn called return true");
+				return true;
+			}
 			/**
 			 *
 			 */
@@ -498,7 +625,8 @@ console.log("$unifileSrv.currentNav already set so do not change it");
 			 * mkdir command
 			 */
 			$scope.doMkdir = function(mkdirName)
-			{ console.log("doMkdir("+mkdirName+") called");
+			{
+//console.log("doMkdir("+mkdirName+") called");
 				if (!$unifileSrv.isCorrectFileName(mkdirName))
 				{
 					console.log("WARNING: name given for new directory is not valid: "+mkdirName);
@@ -506,9 +634,9 @@ console.log("$unifileSrv.currentNav already set so do not change it");
 				}
 				else
 				{
-					console.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path);
+//console.log("creating directory "+mkdirName+" in "+$scope.srv+":"+$scope.path);
 					$unifileSrv.mkdir(mkdirName);
-					$scope.mkdirOn = false; // fixme, should be set to false when server response received
+					$scope.mkdirOn = false; // FIXME, should be set to false when server response received
 				}
 			}
 			$scope.isEmptyClipboard = function() {
@@ -528,6 +656,18 @@ console.log("$unifileSrv.currentNav already set so do not change it");
 			$scope.paste = function()
 			{
 				$unifileSrv.paste();
+			};
+			$scope.chose = function()
+			{
+console.log("chose __ceInstance= "+__ceInstance);
+				for(var fi in $scope.files)
+				{
+					if ($scope.files[fi].isSelected===true)
+					{
+						__ceInstance.choseCb($scope.srv+":"+$scope.path+"/"+$scope.files[fi].name);
+						break;
+					}
+				}
 			};
 		}])
 
@@ -549,8 +689,8 @@ console.log("$unifileSrv.currentNav already set so do not change it");
 				}
 				return fp;
 			}
-			$scope.filePath = getFilePath(); console.log('$scope.filePath= '+$scope.filePath); // FIXME that should be necessary as this is a child scope !!!
-			$scope.fileSrv = $scope.srv; console.log('$scope.fileSrv= '+$scope.fileSrv); // FIXME that should be necessary as this is a child scope !!!
+			$scope.filePath = getFilePath(); //console.log('$scope.filePath= '+$scope.filePath); // FIXME that should be necessary as this is a child scope !!!
+			$scope.fileSrv = $scope.srv; //console.log('$scope.fileSrv= '+$scope.fileSrv); // FIXME that should be necessary as this is a child scope !!!
 			$scope.renameOn = false;
 			// can be dir, file or both
 			$scope.isFile = false;
@@ -997,6 +1137,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 							<li ng-show=\"isCtrlBtnsVisible()\"> \
 								<div file-uploader></div> \
 								<div ce-mkdir-btn></div> \
+								<button ng-hide=\"hideOKBtn()\" ng-click=\"chose()\">OK</button> \
 								<button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> \
 								<button ng-hide=\"isEmptySelection\" ng-click=\"cut()\">Cut</button> \
 								<button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
@@ -1006,11 +1147,11 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 								<div ng-if=\"file.is_dir && !renameOn\" ce-folder ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
 								<div ng-if=\"!file.is_dir && !renameOn\" ce-file ng-class=\"getClass()\"><span>{{file.name}}</span></div> \
 								<div class=\"ce-rename\" ng-if=\"renameOn\" ng-class=\"getClass()\"></div> \
-								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 							</li> \
 							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\"></li> \
 						</ul> \
 					</div>",
+//								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 			controller: 'CERightPaneCtrl'
 		};
 	})
