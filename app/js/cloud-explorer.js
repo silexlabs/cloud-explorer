@@ -76,7 +76,8 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		// the clipboard var used for copy/paste 
 		var clipboard = { "mode":0, "path":"", "files":[] }; // mode=0 => copy, mode=1 => cut
 
-		function listServices() { 
+		function listServices()
+		{ 
 			if (services == undefined)
 			{
 				services = []; // value used by data bindings while the response until the next call has arrived
@@ -84,7 +85,23 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 			}
 			return services;
 		}
-		function login(srvName) {
+		function isConnected(srvName)
+		{
+			for (var si in services)
+			{
+				if (services[si]["name"] == srvName)
+				{
+					if (services[si].hasOwnProperty("isConnected") && services[si]["isConnected"]===true)
+					{
+						return true;
+					}
+					return false;
+				}
+			}
+			return false;
+		}
+		function login(srvName)
+		{
 			for (var si = 0; si < services.length; si++) // FIXME angular 1.1.3 doesn't accept both filter and associative arrays in ng-repeat. As soon as it does, optimize it to make services an associative array
 			{
 				if (services[si]["name"]!=srvName)
@@ -320,6 +337,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 		}
 		return {
 			services: function() { return services; },
+			isConnected: isConnected,
 			currentNav: function() { return currentNav; },
 			clipboard: function() { return clipboard; },
 			listServices: listServices,
@@ -341,85 +359,19 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 angular.module('ceCtrls', ['ceServices'])
 
 	/**
-	 * Controls the "connect to service" button
-	 */
-	.controller('CEConnectBtnCtrl', ['$scope', '$window', '$unifileSrv', '$q', '$unifileStub', function($scope, $window, $unifileSrv, $q, $unifileStub)
-		{
-			// bind the services list
-			$scope.$watch( $unifileSrv.listServices, function (services) {
-				$scope.services = services;
-			});
-			/**
-			 * Opens the application authorization popup for the given service
-			 */
-			function authorize(url, serviceName)
-			{
-				var authPopup = $window.open(url, 'authPopup', 'height=500,width=700,dialog'); // FIXME parameterize size? per service ?
-				authPopup.owner = $window;
-				if ($window.focus) { authPopup.focus() }
-				if (authPopup)
-				{
-					// timer based solution until we find something better to listen to the child window events (close, url change...)
-					var timer = setInterval(function() 
-						{
-							if (authPopup.closed)
-							{
-								clearInterval(timer);
-								$scope.$apply( function($scope){$unifileSrv.login(serviceName);} ); // since 1.1.4, need to wrap call in $apply, not sure why...
-							}
-						}, 500);
-				}
-				else
-				{
-					console.error('Popup could not be opened');
-				}
-			}
-			/**
-			 * Connect to service
-			 */
-			$scope.connect = function(srv)
-			{
-				if (!srv.isConnected)
-				{
-					$q.when(srv.name)
-					.then( function(sn) {
-						var deferred = $q.defer();
-						$unifileStub.connect({service:sn},
-							function (resp) {
-								deferred.resolve(resp);
-							}
-						);
-						return deferred.promise;
-					})
-					.then(function(cr) {
-						authorize(cr.authorize_url, srv.name);
-					});
-				}
-				else
-				{
-					console.log("Already connected to "+srv.name);
-				}
-			};
-			$scope.srvLinkClass = function (srv)
-			{ //console.log("srvLinkClass "+srv.isConnected);
-				if (srv.isConnected)
-				{
-					return "ce-srv-connected";
-				}
-				return "ce-srv-not-connected";
-			}
-		}])
-
-	/**
 	 * Controls the browser left pane
 	 */
 	.controller('CELeftPaneCtrl', ['$scope', '$unifileSrv', '$unifileStub', function($scope, $unifileSrv, $unifileStub)
 		{
 			// the services folder tree
 			$scope.tree = {}; // { "dropbox" => [  ], "gdrive" => [  ] }
+
 			// scope contains the service + folders tree and need to be able to enable/disable a branch (service) id its isConnected flag changes
 			$scope.$watch( $unifileSrv.services, servicesChanged, true);
 			$scope.$watch( $unifileSrv.currentNav, currentNavChanged, true);
+
+			// Initiate the list of services (should it be somewhere else ?)
+			$unifileSrv.listServices();
 			/**
 			 *
 			 */
@@ -427,7 +379,12 @@ angular.module('ceCtrls', ['ceServices'])
 			{
 				for (var s in services)
 				{
-					if (services[s]["isConnected"]===true && !$scope.tree.hasOwnProperty(services[s]["name"]))
+					if (services[s].hasOwnProperty("name") && !$scope.tree.hasOwnProperty(services[s]["name"]))
+					{
+console.log("services[s]= "+JSON.stringify(services[s]))
+						$scope.tree[services[s]["name"]] = [];
+					}
+					if (services[s]["isConnected"]===true)
 					{
 						//console.log(services[s]["name"]+" connected but no data found in tree. Performing ls()...");
 						var sname = services[s]["name"]; // cannot use s in cb functions below (don't know why...)
@@ -437,18 +394,14 @@ angular.module('ceCtrls', ['ceServices'])
 							$unifileSrv.cd(sname, "");
 						}
 						else
-						{ console.log("$unifileSrv.currentNav already set so do not change it");
+						{
+console.log("$unifileSrv.currentNav already set so do not change it");
 							// if tree not empty, we do not want to change current dir automatically
 							$unifileStub.ls({service:sname, path:""}, function (res)
 							{
 								$scope.tree[ sname ] = res;
 							});
 						}
-					}
-					else if (!services[s]["isConnected"] && $scope.tree.hasOwnProperty(services[s]["name"]))
-					{
-						//TODO remove service from tree
-						console.log("TODO remove service from tree");
 					}
 				}
 			}
@@ -511,9 +464,11 @@ angular.module('ceCtrls', ['ceServices'])
 			 *
 			 */
 			function currentNavChanged(currNav)
-			{ //console.log("[CERightPaneCtrl] currentNavChanged in right pane and equals "+currNav);
+			{
+//console.log("[CERightPaneCtrl] currentNavChanged in right pane and equals "+currNav);
 				if (currNav!==undefined)
-				{ //console.log("right pane files set");
+				{
+//console.log("right pane files set");
 					$scope.path = currNav.path;
 					$scope.srv = currNav.srv;
 					$scope.files = currNav.files;
@@ -579,7 +534,7 @@ angular.module('ceCtrls', ['ceServices'])
 	/**
 	 * This controller is shared by the ceFile and ceFolder directives.
 	 */
-	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileSrv', '$unifileStub', 'server.url.unescaped', function($scope, $element, $unifileSrv, $unifileStub, serverUrl)
+	.controller('CEFileEntryCtrl', ['$scope', '$element', '$unifileSrv', '$unifileStub', 'server.url.unescaped', '$q', '$window', function($scope, $element, $unifileSrv, $unifileStub, serverUrl, $q, $window)
 		{
 			function getFilePath() {
 				var fp = $scope.path;
@@ -616,12 +571,68 @@ angular.module('ceCtrls', ['ceServices'])
 				});
 			};
 			/**
+			 * Opens the application authorization popup for the given service
+			 */
+			function authorize(url, serviceName)
+			{
+				var authPopup = $window.open(url, 'authPopup', 'height=550,width=750,dialog'); // FIXME parameterize size? per service ?
+				authPopup.owner = $window;
+				if ($window.focus) { authPopup.focus() }
+				if (authPopup)
+				{
+					// timer based solution until we find something better to listen to the child window events (close, url change...)
+					var timer = setInterval(function() 
+						{
+							if (authPopup.closed)
+							{
+								clearInterval(timer);
+								$scope.$apply( function($scope){$unifileSrv.login(serviceName);} );
+							}
+						}, 500);
+				}
+				else
+				{
+					console.error('ERROR: Authorization popup could not be opened');
+				}
+			}
+			/**
+			 * Connect to service
+			 */
+			function connect(srvName)
+			{
+				if (!$unifileSrv.isConnected(srvName))
+				{
+					$q.when(srvName)
+					.then( function(sn) {
+						var deferred = $q.defer();
+						$unifileStub.connect({service:sn},
+							function (resp) {
+								deferred.resolve(resp);
+							}
+						);
+						return deferred.promise;
+					})
+					.then(function(cr) {
+						authorize(cr.authorize_url, srvName);
+					});
+				}
+				else
+				{
+					console.log("Already connected to "+srvName);
+				}
+			};
+			/**
 			 * TODO comment
 			 */
 			$scope.enterDir = function()
 			{
 console.log("Entering within "+$scope.fileSrv+":"+$scope.filePath);
-				if ($scope.file != null && $scope.file.is_dir || $scope.file == null)
+				if (!$unifileSrv.isConnected($scope.fileSrv))
+				{
+console.log("sorry, but you're not connected to "+$scope.fileSrv);
+					connect($scope.fileSrv);
+				}
+				else if ($scope.file != null && $scope.file.is_dir || $scope.file == null)
 				{
 					$unifileSrv.cd($scope.fileSrv, $scope.filePath);
 				}
@@ -833,7 +844,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			link: function($scope, $element)
 			{
 				var i = $element.find('input');
-				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.renameOn = false; }); } ); // FIXME find a cleaner solution not based on parent scope
+				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.renameOn = false; }); } ); // maybe rootScope instead of parentScope would be safer here
 				i.focus();
 			}
 		};
@@ -849,7 +860,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			link: function($scope, $element)
 			{
 				var i = $element.find('input');
-				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.mkdirOn = false; }); } ); // FIXME find a cleaner solution not based on parent scope
+				i.bind('focusout', function(e) { $scope.$parent.$apply(function(scope){ scope.mkdirOn = false; }); } ); // maybe rootScope instead of parentScope would be safer here
 				i.focus();
 			}
 		};
@@ -931,7 +942,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			}
 		};
 	})
-
+/*
 	// this directive implements the Connect button
 	.directive('ceConnectBtn', function()
 	{
@@ -947,7 +958,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			controller: 'CEConnectBtnCtrl'
 		};
 	})
-
+*/
 	// the browser left pane directive
 	.directive('ceLeftPane',  function()
 	{
@@ -1011,11 +1022,6 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			restrict: 'A',
 			replace: true,
 			template: "<div class=\"ceBrowser\"> \
-						<div class=\"row-fluid\"> \
-							<div class=\"span4\"> \
-								<div ce-connect-btn></div> \
-							</div> \
-						</div> \
 						<div class=\"row-fluid\"> \
 							<div class=\"span4\"> \
 								<div ce-left-pane></div> \
