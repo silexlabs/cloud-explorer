@@ -3,8 +3,8 @@ div#CE
 	color:#61666c;
 	font-weight:400;font-size:1em;font-family:'Open Sans', sans-serif;
 	border:1px solid black;
-	width:800px;height:350px;
-	position:absolute; top:50%;left:50%;margin-left:-400px;margin-top:-175px;
+	width:700px;height:350px;
+	position:absolute; top:50%;left:50%;margin-left:-350px;margin-top:-175px;
 }
 div#CE ul
 {
@@ -93,14 +93,15 @@ div#CE .loggedin-show-false /* FIXME useful ? */
 {
 	display: none;
 }
-/* connect btn */
-div#CE a.ce-srv-connected
+/* save as btn */
+div#CE div.ce-saveas-btn
 {
-	font-style:italic;color:#e3e3e3; /* FIXME color not displayed */
-}
-div#CE a.ce-srv-not-connected
-{
+	border:1px solid black;
 
+}
+div#CE div.ce-saveas-btn input
+{
+	width:80px;
 }
 /* LOGS CONSOLE */
 div#CE .ce-log-console

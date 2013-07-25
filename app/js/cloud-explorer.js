@@ -50,12 +50,13 @@
 
 var ceInstance = null;
 /**
- * out 	choseCb
+ * out 	onSuccess
  * in 	mode
  */
 var __ceInstance = {};
 
-var ONE_FILE_SEL_MODE = 1;
+var ONE_FILE_SEL_MODE = 1; // select one file only
+var ONE_FILE_SAVE_MODE = 2; // write or overwrite one file only
 
 function openCE()
 {
@@ -85,22 +86,32 @@ function closeCE()
  * TODO manage onError
  * TODO manage file upload
  * TODO return CEBlob
+ * TODO url should look like this: http://unifile.silexlabs.org/v1.0/dropbox/exec/get/Photos/SampleAlbum/BostonCityFlow.jpg
  */
 function ce_pick(onSuccess, onError) {
 	__ceInstance["mode"] = ONE_FILE_SEL_MODE;
-	__ceInstance["choseCb"] = function(data) {
+	__ceInstance["onSuccess"] = function(data) {
 		closeCE();
 		onSuccess(data);
 	}
 	openCE();
 }
-function ce_exportFile(input, options, onSuccess, onError, onProgress) {
-
+/**
+ * TODO ce_exportFile(input, [options], onSuccess, onError, onProgress)
+ * When does Alex use it ? use store() first ?
+ */
+function ce_exportFile(onSuccess) {
+	__ceInstance["mode"] = ONE_FILE_SAVE_MODE;
+	__ceInstance["onSuccess"] = function(data) {
+		closeCE();
+		onSuccess(data);
+	}
+	openCE();
 }
 function ce_read(input, [options], onSuccess, onError, onProgress) {
 
 }
-function ce_write(target, data, options, onSuccess, onError, onProgress) {
+function ce_write(target, data, [options], onSuccess, onError, onProgress) {
 
 }
 
@@ -161,6 +172,36 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				mv: {method:'GET', params:{method:'exec', command:'mv'}, isArray:false},
 				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
 			});
+	}])
+
+	.factory('$ceUtils', [ 'server.url.unescaped', function(serverUrl)
+	{
+		function urlToPath(url) {
+			if (url.indexOf(serverUrl) != 0)
+			{
+				console.log("ERROR: can't convert url to path: "+url);
+				return null;
+			}
+			var parsedUrl = url.substr(serverUrl.length);
+			if (parsedUrl.indexOf("/exec/get/") != parsedUrl.indexOf("/"))
+			{
+				console.log("ERROR: can't convert url to path: "+url);
+				return null;
+			}
+			return { 'srv':parsedUrl.substr(0, parsedUrl.indexOf("/")) , 'path':parsedUrl.substr(parsedUrl.indexOf("/")+"/exec/get/".length) };
+		}
+		function pathToUrl(path) {
+			if ( !path.srv || !path.path )
+			{
+				console.log("ERROR: can't convert path to url: "+JSON.stringify(path));
+				return null;
+			}
+			return serverUrl+path.srv+"/exec/get/"+path.path;
+		}
+		return {
+			urlToPath: urlToPath,
+			pathToUrl: pathToUrl
+		}
 	}])
 
 	.factory('$unifileSrv', ['$unifileStub', '$http', 'server.url.unescaped', function($unifileStub, $http, serverUrl)
@@ -387,7 +428,8 @@ console.log("togleSelect "+file.name);
 			{
 				if (currentNav.files[fi] == file)
 				{
-					if (!__ceInstance || __ceInstance["mode"] === 1 && !currentNav.files[fi].is_dir)
+					//if (!__ceInstance || __ceInstance["mode"] === ONE_FILE_SEL_MODE && !currentNav.files[fi].is_dir)
+					if (!__ceInstance || __ceInstance && !currentNav.files[fi].is_dir)
 					{
 						if (currentNav.files[fi]["isSelected"])
 						{
@@ -405,7 +447,8 @@ console.log("togleSelect "+file.name);
 						return;
 					}
 				}
-				else if (__ceInstance && __ceInstance["mode"]===ONE_FILE_SEL_MODE)
+				//else if (__ceInstance && __ceInstance["mode"]===ONE_FILE_SEL_MODE)
+				else if (__ceInstance)
 				{
 					currentNav.files[fi]["isSelected"] = false;
 				}
@@ -468,6 +511,24 @@ console.log("togleSelect "+file.name);
 
 /* Controllers */
 angular.module('ceCtrls', ['ceServices'])
+
+	/**
+	 * Sets some exposed functions to the outside world
+	 */
+	.controller('CEBrowserCtrl', ['$scope', '$unifileSrv', '$unifileStub', function($scope, $unifileSrv, $unifileStub)
+		{
+			if (__ceInstance)
+			{
+				__ceInstance["read"] = function(input) {
+					// TODO
+				};
+				__ceInstance["write"] = function(input) {
+					// TODO
+				};
+			}
+		}
+	])
+
 
 	/**
 	 * Controls the browser left pane
@@ -567,24 +628,36 @@ angular.module('ceCtrls', ['ceServices'])
 	/**
 	 * Controls the browser right pane
 	 */
-	.controller('CERightPaneCtrl', ['$scope', '$unifileSrv', function($scope, $unifileSrv)
+	.controller('CERightPaneCtrl', ['$scope', '$unifileSrv', '$ceUtils', function($scope, $unifileSrv, $ceUtils)
 		{
 			// scope contains the current path, the list of folders and files in the current path
 			$scope.$watch( $unifileSrv.currentNav, currentNavChanged, true);
 
-			//$scope.$watch( __ceInstance["mode"], modeChanged );
 			/**
 			 *
 			 */
-			$scope.hideOKBtn = function()
+			$scope.hideSelectBtn = function()
 			{
-console.log("hideOKBtn called");
-				if (__ceInstance && __ceInstance["mode"] == ONE_FILE_SEL_MODE)
+				if (__ceInstance && (__ceInstance["mode"] === ONE_FILE_SEL_MODE || __ceInstance["mode"] === ONE_FILE_SAVE_MODE))
 				{
-console.log("hideOKBtn called return isEmptySelection= "+$scope.isEmptySelection);
 					return $scope.isEmptySelection;
 				}
-console.log("hideOKBtn called return true");
+				return true;
+			}
+			$scope.hideSaveAsBtn = function()
+			{
+				if (__ceInstance && __ceInstance["mode"] === ONE_FILE_SAVE_MODE)
+				{
+					return false;
+				}
+				return true;
+			}
+			$scope.hideUploadBtn = function()
+			{
+				if (!__ceInstance || (__ceInstance && __ceInstance["mode"] === ONE_FILE_SEL_MODE))
+				{
+					return false;
+				}
 				return true;
 			}
 			/**
@@ -659,15 +732,19 @@ console.log("hideOKBtn called return true");
 			};
 			$scope.chose = function()
 			{
-console.log("chose __ceInstance= "+__ceInstance);
 				for(var fi in $scope.files)
 				{
 					if ($scope.files[fi].isSelected===true)
 					{
-						__ceInstance.choseCb($scope.srv+":"+$scope.path+"/"+$scope.files[fi].name);
+						__ceInstance.onSuccess({ 'url': $ceUtils.pathToUrl({'srv':$scope.srv, 'path':$scope.path+'/'+$scope.files[fi].name }) }); // FIXME other CEBlob fields
 						break;
 					}
 				}
+			};
+			$scope.saveAs = function(fileName)
+			{
+				// TODO create file ?
+				__ceInstance.onSuccess({ 'url': $ceUtils.pathToUrl({'srv':$scope.srv, 'path':$scope.path+'/'+fileName+".ext" }) }); // FIXME other CEBlob fields // FIXME extension
 			};
 		}])
 
@@ -909,11 +986,13 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 			$scope.rename = function(newName)
 			{
 				if (!$scope.renameOn)
-				{ console.log("rename called and now on");
+				{
+console.log("rename called and now on");
 					$scope.renameOn = true;
 				}
 				else
-				{ console.log("rename called and now off");
+				{
+console.log("rename called and now off");
 					if (!$unifileSrv.isCorrectFileName(newName))
 					{
 						console.log("WARNING: won't rename, incorrect file/folder name given: "+newName);
@@ -1135,12 +1214,10 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			template: "<div> \
 						<ul> \
 							<li ng-show=\"isCtrlBtnsVisible()\"> \
-								<div file-uploader></div> \
+								<div ng-hide=\"hideUploadBtn()\" file-uploader></div> \
 								<div ce-mkdir-btn></div> \
-								<button ng-hide=\"hideOKBtn()\" ng-click=\"chose()\">OK</button> \
-								<button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> \
-								<button ng-hide=\"isEmptySelection\" ng-click=\"cut()\">Cut</button> \
-								<button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
+								<div ng-hide=\"hideSaveAsBtn()\" class=\"ce-saveas-btn\">{{ srv+\":\"+path+\"/\" }} <input type=\"text\" ng-model=\"saveAsName\"> .ext <button ng-click=\"saveAs(saveAsName)\">Save As</button></div> \
+								<button ng-hide=\"hideSelectBtn()\" ng-click=\"chose()\">Select</button> \
 							</li> \
 							<li ng-if=\"showLinkToParent()\"><span ng-init=\"setLinkToParent()\" class=\"ce-item is-dir-true\" ce-folder>..</span></li> \
 							<li class=\"ce-item\" ng-repeat=\"file in files | orderBy:'is_dir':true\"> \
@@ -1151,6 +1228,9 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\"></li> \
 						</ul> \
 					</div>",
+//								<button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> \
+//								<button ng-hide=\"isEmptySelection\" ng-click=\"cut()\">Cut</button> \
+//								<button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
 //								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 			controller: 'CERightPaneCtrl'
 		};
@@ -1164,14 +1244,15 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			replace: true,
 			template: "<div class=\"ceBrowser\"> \
 						<div class=\"row-fluid\"> \
-							<div class=\"span4\"> \
+							<div class=\"span5\"> \
 								<div ce-left-pane></div> \
 							</div> \
-							<div class=\"span8\"> \
+							<div class=\"span7\"> \
 								<div class=\"ce-right-pane\"></div> \
 							</div> \
 						</div> \
 						<div class=\"row-fluid\"><div class=\"span12\" ce-console></div></div> \
-					</div>"
+					</div>",
+			controller: 'CEBrowserCtrl'
 		};
 	});

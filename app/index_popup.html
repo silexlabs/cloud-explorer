@@ -15,15 +15,16 @@
 	</head>
 	<body>
 		<script>
-			function pickCb(data) {
-				document.getElementById("traces").innerHTML += data+"<br>";
+			function successCb(data) {
+				document.getElementById("traces").innerHTML += data.url+"<br>";
 			}
 		</script>
 		<div style="display:none;" id="CE" ng-app="ceDirectives">
 			<div ce-browser></div>
 			<button>close</button>
 		</div>
-		<button onclick="javascript:cloudExplorer.pick(pickCb);">Pick</button>
+		<button onclick="javascript:cloudExplorer.pick(successCb);">Pick</button>
+		<button onclick="javascript:cloudExplorer.exportFile(successCb);">Export</button>
 		<div id="traces"></div>
 	</body>
 </html>
