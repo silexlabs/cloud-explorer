@@ -81,12 +81,10 @@ function closeCE()
 	ceInstance.style.display = "none";
 }
 /**
- * TODO pick([options], onSuccess(InkBlob){}, onError(FPError){})
- * TODO force one file selection (forbid multi select and folder select)
+ * TODO match method signature: pick([options], onSuccess(InkBlob){}, onError(FPError){})
  * TODO manage onError
  * TODO manage file upload
  * TODO return CEBlob
- * TODO url should look like this: http://unifile.silexlabs.org/v1.0/dropbox/exec/get/Photos/SampleAlbum/BostonCityFlow.jpg
  */
 function ce_pick(onSuccess, onError) {
 	__ceInstance["mode"] = ONE_FILE_SEL_MODE;
@@ -97,7 +95,7 @@ function ce_pick(onSuccess, onError) {
 	openCE();
 }
 /**
- * TODO ce_exportFile(input, [options], onSuccess, onError, onProgress)
+ * TODO match method signature: ce_exportFile(input, [options], onSuccess, onError, onProgress)
  * When does Alex use it ? use store() first ?
  */
 function ce_exportFile(onSuccess) {
@@ -108,11 +106,23 @@ function ce_exportFile(onSuccess) {
 	}
 	openCE();
 }
-function ce_read(input, [options], onSuccess, onError, onProgress) {
-
+/**
+ * TODO ce_read(input, [options], onSuccess, onError, onProgress)
+ * @param 
+ */
+function ce_read(input, onSuccess) {
+	__ceInstance.read(input, onSuccess);
 }
-function ce_write(target, data, [options], onSuccess, onError, onProgress) {
-
+/**
+ * TODO match method signature: ce_write(target, data, [options], onSuccess, onError, onProgress)
+ * TODO support "CEBlob, a DOM File Object, or an <input type="file"/>" as data
+ * 
+ * @param target An CEBlob pointing to the file you'd like to write to.
+ * @param data The data to write to the target file, or an object that holds the data. Can be raw data, an CEBlob, a DOM File Object, or an <input type="file"/>.
+ * @param onSuccess The function to call if the write is successful. We'll return an CEBlob as a JSON object.
+ */
+function ce_write(target, data, onSuccess) {
+	__ceInstance.write(target, data, onSuccess);
 }
 
 
@@ -170,7 +180,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				mkdir: {method:'GET', params:{method:'exec', command:'mkdir'}, isArray:false},
 				cp: {method:'GET', params:{method:'exec', command:'cp'}, isArray:false},
 				mv: {method:'GET', params:{method:'exec', command:'mv'}, isArray:false},
-				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:true}
+				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:false}
 			});
 	}])
 
@@ -454,7 +464,7 @@ console.log("togleSelect "+file.name);
 				}
 			}
 		}
-		function upload(uploadFiles, path)
+		function upload(uploadFiles, path, onSuccess=null)
 		{
 			//enforce path as a folder path
 			if (path != "" && path.lastIndexOf('/') != path.length-1) // TODO check in unifile if it's not a bug
@@ -487,6 +497,28 @@ console.log("togleSelect "+file.name);
 						}
 					}
 					console.log("file(s) successfully sent");
+					if (onSuccess != null)
+					{
+						onSuccess();
+					}
+				});
+		}
+		function get(srv, path, onSuccess)
+		{
+console.log("[unifileSrv] get called");
+			$http({
+					method: 'GET',
+					url: serverUrl+srv+'/exec/get/'+path, // FIXME address as config value, srv as param
+				//	data: formData,
+				//	headers: {'Content-Type': undefined},
+					transformRequest: angular.identity
+				})
+				.success(function(data, status, headers, config) {
+					console.log("successfuly got file content: "+data);
+					if (onSuccess != null)
+					{
+						onSuccess(data);
+					}
 				});
 		}
 		return {
@@ -504,7 +536,8 @@ console.log("togleSelect "+file.name);
 			mkdir:mkdir,
 			isCorrectFileName: isCorrectFileName,
 			togleSelect: togleSelect,
-			upload: upload
+			upload: upload,
+			get: get
 		};
 	}]);
 
@@ -515,15 +548,25 @@ angular.module('ceCtrls', ['ceServices'])
 	/**
 	 * Sets some exposed functions to the outside world
 	 */
-	.controller('CEBrowserCtrl', ['$scope', '$unifileSrv', '$unifileStub', function($scope, $unifileSrv, $unifileStub)
+	.controller('CEBrowserCtrl', ['$scope', '$unifileSrv', '$unifileStub', '$ceUtils', function($scope, $unifileSrv, $unifileStub, $ceUtils)
 		{
 			if (__ceInstance)
 			{
-				__ceInstance["read"] = function(input) {
-					// TODO
+				__ceInstance["read"] = function(input, onSuccess) {
+					var path = $ceUtils.urlToPath(input.url);
+console.log("path.srv= "+path.srv+"   path.path= "+path.path);
+					//$unifileStub.get({service:path.srv, path:path.path}, function (data) { console.log("onSuccess data= "+data); onSuccess(data); });
+					//$unifileSrv.get(path.srv, path.path, function (data) { console.log("onSuccess data= "+data); onSuccess(data); });
+
+					$scope.$apply( function($scope){ $unifileSrv.get(path.srv, path.path, function (data) { console.log("onSuccess data= "+data); onSuccess(data); }); } );
 				};
-				__ceInstance["write"] = function(input) {
-					// TODO
+				__ceInstance["write"] = function(target, data, onSuccess) {
+					var path = $ceUtils.urlToPath(target.url);
+					var fileContent = [data];
+					var fileBlob = new Blob(fileContent, { "type" : target.mimetype });
+					//fileBlob['name'] = 
+
+					$unifileSrv.upload( [fileBlob], path.path, function() { onSuccess(target); } );
 				};
 			}
 		}
