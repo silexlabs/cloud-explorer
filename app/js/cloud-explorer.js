@@ -71,6 +71,10 @@ function openCE()
 			}
 		}
 	}
+	else
+	{
+		__ceInstance["refresh"]();
+	}
 	if (ceInstance.style.display != "block")
 	{
 		ceInstance.style.display = "block";
@@ -458,17 +462,13 @@ console.log("togleSelect "+file.name);
 			{
 				if (currentNav.files[fi] == file)
 				{
-					//if (!__ceInstance || __ceInstance["mode"] === ONE_FILE_SEL_MODE && !currentNav.files[fi].is_dir)
-					if (!__ceInstance || __ceInstance && !currentNav.files[fi].is_dir)
+					if (currentNav.files[fi]["isSelected"])
 					{
-						if (currentNav.files[fi]["isSelected"])
-						{
-							currentNav.files[fi]["isSelected"] = !currentNav.files[fi]["isSelected"];
-						}
-						else
-						{
-							currentNav.files[fi]["isSelected"] = true;
-						}
+						currentNav.files[fi]["isSelected"] = !currentNav.files[fi]["isSelected"];
+					}
+					else
+					{
+						currentNav.files[fi]["isSelected"] = true;
 					}
 					currentNav.files[fi]["lastSelectionDate"] = Date.now();
 
@@ -592,6 +592,9 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path+"    path.filename=
 						$unifileSrv.upload( [fileBlob], path.path, function() { onSuccess(target); } );
 					 } );
 				};
+				__ceInstance["refresh"] = function() {
+					$scope.$digest();
+				}
 			}
 		}
 	])
@@ -707,7 +710,13 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path+"    path.filename=
 			{
 				if (__ceInstance && (__ceInstance["mode"] === ONE_FILE_SEL_MODE || __ceInstance["mode"] === ONE_FILE_SAVE_MODE))
 				{
-					return $scope.isEmptySelection;
+					for(var fi in $scope.files)
+					{
+						if ($scope.files[fi].isSelected===true)
+						{
+							return $scope.files[fi].is_dir;
+						}
+					}
 				}
 				return true;
 			}
@@ -1030,7 +1039,7 @@ console.log("ceFile => dragStart,  e.target= "+e.target+",  path= "+$scope.fileP
 					for (var i in evData.files)
 					{
 						if ( evData.path != '' && $scope.filePath == evData.path+'/'+evData.files[i].name || 
-							evData.path == '' && $scope.filePath == evData.file.name )
+							evData.path == '' && $scope.filePath == evData.files[i].name )
 						{
 							console.log("WARNING: cannot move a folder into itself!");
 							return; // FIXME could it be cleaner ?
@@ -1283,6 +1292,11 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 							<li ng-show=\"isCtrlBtnsVisible()\"> \
 								<div ng-hide=\"hideUploadBtn()\" file-uploader></div> \
 								<div ce-mkdir-btn></div> \
+								<button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> \
+								<button ng-hide=\"isEmptySelection\" ng-click=\"cut()\">Cut</button> \
+								<button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
+							</li> \
+							<li ng-show=\"isCtrlBtnsVisible()\"> \
 								<div ng-hide=\"hideSaveAsBtn()\" class=\"ce-saveas-btn\">{{ srv+\":\"+path+\"/\" }} <input type=\"text\" ng-model=\"saveAsName\"> .ext <button ng-click=\"saveAs(saveAsName)\">Save As</button></div> \
 								<button ng-hide=\"hideSelectBtn()\" ng-click=\"chose()\">Select</button> \
 							</li> \
@@ -1295,9 +1309,6 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 							<li class=\"ce-new-item ce-mkdir\" ng-if=\"mkdirOn\"></li> \
 						</ul> \
 					</div>",
-//								<button ng-hide=\"isEmptySelection\" ng-click=\"copy()\">Copy</button> \
-//								<button ng-hide=\"isEmptySelection\" ng-click=\"cut()\">Cut</button> \
-//								<button ng-hide=\"isEmptyClipboard()\" ng-click=\"paste()\">Paste</button> <button ng-hide=\"isEmptySelection\" ng-click=\"remove()\">Delete</button> \
 //								<a ng-hide=\"file.is_dir\" ng-href=\"{{download()}}\" download=\"{{file.name}}\" target=\"blank\">download</a> \
 			controller: 'CERightPaneCtrl'
 		};
