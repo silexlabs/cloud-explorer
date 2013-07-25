@@ -98,7 +98,7 @@ function ce_pick(onSuccess, onError) {
  * TODO match method signature: ce_exportFile(input, [options], onSuccess, onError, onProgress)
  * When does Alex use it ? use store() first ?
  */
-function ce_exportFile(onSuccess) {
+function ce_exportFile(input, onSuccess, onError) {
 	__ceInstance["mode"] = ONE_FILE_SAVE_MODE;
 	__ceInstance["onSuccess"] = function(data) {
 		closeCE();
@@ -110,7 +110,7 @@ function ce_exportFile(onSuccess) {
  * TODO ce_read(input, [options], onSuccess, onError, onProgress)
  * @param 
  */
-function ce_read(input, onSuccess) {
+function ce_read(input, onSuccess, onError) {
 	__ceInstance.read(input, onSuccess);
 }
 /**
@@ -121,7 +121,7 @@ function ce_read(input, onSuccess) {
  * @param data The data to write to the target file, or an object that holds the data. Can be raw data, an CEBlob, a DOM File Object, or an <input type="file"/>.
  * @param onSuccess The function to call if the write is successful. We'll return an CEBlob as a JSON object.
  */
-function ce_write(target, data, onSuccess) {
+function ce_write(target, data, onSuccess, onError) {
 	__ceInstance.write(target, data, onSuccess);
 }
 
@@ -501,7 +501,7 @@ console.log("togleSelect "+file.name);
 					fn.push({ "name": uploadFiles[i].name });
 				}
 			}
-			if (fn.length == 1) // temporary workaround for issue on FF: https://bugzilla.mozilla.org/show_bug.cgi?id=690659
+			if (fn.length == 1) // FIXME this is a temporary workaround for following issue on FF: https://bugzilla.mozilla.org/show_bug.cgi?id=690659
 			{
 				path += fn[0].name;
 			}
@@ -520,7 +520,7 @@ console.log("togleSelect "+file.name);
 							currentNav.files.push({ 'name': fn[i].name, 'is_dir': false }); // FIXME see if unifile couldn't send back the file json objects
 						}
 					}
-					console.log("file(s) successfully sent");
+					console.log(fn.length+" file(s) successfully sent");
 					if (onSuccess != null)
 					{
 						onSuccess();
@@ -529,12 +529,10 @@ console.log("togleSelect "+file.name);
 		}
 		function get(srv, path, onSuccess)
 		{
-console.log("[unifileSrv] get called");
+//console.log("[unifileSrv] get called");
 			$http({
 					method: 'GET',
 					url: serverUrl+srv+'/exec/get/'+path, // FIXME address as config value, srv as param
-				//	data: formData,
-				//	headers: {'Content-Type': undefined},
 					transformRequest: angular.identity
 				})
 				.success(function(data, status, headers, config) {
