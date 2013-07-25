@@ -180,7 +180,7 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				mkdir: {method:'GET', params:{method:'exec', command:'mkdir'}, isArray:false},
 				cp: {method:'GET', params:{method:'exec', command:'cp'}, isArray:false},
 				mv: {method:'GET', params:{method:'exec', command:'mv'}, isArray:false},
-				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:false}
+				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:false} // FIXME buggy
 			});
 	}])
 
@@ -198,15 +198,35 @@ angular.module('ceServices', ['ngResource', 'ceConf'])
 				console.log("ERROR: can't convert url to path: "+url);
 				return null;
 			}
-			return { 'srv':parsedUrl.substr(0, parsedUrl.indexOf("/")) , 'path':parsedUrl.substr(parsedUrl.indexOf("/")+"/exec/get/".length) };
+			var srv = parsedUrl.substr(0, parsedUrl.indexOf("/"));
+			parsedUrl = parsedUrl.substr(parsedUrl.indexOf("/exec/get/")+"/exec/get/".length); 
+console.log("before extracting path and filename, parsedUrl= "+parsedUrl);
+			var filename = "";
+			var path = "";
+			if (parsedUrl.lastIndexOf('/') > -1)
+			{
+				filename = parsedUrl.substr(parsedUrl.lastIndexOf('/')+1);
+				path = parsedUrl.substr(0, parsedUrl.lastIndexOf('/')+1);
+			}
+			else
+			{
+				filename = parsedUrl;
+			}
+			return { 'srv':srv, 'path':path, 'filename': filename };
 		}
 		function pathToUrl(path) {
-			if ( !path.srv || !path.path )
+			if ( path.srv === undefined || path.path === undefined || path.filename === undefined )
 			{
 				console.log("ERROR: can't convert path to url: "+JSON.stringify(path));
 				return null;
 			}
-			return serverUrl+path.srv+"/exec/get/"+path.path;
+			var ret = serverUrl+path.srv+"/exec/get/"+path.path;
+			if (path.path.length > 0)
+			{
+				ret += '/';
+			}
+			ret += path.filename;
+			return ret;
 		}
 		return {
 			urlToPath: urlToPath,
@@ -481,6 +501,10 @@ console.log("togleSelect "+file.name);
 					fn.push({ "name": uploadFiles[i].name });
 				}
 			}
+			if (fn.length == 1) // temporary workaround for issue on FF: https://bugzilla.mozilla.org/show_bug.cgi?id=690659
+			{
+				path += fn[0].name;
+			}
 			return $http({
 					method: 'POST',
 					url: serverUrl+'dropbox/exec/put/'+path, // FIXME address as config value, srv as param
@@ -554,19 +578,21 @@ angular.module('ceCtrls', ['ceServices'])
 			{
 				__ceInstance["read"] = function(input, onSuccess) {
 					var path = $ceUtils.urlToPath(input.url);
-console.log("path.srv= "+path.srv+"   path.path= "+path.path);
-					//$unifileStub.get({service:path.srv, path:path.path}, function (data) { console.log("onSuccess data= "+data); onSuccess(data); });
-					//$unifileSrv.get(path.srv, path.path, function (data) { console.log("onSuccess data= "+data); onSuccess(data); });
+console.log("path.srv= "+path.srv+"   path.path= "+path.path+"    path.filename= "+path.filename);
 
-					$scope.$apply( function($scope){ $unifileSrv.get(path.srv, path.path, function (data) { console.log("onSuccess data= "+data); onSuccess(data); }); } );
+					$scope.$apply( function($scope){ $unifileSrv.get(path.srv, path.path+path.filename, function (data) { console.log("onSuccess data= "+data); onSuccess(data); }); } );
+					//$scope.$apply( function($scope){ $unifileStub.get({service:path.srv, path:path.path}, function (data) { console.log("onSuccess data= "+JSON.stringify(data)); onSuccess(data); }); } );
 				};
 				__ceInstance["write"] = function(target, data, onSuccess) {
 					var path = $ceUtils.urlToPath(target.url);
 					var fileContent = [data];
 					var fileBlob = new Blob(fileContent, { "type" : target.mimetype });
-					//fileBlob['name'] = 
+					fileBlob["name"] = path.filename;
+//console.log("path.filename= "+path.filename);
 
-					$unifileSrv.upload( [fileBlob], path.path, function() { onSuccess(target); } );
+					$scope.$apply( function($scope){ 
+						$unifileSrv.upload( [fileBlob], path.path, function() { onSuccess(target); } );
+					 } );
 				};
 			}
 		}
@@ -779,7 +805,7 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path);
 				{
 					if ($scope.files[fi].isSelected===true)
 					{
-						__ceInstance.onSuccess({ 'url': $ceUtils.pathToUrl({'srv':$scope.srv, 'path':$scope.path+'/'+$scope.files[fi].name }) }); // FIXME other CEBlob fields
+						__ceInstance.onSuccess({ 'url': $ceUtils.pathToUrl({'srv':$scope.srv, 'path':$scope.path, 'filename':$scope.files[fi].name }) }); // FIXME other CEBlob fields
 						break;
 					}
 				}
@@ -787,7 +813,7 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path);
 			$scope.saveAs = function(fileName)
 			{
 				// TODO create file ?
-				__ceInstance.onSuccess({ 'url': $ceUtils.pathToUrl({'srv':$scope.srv, 'path':$scope.path+'/'+fileName+".ext" }) }); // FIXME other CEBlob fields // FIXME extension
+				__ceInstance.onSuccess({ 'url': $ceUtils.pathToUrl({'srv':$scope.srv, 'path':$scope.path, 'filename':fileName+".ext" }) }); // FIXME other CEBlob fields // FIXME extension
 			};
 		}])
 

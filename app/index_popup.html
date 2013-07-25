@@ -33,6 +33,7 @@
 			function testWrite() {
 				if (myCEBlob != null)
 				{
+					myCEBlob.mimetype = "text/xml";
 					cloudExplorer.write(myCEBlob, "Cloud Explorer rules the web !", writeCb);
 				}
 				else
