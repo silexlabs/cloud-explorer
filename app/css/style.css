@@ -1,40 +1,43 @@
-body
+div#CE
 {
 	color:#61666c;
 	font-weight:400;font-size:1em;font-family:'Open Sans', sans-serif;
+	border:1px solid black;
+	width:700px;height:350px;
+	position:absolute; top:50%;left:50%;margin-left:-350px;margin-top:-175px;
 }
-ul
+div#CE ul
 {
 	margin:0;padding:0;padding-left:10px;
 }
-a
+div#CE a
 {
 	z-index: 10;text-decoration:none;
 	cursor:pointer;
 }
 /* hide input file */
-input[type=file]
+div#CE input[type=file]
 {
 	width:0;height:0;overflow:hidden;
 }
 /* FILES TREE */
-ul.tree, .ce-right-pane ul
+div#CE ul.tree, div#CE .ce-right-pane ul
 {
 	list-style:none;
 }
-.ce-right-pane div
+div#CE .ce-right-pane div
 {
 	display:inline-block;
 }
 
 /* SERVICES */
-span.dropbox
+div#CE span.dropbox
 {
 	background:url('../assets/dropbox.png') no-repeat;
 	padding-left:20px;
 	cursor:pointer;
 }
-span.gdrive
+div#CE span.gdrive
 {
 	background:url('../assets/gdrive.png') no-repeat;
 	padding-left:20px;
@@ -49,65 +52,66 @@ span.gdrive
   -khtml-user-drag:element; -webkit-user-drag:element;
   cursor:move;
 }
-.ce-folder-over /* TODO */
+div#CE .ce-folder-over /* TODO */
 {
 	border:1px solid red;
 }
-span.is-dir-true, div.is-dir-true
+div#CE span.is-dir-true, div.is-dir-true
 {
 	background:url('../assets/folder.png') no-repeat;
 	padding-left:20px;
 	cursor:pointer;
 }
-span.is-dir-false, div.is-dir-false
+div#CE span.is-dir-false, div.is-dir-false
 {
 	background:url('../assets/file.png') no-repeat;
 	padding-left:20px;
 	cursor:pointer;
 }
-div.ce-file-selected
+div#CE div.ce-file-selected
 {
 	background-color:blue;
 }
-.ce-item, .ce-new-item
+div#CE .ce-item, div#CE .ce-new-item
 {
 	-moz-user-select:none;-khtml-user-select:none;-webkit-user-select:none;user-select:none;
 }
-.ce-item form, .ce-new-item form
+div#CE .ce-item form, div#CE .ce-new-item form
 {
 	padding:0;margin:0;
 }
-.ce-item input[type="text"], .ce-new-item input[type="text"]
+div#CE .ce-item input[type="text"], div#CE .ce-new-item input[type="text"]
 {
 	padding:0;margin:0;
 	height:20px;line-height:18px;
 }
-.loggedin-hide-true /* FIXME useful ? */
+div#CE .loggedin-hide-true /* FIXME useful ? */
 {
 	display: none;
 }
-.loggedin-show-false /* FIXME useful ? */
+div#CE .loggedin-show-false /* FIXME useful ? */
 {
 	display: none;
 }
-/* connect btn */
-a.ce-srv-connected
+/* save as btn */
+div#CE div.ce-saveas-btn
 {
-	font-style:italic;color:#e3e3e3; /* FIXME color not displayed */
-}
-a.ce-srv-not-connected
-{
+	border:1px solid black;
 
 }
+div#CE div.ce-saveas-btn input
+{
+	width:80px;
+}
 /* LOGS CONSOLE */
-.ce-log-console
+div#CE .ce-log-console
 {
 	font-size:small;
 	height:50px; overflow-y:scroll;
 	list-style-type:none;
 }
 /* file uploader directive */
-div.fileUploader
+div#CE div.fileUploader
 {
 	
 }
