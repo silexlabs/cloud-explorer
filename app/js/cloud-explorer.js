@@ -484,7 +484,7 @@ console.log("togleSelect "+file.name);
 				}
 			}
 		}
-		function upload(uploadFiles, path, onSuccess=null)
+		function upload(uploadFiles, path, onSuccess)
 		{
 			//enforce path as a folder path
 			if (path != "" && path.lastIndexOf('/') != path.length-1) // TODO check in unifile if it's not a bug
@@ -1321,6 +1321,7 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			restrict: 'A',
 			replace: true,
 			template: "<div class=\"ceBrowser\"> \
+						<div class=\"ceTitle\">Browse your cloud drives</div> \
 						<div class=\"row-fluid\"> \
 							<div class=\"span5\"> \
 								<div ce-left-pane></div> \
