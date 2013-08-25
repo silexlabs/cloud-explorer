@@ -204,11 +204,11 @@ console.log('getMimeByExt '+ext);
 /* Config */
 angular.module('ceConf', [])
 
-	//.constant( 'server.url', 'http://127.0.0.1\\:5000/v1.0/' )
-	.constant( 'server.url', 'http://unifile.silexlabs.org/v1.0/' )
+	.constant( 'server.url', 'http://127.0.0.1\\:5000/v1.0/' )
+	//.constant( 'server.url', 'http://unifile.silexlabs.org/v1.0/' )
 
-	//.constant( 'server.url.unescaped', 'http://127.0.0.1:5000/v1.0/' ) // Need to get rid of this as soon as we use an angular version that is not buggy on this
-	.constant( 'server.url.unescaped', 'http://unifile.silexlabs.org/v1.0/' ) // Need to get rid of this as soon as we use an angular version that is not buggy on this
+	.constant( 'server.url.unescaped', 'http://127.0.0.1:5000/v1.0/' ) // Need to get rid of this as soon as we use an angular version that is not buggy on this
+	//.constant( 'server.url.unescaped', 'http://unifile.silexlabs.org/v1.0/' ) // Need to get rid of this as soon as we use an angular version that is not buggy on this
 
 	.constant( 'console.level', 0 ) // 0: DEBUG, 1: INFO, 2: WARNING, 3: ERROR, 4: NOTHING (no console)
 
@@ -671,7 +671,6 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path+"    path.filename=
 
 			// scope contains the service + folders tree and need to be able to enable/disable a branch (service) id its isConnected flag changes
 			$scope.$watch( $unifileSrv.services, servicesChanged, true);
-			$scope.$watch( $unifileSrv.currentNav, currentNavChanged, true);
 
 			// Initiate the list of services (should it be somewhere else ?)
 			$unifileSrv.listServices();
@@ -690,7 +689,7 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path+"    path.filename=
 					if (services[s]["isConnected"]===true && services[s]["isLoggedIn"]===true)
 					{
 						//console.log(services[s]["name"]+" connected but no data found in tree. Performing ls()...");
-						var sname = services[s]["name"]; // cannot use s in cb functions below (don't know why...)
+						var sname = services[s]["name"];
 						if ( $unifileSrv.currentNav() == undefined )
 						{
 							// if tree empty we set current dir
@@ -707,52 +706,6 @@ console.log("path.srv= "+path.srv+"   path.path= "+path.path+"    path.filename=
 						}
 					}
 				}
-			}
-			/**
-			 * 
-			 */
-			function currentNavChanged(currNav)
-			{
-				if (currNav!=undefined)
-					$scope.tree[currNav.srv] = appendToTree( $scope.tree[currNav.srv], currNav.path, currNav.files );
-			}
-			/**
-			 * Creates or updates the tree
-			 */
-			function appendToTree( tree, path, files )
-			{
-				if ( path == '' || path == undefined )
-				{
-					return files;
-				}
-				var np;
-
-				if (path.indexOf('/') != -1)
-				{
-					np = path.substring( 0, path.indexOf('/') );
-					path = path.substring(path.indexOf('/') + 1);
-				}
-				else
-				{
-					np = path;
-					path = '';
-				}
-				var ci = -1;
-
-				for (ci = 0; ci < tree.length; ci++)
-				{
-					if (tree[ci].name == np && tree[ci].is_dir == true)
-					{
-						break;
-					}
-				}
-				if (ci == tree.length || ci == -1)
-				{
-					throw(Error('No jump allowed yet : at ci='+ci));
-				}
-				tree[ci]['children'] = appendToTree( tree[ci]['children'], path, files );
-
-				return tree;
 			}
 		}])
 
@@ -1345,18 +1298,9 @@ angular.module('ceDirectives', [ 'ceConf', 'ceServices', 'ceCtrls' ])
 			restrict: 'A',
 			replace: true,
 			template: "<div> \
-						<script type=\"text/ng-template\" id=\"tree_item_renderer.html\"> \
-							<span class=\"ce-item is-dir-true\" ce-folder ng-click=\"enterDir()\">{{file.name}}</span> \
-							<ul class=\"tree\" ng-init=\"path=filePath;\"> \
-								<li ng-repeat=\"file in file.children | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\"></li> \
-							</ul> \
-						</script> \
 						<ul class=\"tree\"> \
 							<li ng-repeat=\"(srvTreeK, srvTreeV) in tree\" ng-init=\"srv=srvTreeK; path='';\"> \
 								<span class=\"ce-item\" ce-folder ng-click=\"enterDir()\" ng-class=\"srvTreeK\">{{ srvTreeK }}</span> \
-								<ul class=\"tree\"> \
-									<li ng-repeat=\"file in srvTreeV | filter:{'is_dir':true}\" ng-include=\"'tree_item_renderer.html'\" onload=\"srv=srvTreeK; path='';\"></li> \
-								</ul> \
 							</li> \
 						</ul> \
 					</div>",
