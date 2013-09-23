@@ -1,6 +1,6 @@
 div#CE
 {
-	color: black;
+	color: #727271;
 	font-style: normal;
 	font-size: 13px;
 	font-family: arial, sans-serif;
@@ -23,6 +23,12 @@ div#CE
 	-moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px 0px;
 	-webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 16px 0px;
 }
+div#CE .homeMsg
+{
+	width:70%;margin-left:15%;margin-top:40%;
+	text-align:center;
+	font-size:18pt;
+}
 div#CE .ceTitle{
 	border-top: 1px solid rgb(229, 229, 229);
 
@@ -37,9 +43,15 @@ div#CE .ceTitle{
 }
 div#CE .ceTitle button {
 	display:inline-block;border:0;padding:0;margin-right:15px;
-	background:none;
 	float:right;
 	margin-right:10px;
+	height:30px;
+	cursor:pointer;
+}
+div#CE .close-btn
+{
+	background:url("../assets/close.png") no-repeat center center;
+	background-size: 11px 11px;width:30px;
 }
 div#CE .ce-browser{
 	height: 100%;
