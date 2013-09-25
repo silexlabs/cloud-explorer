@@ -25,7 +25,7 @@ div#CE
 }
 div#CE .homeMsg
 {
-	width:70%;margin-left:15%;margin-top:40%;
+	width:70%;margin-left:15%;margin-top:35%;
 	text-align:center;
 	font-size:18pt;
 }
@@ -90,9 +90,12 @@ div#CE input[type=file]
 div#CE .ce-left-pane li {
 	margin-bottom:10px;
 }
-div#CE ul.tree, div#CE .ce-right-pane ul{
+div#CE ul.tree, div#CE .ce-right-pane ul {
 	list-style:none;
 	margin: 15px;
+}
+div#CE .ce-right-pane ul{
+	height:350px;overflow-y:scroll;
 }
 div#CE .ce-right-pane li{
 	border-bottom: 1px solid rgb(229, 229, 229);
@@ -129,9 +132,58 @@ div#CE span.gdrive
   -khtml-user-drag:element; -webkit-user-drag:element;
   cursor:move;
 }
+div#CE .dropzone
+{
+	border:4px dashed #727271;background-color:white;
+	width:98%;margin:2px;margin-top:10px;padding-bottom:10px;
+	text-align:center;
+}
+div#CE .dropzone div /* TODO clean */
+{
+	display:block;margin-bottom:5px;
+}
+div#CE .file-uploader button /* TODO clean */
+{
+	-webkit-box-shadow: none;
+	-webkit-transition-delay: 0s;
+	-webkit-transition-duration: 0.218s;
+	-webkit-transition-property: all;
+	-webkit-transition-timing-function: ease;
+	-webkit-user-select: none;
+	border-image-outset: 0px;
+	border-image-repeat: stretch;
+	border-image-slice: 100%;
+	border-image-source: none;
+	border-image-width: 1;
+	background-color: rgb(77, 144, 254);
+	background-image: -webkit-linear-gradient(top, rgb(77, 144, 254), rgb(71, 135, 237));
+	border:1px solid rgb(48, 121, 237);
+	border-radius: 2px;
+	border-collapse: separate;
+	box-shadow: none;
+	color: rgb(255, 255, 255);
+	cursor: default;
+	font-family: arial, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	height: 27px;
+	line-height: 27px;
+	margin: 0px;
+	min-width: 54px;
+	outline-color: rgb(255, 255, 255);
+	outline-style: none;
+	outline-width: 0px;
+	padding-bottom: 0px 8px 8px 0px;
+	position: relative;
+	text-align: center;
+	transition-delay: 0s;
+	transition-duration: 0.218s;
+	transition-property: all;
+	transition-timing-function: ease;
+}
 div#CE .ce-folder-over /* TODO */
 {
-	border:1px solid red;
+	/*border:1px solid red;*/
 }
 div#CE span.is-dir-true, div.is-dir-true
 {
@@ -170,7 +222,7 @@ div#CE .ce-item:hover .ctrls
 {
 	display:inline-block;
 }
-div#CE .ce-item button
+div#CE .ce-item .ctrls button
 {
 	background:url("../assets/editortoolbar.png") no-repeat;
 	width:16px;height:16px;
@@ -217,9 +269,4 @@ div#CE .ce-log-console
 	font-size:small;
 	height:50px; overflow-y:scroll;
 	list-style-type:none;
-}
-/* file uploader directive */
-div#CE div.fileUploader
-{
-	
 }
