@@ -111,16 +111,8 @@ div#CE .ce-right-pane div
 }
 
 /* SERVICES */
-div#CE span.dropbox
+div#CE span.srvIt
 {
-	background:url('../assets/dropbox.png') no-repeat;
-	padding-left:20px;
-	cursor:pointer;
-}
-div#CE span.gdrive
-{
-	background:url('../assets/gdrive.png') no-repeat;
-	padding-left:20px;
 	cursor:pointer;
 }
 /* FILES AND FOLDERS */
