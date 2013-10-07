@@ -255,6 +255,11 @@ div#CE div.ce-saveas-btn input
 {
 	width:80px;
 }
+div#CE .error-popup {
+	background-color:red;width:100%;
+	font-size:16px;text-align:center;
+	color:black;font-weight:bold;
+}
 /* LOGS CONSOLE */
 div#CE .ce-log-console
 {
