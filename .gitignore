@@ -5,3 +5,4 @@
 *.sublime-workspace
 *.DS_Store
 .temp
+node_modules
