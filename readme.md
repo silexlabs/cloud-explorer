@@ -62,23 +62,23 @@ Installation of the cloud explorer
 * Go to the cloud explorer's Directory.
 * install depedencies  : npm install
 * if you use it with a root path other than "/" like "/cloud-explorer" for example, edit the unifile default-config.js file like this :
+```
+/**
+ * route name for unifile api
+ */
+exports.apiRoot = "/cloud-explorer/api"; // specify your root path before /api
 
->/**
-> * route name for unifile api
-> */
->exports.apiRoot = "/cloud-explorer/api"; // specify your root path before /api
->
->/**
-> * static folders
-> */
->exports.staticFolders = [
->	// assets
->	{
->		name: "/cloud-explorer/unifile-assets", // specify your root path before /unifile-assets
->		path: "../../unifile-assets/"
->	}
->];
-
+/**
+ * static folders
+ */
+exports.staticFolders = [
+	// assets
+	{
+		name: "/cloud-explorer/unifile-assets", // specify your root path before /unifile-assets
+		path: "../../unifile-assets/"
+	}
+];
+```
 Start the cloud explorer
 
 * Launch it from a command prompt: node server/api-server.js
