@@ -23,13 +23,6 @@ At the moment, Cloud explorer partially implements the following methods :
 
 An example of cloud explorer integration in a web page can be found in /lib/app/index.html
 
-##Roadmap
-
-If you plan to use cloud explorer in your current project, it is important for you to know the next big changes that will be performed in cloud explorer :
-
-* cloud explorer will be ported to haxe (www.haxe.org) in a very soon refactoring and the angular js dependency will be removed.
-* cloud explorer will always be compatible with the Ink File Picker API : https://developers.inkfilepicker.com/docs/web
-
 Discussions
 
 * Facebook http://www.facebook.com/silexlabs
@@ -47,6 +40,13 @@ Main contributors
 
 * [Thomas Fétiveau](http://www.tokom.fr/) [@zab0jad](https://twitter.com/zab0jad)
 * Alex [lexoyo](http://lexoyo.me) Hoyau [@lexoyo](http://twitter.com/lexoyo)
+
+Roadmap
+
+If you plan to use cloud explorer in your current project, it is important for you to know the next big changes that will be performed in cloud explorer :
+
+* cloud explorer will be ported to haxe (www.haxe.org) in a very soon refactoring and the angular js dependency will be removed.
+* cloud explorer will always be compatible with the Ink File Picker API : https://developers.inkfilepicker.com/docs/web
 
 ##Installation on your local computer
 
