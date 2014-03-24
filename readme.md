@@ -25,7 +25,7 @@ GPL license
 
 Main contributors
 
-* [Thomas zabojad Fetiveau](http://www.tokom.fr/)
+* [Thomas Fétiveau](http://www.tokom.fr/) [@zab0jad](https://twitter.com/zab0jad)
 * Alex [lexoyo](http://lexoyo.me) Hoyau [@lexoyo](http://twitter.com/lexoyo)
 
 ##Installation on your local computer
@@ -61,6 +61,23 @@ Installation of the cloud explorer
 * Create a complete clone of Silex Project : git clone --recursive https://github.com/silexlabs/cloud-explorer.git
 * Go to the cloud explorer's Directory.
 * install depedencies  : npm install
+* if you use it with a root path other than "/" like "/cloud-explorer" for example, edit the unifile default-config.js file like this :
+
+>/**
+> * route name for unifile api
+> */
+>exports.apiRoot = "/cloud-explorer/api"; // specify your root path before /api
+>
+>/**
+> * static folders
+> */
+>exports.staticFolders = [
+>	// assets
+>	{
+>		name: "/cloud-explorer/unifile-assets", // specify your root path before /unifile-assets
+>		path: "../../unifile-assets/"
+>	}
+>];
 
 Start the cloud explorer
 
