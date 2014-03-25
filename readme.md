@@ -19,7 +19,7 @@ At the moment, Cloud explorer partially implements the following methods :
 * https://developers.inkfilepicker.com/docs/web/#write
 * https://developers.inkfilepicker.com/docs/web/#export
 
-* the InkBlob prototype is not yet implemented in cloud explorer.
+* the InkBlob prototype is not yet fully implemented in cloud explorer.
 
 An example of cloud explorer integration in a web page can be found in /lib/app/index.html
 

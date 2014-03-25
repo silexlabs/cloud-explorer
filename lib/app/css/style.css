@@ -228,6 +228,11 @@ div#CE .ce-item button.remove
 {
 	background-position: -528px 0;
 }
+div#CE .ce-item .ctrls button.select
+{
+	background:url("../assets/select.png") no-repeat;
+	background-size: auto 16px;
+}
 div#CE .ce-mkdir-btn
 {
 	display:inline-block;border:0;padding:0;margin-right:15px;margin-bottom:11px;

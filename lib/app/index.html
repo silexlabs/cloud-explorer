@@ -16,6 +16,7 @@
 		<div style="display:none;" id="CE" ng-app="ceDirectives">
 			<div class="ce-browser"></div>
 		</div>
+		<button onclick="javascript:cloudExplorer.pick({ folders: true }, successCb);">Pick Folder</button>
 		<button onclick="javascript:cloudExplorer.pick(successCb);">Pick</button>
 		<button onclick="javascript:cloudExplorer.exportFile(myCEBlob, successCb);">Export</button>
 		<button onclick="javascript:cloudExplorer.exportFile(myCEBlob, {'mimetype':'text/html'}, successCb);">Export as HTML</button>
@@ -24,6 +25,8 @@
 		<div id="traces"></div>
 		<script>
 			var myCEBlob = null;
+			var folderPath = null;
+
 			var traces = document.getElementById("traces");
 			function successCb(data) {
 				myCEBlob = data;
@@ -32,8 +35,16 @@
 			function testWrite() {
 				if (myCEBlob != null)
 				{
-					myCEBlob.mimetype = "text/html";
-					cloudExplorer.write(myCEBlob, "Cloud Explorer rules the web !", writeCb);
+					if (myCEBlob.mimetype == null) {
+
+						traces.innerHTML += "Cannot overwrite folder with file<br>";
+
+					} else {
+
+						// overwrite file with a text file
+						myCEBlob.mimetype = "text/html";
+						cloudExplorer.write(myCEBlob, "Cloud Explorer rules the web !", writeCb);
+					}
 				}
 				else
 				{
@@ -46,7 +57,14 @@
 			function testRead() {
 				if (myCEBlob != null)
 				{
-					cloudExplorer.read(myCEBlob, readCb);
+					if (myCEBlob.mimetype == null) {
+
+						traces.innerHTML += "Your current selection is a folder with path: "+myCEBlob.url+"<br>";
+
+					} else {
+
+						cloudExplorer.read(myCEBlob, readCb);
+					}
 				}
 				else
 				{
