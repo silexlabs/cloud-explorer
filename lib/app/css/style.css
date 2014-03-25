@@ -283,3 +283,12 @@ div#CE .ce-log-console
 	height:50px; overflow-y:scroll;
 	list-style-type:none;
 }
+
+.breadcrumLink{
+	font-style: italic;
+	cursor: pointer;
+	color: #727271;
+}
+.breadcrumLink:hover{
+	text-decoration: underline;
+}
