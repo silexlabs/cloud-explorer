@@ -1,3 +1,14 @@
+/*General css class*/
+	button{cursor: pointer;}
+	.clear{clear: both;}
+
+	.clearfix:before, .clearfix:after {content: " ";display: table;}
+	.clearfix:after{clear: both;}
+	/* IE6/7 support */
+	.clearfix {*zoom: 1;}
+	.left{float: left;}
+	.right{float: right;}
+
 div#CE
 {
 	color: #727271;
@@ -284,11 +295,36 @@ div#CE .ce-log-console
 	list-style-type:none;
 }
 
+div#CE .ce-right-pane li.breadcrumLinkContent{
+	border:none; 
+	color:#000;
+}
 .breadcrumLink{
 	font-style: italic;
 	cursor: pointer;
 	color: #727271;
+
 }
 .breadcrumLink:hover{
 	text-decoration: underline;
 }
+.ce-item {
+	position: relative;
+}
+.ce-item input[type="checkbox"]{
+	position: absolute;
+	top:8px; left: 5px;
+	z-index: 1;
+}
+.ce-item label{
+	display: inline-block;
+	display: block; 
+	height: 100%; 
+	width: 100%;
+	padding-left: 20px;
+}
+.ce-item input[type="checkbox"]:checked + label{
+	background: #D7D7FF;
+}
+
+.checkedOption{float: right;}
