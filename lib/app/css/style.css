@@ -114,6 +114,7 @@ div#CE .ce-browser .preview{
 div#CE .ce-browser .cloudList{
 	width: 15%;
 	border-right: 1px solid rgb(229, 229, 229);
+	background: #b4dff8;
 }
 
 div#CE .ce-browser .fileList .controls{
@@ -213,13 +214,46 @@ div#CE input[type=file]
 	width:0;height:0;overflow:hidden;
 }
 /* FILES TREE */
+div#CE .ce-left-pane{
+	border-radius: 5px; background: #fff; height: 40px; padding: 10px 0;
+	display:block; border:0;margin:10px auto 0;
+	font-size: 18px; font-weight: 300; color: #444;
+	cursor: pointer;width: 175px;position: relative;
+}
 div#CE .ce-left-pane li {
-	margin-bottom:10px;
+	/*margin-bottom:10px;*/
 }
 div#CE ul.tree{
-	margin: 15px;
+	padding: 0 10px;
 }
- div#CE .ce-right-pane ul {
+div#CE ul.tree > li{
+	display: block;
+}
+div#CE ul.tree li ul {
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	left: 0;
+	margin-top: 15px;
+	width: 100%;
+	position: absolute;
+}
+div#CE ul.tree li ul li{
+	border-bottom: 1px solid #ccc;
+	padding: 10px;
+}
+div#CE .ce-left-pane:after{
+	background:url('../assets/icon-arrow.png') 50% 50% no-repeat #ddd;
+	border-radius:0 5px 5px 0;
+	content:"";
+	height: 100%;
+	width: 40px;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+div#CE .ce-left-pane:hover:after{
+	background:url('../assets/icon-arrow-hover.png') 50% 50% no-repeat #ddd;
 }
 div#CE .ce-right-pane li{
 	border-bottom: 1px solid rgb(229, 229, 229);
