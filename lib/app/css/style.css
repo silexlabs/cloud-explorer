@@ -41,7 +41,7 @@ ul{margin:0;padding:0;list-style:none;}
 	.right{float: right;}
 
 	*, *:before, *:after {-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
-	body{font-family: 'Roboto', arial, sans-serif; font-size: 13px; color: #727271;}
+	body{font-family: 'Roboto', arial, sans-serif; font-size: 14px; color: #727271;}
 
 /*CE*/
 div#CE
@@ -158,6 +158,9 @@ div#CE .ce-browser .fileList{
 div#CE .ce-browser .fileList ul{
 	height: 300px; overflow-y: scroll;
 }
+div#CE .ce-browser .fileList ul .linkToParent{
+	cursor: pointer;
+}
 div#CE .ce-browser .fileList .file{
 	display: inline-block; width: 100%;
 }
@@ -178,8 +181,10 @@ div#CE .ce-browser .fileList .titleCol.lastUpdate{
 div#CE .ce-browser .fileList .titleCol.fileName{
 	padding-left: 35px;
 	width: 210px;
+	cursor: pointer;
 }
 div#CE .ce-browser .fileList .fileName{
+	cursor:pointer;
 	width: 160px;
 	 white-space: nowrap; overflow: hidden; -ms-text-overflow: ellipsis; /* Required for IE8 */ -o-text-overflow: ellipsis; /* Required for Opera */ text-overflow: ellipsis;
 }
@@ -310,17 +315,16 @@ div#CE .ce-folder-over /* TODO */
 {
 	/*border:1px solid red;*/
 }
-div#CE span.is-dir-true, div.is-dir-true
+div#CE span.is-dir-true, 
+div.is-dir-true
 {
 	background:url('../assets/folder.png') no-repeat;
 	padding-left:20px;
-	cursor:pointer;
 }
 div#CE span.is-dir-false, div.is-dir-false
 {
 	background:url('../assets/file.png') no-repeat;
 	padding-left:20px;
-	cursor:pointer;
 }
 div#CE div.ce-file-selected
 {
@@ -418,9 +422,17 @@ div#CE .ce-log-console
 	list-style-type:none;
 }
 
-div#CE .ce-right-pane li.breadcrumLinkContent{
+div#CE .ce-right-pane .breadcrumLinkContent{
 	border:none; 
 	color:#000;
+	float: left;
+	width: 90%;
+}
+div#CE .ce-right-pane .nbFiles{
+	float: right;
+	line-height: 70px;
+	width: 10%;
+	color: #222222;
 }
 .ce-item {
 	position: relative;
