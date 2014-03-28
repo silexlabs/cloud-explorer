@@ -43,72 +43,74 @@ ul{margin:0;padding:0;list-style:none;}
 	*, *:before, *:after {-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 	body{font-family: 'Roboto', arial, sans-serif; font-size: 14px; color: #727271;}
 
-/*CE*/
-div#CE
-{
-	max-width:929px;
-	width: 100%;
-	/*height: 574px;*/
+/*CE global*/
+	div#CE
+	{
+		max-width:929px;
+		width: 100%;
+		/*height: 574px;*/
 
-	position: static;
-	margin: auto;
+		position: static;
+		margin: auto;
 
-	background-color: white;
+		background-color: white;
 
-	border-color: rgb(172, 172, 172);
-	border-style: solid;
-	border-width: 1px;
+		border-color: rgb(172, 172, 172);
+		border-style: solid;
+		border-width: 1px;
 
-	box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
-	-moz-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
-	-webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
-}
-div#CE .homeMsg
-{
-	width:70%;margin-left:15%;margin-top:35%;
-	text-align:center;
-	font-size:18pt;
-}
-div#CE .ceTitle{
-	background: #282828;
-	color: #fff;
-	border-top: 1px solid rgb(229, 229, 229);
+		box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+		-moz-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+		-webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+	}
+	div#CE .homeMsg
+	{
+		width:70%;margin-left:15%;margin-top:35%;
+		text-align:center;
+		font-size:18pt;
+	}
+	div#CE .ceTitle{
+		background: #282828;
+		color: #fff;
+		border-top: 1px solid rgb(229, 229, 229);
 
-	padding: 10px;
+		padding: 10px;
 
-	font-size: 20px;
-}
-div#CE .ceTitle .logo{
-	display: block;
-	margin: 0 auto;
-}
-div#CE .ceTitle button {
-	display:inline-block;border:0;padding:0;margin-right:15px;
-	float:right;
-	margin-right:10px;
-	height:30px;
-	cursor:pointer;
-}
-div#CE .close-btn
-{
-	background:url("../assets/close.png") no-repeat center center;
-	background-size: 11px 11px;width:30px;
-}
-div#CE .ce-browser{
-	height: 100%;position:relative;
-}
+		font-size: 20px;
+	}
+	div#CE .ceTitle .logo{
+		display: block;
+		margin: 0 auto;
+	}
+	div#CE .ceTitle button {
+		display:inline-block;border:0;padding:0;margin-right:15px;
+		float:right;
+		margin-right:10px;
+		height:30px;
+		cursor:pointer;
+	}
+	div#CE .close-btn
+	{
+		background:url("../assets/close.png") no-repeat center center;
+		background-size: 11px 11px;width:30px;
+	}
+	div#CE .ce-browser{
+		height: 100%;position:relative;
+	}
 
 div#CE .content{
 	position: relative;
 }
 div#CE .ce-browser .cloudList,
-div#CE .ce-browser .fileList,
-div#CE .ce-browser .preview{
+div#CE .ce-browser .folderExplorer{
 	border-top: 1px solid rgb(229, 229, 229);
 	float: left;
 	overflow-y: auto;
 	overflow-x: hidden;
 	height: 600px;
+}
+div#CE .ce-browser .folderExplorer{
+	overflow: hidden;
 }
 
 div#CE .ce-browser .cloudList{
@@ -116,92 +118,118 @@ div#CE .ce-browser .cloudList{
 	border-right: 1px solid rgb(229, 229, 229);
 }
 
-div#CE .ce-browser .fileList .controls{
-	min-height: 60px;
-	padding: 10px;
-	background: #b4dff8;
-}
-div#CE .ce-browser .fileList .controls button{
-	border-radius: 5px; background: #fff; height: 40px; padding: 10px;
-	display:inline-block; border:0; margin-right:15px;
-	font-size: 18px; font-weight: 300; color: #444; text-transform: lowercase;
-}
-div#CE .ce-browser .fileList .controls button .icon-add_folder{font-size: 27px; vertical-align: middle; position: relative; top: -2px;}
-div#CE .ce-browser .fileList .breadcrumLinkContent{
-	padding: 10px;
-	font-size: 14px;
-}
-div#CE .ce-browser .fileList .breadcrumLinkContent .title{
-	font-size: 22px;
-	color: #222;
-	padding: 10px 0 0 10px;
-}
-div#CE .ce-browser .fileList .breadcrumLinkContent .title .icon-folder{
-	font-size: 32px;
-	color: #dd4b39;
-	vertical-align: middle;
-	margin-right: 5px;
-}
-div#CE .ce-browser .fileList .breadcrumLinkContent .breadcrumLink{
-	font-style: italic;
-	cursor: pointer;
-	color: #727271;
+/*folderExplorer*/
+	div#CE .ce-browser .folderExplorer .folderExplorer-content{
+		width: 75%; float: left;
+	}
 
-}
-div#CE .ce-browser .fileList .breadcrumLinkContent .breadcrumLink:hover{
-	text-decoration: underline;
-}
-div#CE .ce-browser .fileList{
-	width: 70%;
-}
+	div#CE .ce-browser .folderExplorer .controls{
+		min-height: 60px;
+		padding: 10px;
+		background: #b4dff8;
+	}
+	div#CE .ce-browser .folderExplorer .controls button{
+		border-radius: 5px; background: #fff; height: 40px; padding: 10px;
+		display:inline-block; border:0; margin-right:15px;
+		font-size: 18px; font-weight: 300; color: #444; text-transform: lowercase;
+	}
+	div#CE .ce-browser .folderExplorer .controls button .icon-add_folder{font-size: 27px; vertical-align: middle; position: relative; top: -2px;}
+	div#CE .ce-browser .folderExplorer .controls .checkedOption{float: right;}
+	div#CE .ce-browser .folderExplorer .controls .checkedOption .deleteList{
+	 -webkit-transition: all .15s linear;
+		-moz-transition: all .15s linear;
+		 -ms-transition: all .15s linear;
+		  -o-transition: all .15s linear;
+			 transition: all .15s linear;
+	}
+	div#CE .ce-browser .folderExplorer .controls .checkedOption .deleteList:hover,
+	div#CE .ce-browser .folderExplorer .controls .checkedOption .deleteList:focus{color: #dd4b39;}
+	div#CE .ce-browser .folderExplorer .breadcrumLinkContent{
+		padding: 10px;
+		font-size: 14px;
+	}
+	div#CE .ce-browser .folderExplorer .breadcrumLinkContent .title{
+		font-size: 22px;
+		color: #222;
+		padding: 10px 0 0 10px;
+	}
+	div#CE .ce-browser .folderExplorer .breadcrumLinkContent .title .icon-folder{
+		font-size: 32px;
+		color: #dd4b39;
+		vertical-align: middle;
+		margin-right: 5px;
+	}
+	div#CE .ce-browser .folderExplorer .breadcrumLinkContent .breadcrumLink{
+		font-style: italic;
+		cursor: pointer;
+		color: #727271;
 
-div#CE .ce-browser .fileList ul{
-	height: 300px; overflow-y: scroll;
-}
-div#CE .ce-browser .fileList ul .linkToParent{
-	cursor: pointer;
-}
-div#CE .ce-browser .fileList .file{
-	display: inline-block; width: 100%;
-}
-div#CE .ce-browser .fileList .fileName,
-div#CE .ce-browser .fileList .fileType,
-div#CE .ce-browser .fileList .lastUpdate{
-	display: block; float: left; padding-left: 10px;
-}
+	}
+	div#CE .ce-browser .folderExplorer .breadcrumLinkContent .breadcrumLink:hover{
+		text-decoration: underline;
+	}
+	div#CE .ce-browser .folderExplorer{
+		width: 85%;
+	}
 
-div#CE .ce-browser .fileList .titleCol.fileName,
-div#CE .ce-browser .fileList .titleCol.fileType,
-div#CE .ce-browser .fileList .titleCol.lastUpdate{
-	color: #dd4b39; font-size: 14px; padding-top: 10px; padding-bottom: 10px;
-}
-div#CE .ce-browser .fileList .titleCol.lastUpdate{
-	width: 170px;
-}
-div#CE .ce-browser .fileList .titleCol.fileName{
-	padding-left: 35px;
-	width: 210px;
-	cursor: pointer;
-}
-div#CE .ce-browser .fileList .fileName{
-	cursor:pointer;
-	width: 160px;
-	 white-space: nowrap; overflow: hidden; -ms-text-overflow: ellipsis; /* Required for IE8 */ -o-text-overflow: ellipsis; /* Required for Opera */ text-overflow: ellipsis;
-}
-div#CE .ce-browser .fileList .fileType{
-	width: 80px;
-}
-div#CE .ce-browser .fileList .lastUpdate{
-	float: right;
-	width: 160px;
-}
-div#CE .ce-browser .fileList .ce-rename{
-	display: inline-block;
-}
+	div#CE .ce-browser .folderExplorer .fileList{
+		height: 300px; overflow-y: auto;
+	}
+	div#CE .ce-browser .folderExplorer .fileList .linkToParent{
+		cursor: pointer;
+	}
+	div#CE .ce-browser .folderExplorer .file{
+		display: inline-block; width: 100%;
+	}
+	div#CE .ce-browser .folderExplorer .fileName,
+	div#CE .ce-browser .folderExplorer .fileType,
+	div#CE .ce-browser .folderExplorer .lastUpdate{
+		display: block; float: left; padding-left: 10px;
+	}
 
-div#CE .ce-browser .preview{
-	width: 25%;
-}
+	div#CE .ce-browser .folderExplorer .titleCol.fileName,
+	div#CE .ce-browser .folderExplorer .titleCol.fileType,
+	div#CE .ce-browser .folderExplorer .titleCol.lastUpdate{
+		color: #dd4b39; font-size: 14px; padding-top: 10px; padding-bottom: 10px;
+	}
+	div#CE .ce-browser .folderExplorer .titleCol.lastUpdate{
+		width: 170px;
+	}
+	div#CE .ce-browser .folderExplorer .titleCol.fileName{
+		padding-left: 35px;
+		width: 210px;
+		cursor: default;
+	}
+	div#CE .ce-browser .folderExplorer .fileName{
+		cursor:pointer;
+		width: 160px;
+		 white-space: nowrap; overflow: hidden; -ms-text-overflow: ellipsis; /* Required for IE8 */ -o-text-overflow: ellipsis; /* Required for Opera */ text-overflow: ellipsis;
+	}
+	div#CE .ce-browser .folderExplorer .fileType{
+		width: 80px;
+	}
+	div#CE .ce-browser .folderExplorer .lastUpdate{
+		float: right;
+		width: 160px;
+	}
+	div#CE .ce-browser .folderExplorer .ce-rename{
+		display: inline-block;
+	}
+
+/*PREVIEW*/
+	div#CE .ce-browser .preview{
+		float: right;
+		width: 25%;
+		height: 539px;
+		padding: 60px 10px 0;
+		border-left: 1px solid rgb(229, 229, 229);
+		text-align: center;
+	}
+	div#CE .ce-browser .preview li{padding: 10px 0;}
+	div#CE .ce-browser .preview .filePreview{display: inline-block; max-width: 100%;}
+	div#CE .ce-browser .preview .fileName{}
+	div#CE .ce-browser .preview .fileSize{}
+
 div#CE a
 {
 	z-index: 10;text-decoration:none;
@@ -247,15 +275,15 @@ div#CE span.srvIt
 }
 div#CE .dropzone
 {
+	border-top: 1px solid rgb(229, 229, 229);
 	/*border:4px dashed #727271;
 	background-color:white;*/
 	background: url("../assets/dragzone.png") no-repeat center;
-	width:98%; margin-top:10px; padding-bottom:10px;
 	text-align:center;
 	height: 140px;
 }
 div#CE .dropzone h2{
-	top: 75px;
+	top: 60px;
 	position: relative;
 	font-weight: 300;
 	color: #ccc;
@@ -452,5 +480,3 @@ div#CE .ce-right-pane .nbFiles{
 .ce-item input[type="checkbox"]:checked + label{
 	background: #D7D7FF;
 }
-
-.checkedOption{float: right;}
