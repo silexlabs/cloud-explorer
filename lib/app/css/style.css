@@ -88,8 +88,10 @@ ul{margin:0;padding:0;list-style:none;}
 		margin-right:10px;
 		height:30px;
 		cursor:pointer;
+		background: #282828;
+		color: #fff;
 	}
-	div#CE .close-btn
+	div#CE .ceTitle button.close-btn
 	{
 		background:url("../assets/close.png") no-repeat center center;
 		background-size: 11px 11px;width:30px;
@@ -114,22 +116,29 @@ div#CE .ce-browser .folderExplorer{
 }
 
 div#CE .ce-browser .cloudList{
-	width: 15%;
-	border-right: 1px solid rgb(229, 229, 229);
-	background: #b4dff8;
+	width: 22%;
+	/*border-right: 1px solid rgb(229, 229, 229);*/
+	/*background: #b4dff8;*/
+	height: auto; padding: 10px;
+	position: absolute;left: 0; top: 0;
 }
 
 /*folderExplorer*/
+	div#CE .ce-browser .folderExplorer{
+		width: 100%;
+	}
+
 	div#CE .ce-browser .folderExplorer .folderExplorer-content{
 		width: 75%; float: left;
 	}
 
 	div#CE .ce-browser .folderExplorer .controls{
 		min-height: 60px;
-		padding: 10px;
+		padding: 10px 10px 10px 30%;
 		background: #b4dff8;
 	}
 	div#CE .ce-browser .folderExplorer .controls button{
+		float: right;
 		border-radius: 5px; background: #fff; height: 40px; padding: 10px;
 		display:inline-block; border:0; margin-right:15px;
 		font-size: 18px; font-weight: 300; color: #444; text-transform: lowercase;
@@ -168,9 +177,6 @@ div#CE .ce-browser .cloudList{
 	}
 	div#CE .ce-browser .folderExplorer .breadcrumLinkContent .breadcrumLink:hover{
 		text-decoration: underline;
-	}
-	div#CE .ce-browser .folderExplorer{
-		width: 85%;
 	}
 
 	div#CE .ce-browser .folderExplorer .fileList{
@@ -244,9 +250,10 @@ div#CE input[type=file]
 /* FILES TREE */
 div#CE .ce-left-pane{
 	border-radius: 5px; background: #fff; height: 40px; padding: 10px 0;
-	display:block; border:0;margin:10px auto 0;
+	display:block; border:0;
 	font-size: 18px; font-weight: 300; color: #444;
 	cursor: pointer;width: 175px;position: relative;
+	border: 1px solid #ccc;
 }
 div#CE .ce-left-pane li {
 	/*margin-bottom:10px;*/
@@ -271,7 +278,7 @@ div#CE ul.tree li ul li{
 	padding: 10px;
 }
 div#CE .ce-left-pane:after{
-	background:url('../assets/icon-arrow.png') 50% 50% no-repeat #ddd;
+	background:url('../assets/icon-arrow.png') 50% 50% no-repeat #282828;
 	border-radius:0 5px 5px 0;
 	content:"";
 	height: 100%;
@@ -297,6 +304,8 @@ div#CE .ce-right-pane .is-dir-true{
 div#CE span.srvIt
 {
 	cursor:pointer;
+	position: absolute;
+	top: 8px;
 }
 /* FILES AND FOLDERS */
 /* Prevent the text contents of draggable elements from being selectable. */
@@ -512,5 +521,5 @@ div#CE .ce-right-pane .nbFiles{
 	padding-left: 25px;
 }
 .ce-item input[type="checkbox"]:checked + label{
-	background: #D7D7FF;
+	background: #fcf2da;
 }
