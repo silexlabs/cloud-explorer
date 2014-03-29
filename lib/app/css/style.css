@@ -152,7 +152,7 @@ div#CE .ce-browser .fileList .breadcrumLinkContent .breadcrumLink:hover{
 	text-decoration: underline;
 }
 div#CE .ce-browser .fileList{
-	width: 70%;
+	width: 85%;
 }
 
 div#CE .ce-browser .fileList ul{
@@ -302,7 +302,7 @@ div#CE .file-uploader button /* TODO clean */
 div#CE .file-uploader{position: absolute; top: 0; left: 0; right: 0;}
 div#CE .file-uploader,
 div#CE .file-uploader button{
-	height: 100%; width: 100%; 
+	height: 100%; width: 100%;
 	opacity: 0; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	cursor: pointer;
 }
@@ -419,7 +419,7 @@ div#CE .ce-log-console
 }
 
 div#CE .ce-right-pane li.breadcrumLinkContent{
-	border:none; 
+	border:none;
 	color:#000;
 }
 .ce-item {
@@ -432,8 +432,8 @@ div#CE .ce-right-pane li.breadcrumLinkContent{
 }
 .ce-item label{
 	display: inline-block;
-	display: block; 
-	height: 100%; 
+	display: block;
+	height: 100%;
 	width: 100%;
 	padding-left: 25px;
 }
