@@ -21,27 +21,27 @@ ul{margin:0;padding:0;list-style:none;}
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.icon-folder:before {content: "\e601";}
-.icon-add_folder:before {content: "\e602";}
-.icon-cloud:before {content: "\e603";}
-.icon-suppr:before {content: "\e604";}
-.icon-import:before {content: "\e605";}
-.icon-export:before {content: "\e606";}
-.icon-cloudexplorer:before {content: "\e600";}
+div#CE .icon-folder:before {content: "\e601";}
+div#CE .icon-add_folder:before {content: "\e602";}
+div#CE .icon-cloud:before {content: "\e603";}
+div#CE .icon-suppr:before {content: "\e604";}
+div#CE .icon-import:before {content: "\e605";}
+div#CE .icon-export:before {content: "\e606";}
+div#CE .icon-cloudexplorer:before {content: "\e600";}
 
 /*General css class*/
-	button{cursor: pointer; font: inherit;}
-	.clear{clear: both;}
+div#CE button{cursor: pointer; font: inherit;}
+div#CE .clear{clear: both;}
 
-	.clearfix:before, .clearfix:after {content: " ";display: table;}
-	.clearfix:after{clear: both;}
-	/* IE6/7 support */
-	.clearfix {*zoom: 1;}
-	.left{float: left;}
-	.right{float: right;}
+div#CE .clearfix:before, .clearfix:after {content: " ";display: table;}
+div#CE .clearfix:after{clear: both;}
+/* IE6/7 support */
+div#CE .clearfix {*zoom: 1;}
+div#CE .left{float: left;}
+div#CE .right{float: right;}
 
-	*, *:before, *:after {-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
-	body{font-family: 'Roboto', arial, sans-serif; font-size: 13px; color: #727271;}
+div#CE *, div#CE *:before, div#CE *:after {-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
+div#CE{font-family: 'Roboto', arial, sans-serif; font-size: 13px; color: #727271;}
 
 /*CE*/
 div#CE
