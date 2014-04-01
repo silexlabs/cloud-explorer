@@ -1,0 +1,6 @@
+# js lib compilation
+-js app/scripts/cloud-explorer.js
+-cp src
+# uncomment the following to disable traces
+#--no-traces
+ce.api.CloudExplorer
