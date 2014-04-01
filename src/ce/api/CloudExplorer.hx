@@ -40,18 +40,17 @@ class CloudExplorer {
 
 	private function new(? iframeEltId : Null<String>) {
 
-		var ceIf : IFrameElement = iframeEltId != null ? cast js.Browser.document.getElementById(iframeEltId) : null;
+		var ceIframe : IFrameElement = iframeEltId != null ? cast js.Browser.document.getElementById(iframeEltId) : null;
 
-		if (ceIf == null) {
+		if (ceIframe == null) {
 
-			// TODO
+			ceIframe = js.Browser.document.createIFrameElement();
+
+			js.Browser.document.appendChild(ceIframe);
 		}
-
-		ceIf.style.display = "none";
-		ceIf.src = "cloud-explorer.html";
 
 		var config : Config = new Config(); // TODO
 
-		ctrl = new Controller(config, ceIf);
+		ctrl = new Controller(config, ceIframe);
 	}
 }

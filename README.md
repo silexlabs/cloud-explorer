@@ -8,7 +8,7 @@ As soon as the HTML5 target becomes stable, this branch will become the master b
 
 The Cloud Explorer API will remained unchanged and will still stick to the Ink File Picker API : https://developers.inkfilepicker.com/docs/web/
 
-##Setup
+###Setup
 
 For early testers and contributors, here are the setup steps to follow in order to run this version of CE:
 
