@@ -22,4 +22,4 @@ npm install
  - run the following command in a terminal to start the local server:
 ```
 grunt server
-``
+```
