@@ -2,7 +2,7 @@ Cloud Explorer refactoring in Progress
 --------------------------------------
 by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alexandre Hoyau [@lexoyo](https://twitter.com/lexoyo)
 
-Cloud Explorer is being ported to Haxe to make it available in HTML5, Flash, native iOS and native Android.
+Cloud Explorer is being ported to [Haxe](www.haxe.org).
 
 As soon as the HTML5 target becomes stable, this branch will become the master branch of the repository.
 
