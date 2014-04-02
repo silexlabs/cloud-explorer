@@ -1,3 +1,14 @@
+/**
+ * Cloud Explorer, lightweight frontend component for file browsing with cloud storage services.
+ * @see https://github.com/silexlabs/cloud-explorer
+ *
+ * Cloud Explorer works as a frontend interface for the unifile node.js module:
+ * @see https://github.com/silexlabs/unifile
+ *
+ * @author Thomas Fétiveau, http://www.tokom.fr  &  Alexandre Hoyau, http://lexoyo.me
+ * Copyrights SilexLabs 2013 - http://www.silexlabs.org/ -
+ * License MIT
+ */
 package ce.core.view;
 
 import js.html.Element;
@@ -14,7 +25,6 @@ class Application {
 
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
-	static inline var SELECTOR_LOADER : String = ".loader";
 	static inline var SELECTOR_HOME : String = ".home";
 	static inline var SELECTOR_BROWSER : String = ".browser";
 
@@ -24,7 +34,7 @@ class Application {
 
 		this.iframe = iframe;
 
-		init();
+		initFrame();
 	}
 
 	var iframe : js.html.IFrameElement;
@@ -34,9 +44,23 @@ class Application {
 	var logoutBtn : Element;
 	var closeBtn : Element;
 
-	var loader : Element;
-	var home : Element;
-	var browser : Element;
+
+	public var home (default, null) : Home;
+
+	public var browser (default, null) : Browser;
+
+
+	///
+	// CALLBACKS
+	//
+
+	public dynamic function onViewReady() : Void { }
+
+	public dynamic function onLogoutClicked() : Void { }
+
+	public dynamic function onCloseClicked() : Void { }
+
+	public dynamic function onServiceClicked(srvIndex : Int) : Void { }
 
 
 	///
@@ -68,23 +92,34 @@ class Application {
 	// INTERNALS
 	//
 
-	private function init() : Void {
+	private function initFrame() : Void {
 
 		// init iframe
-		iframe.style.display = "none";
+		iframe.style.display = "none"; trace("initFrame");
 		iframe.style.position = "absolute";
 		iframe.style.top = iframe.style.left = iframe.style.bottom = iframe.style.right = "0";
+
+		iframe.onload = function(?_){ initElts(); }
+
 		iframe.src = "cloud-explorer.html";
+	}
+
+	private function initElts() : Void {
 
 		// select elements
-		trace("iframe.contentDocument= "+iframe.contentDocument.body.innerHTML);
 		rootElt = iframe.contentDocument.getElementById(ID_APPLICATION);
 
 		logoutBtn = rootElt.querySelector(SELECTOR_LOGOUT_BTN);
-		closeBtn = rootElt.querySelector(SELECTOR_CLOSE_BTN);
+		logoutBtn.addEventListener( "click", function(?_){ onLogoutClicked(); } );
 
-		loader = rootElt.querySelector(SELECTOR_LOADER);
-		home = rootElt.querySelector(SELECTOR_HOME);
-		browser = rootElt.querySelector(SELECTOR_BROWSER);
+		closeBtn = rootElt.querySelector(SELECTOR_CLOSE_BTN);
+		closeBtn.addEventListener( "click", function(?_){ onCloseClicked(); } );
+
+		home = new Home(rootElt.querySelector(SELECTOR_HOME));
+		home.onServiceClicked = onServiceClicked;
+
+		browser = new Browser(rootElt.querySelector(SELECTOR_BROWSER));
+
+		onViewReady();
 	}
 }

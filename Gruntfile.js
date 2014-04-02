@@ -267,7 +267,6 @@ module.exports = function (grunt) {
                     dest: '<%= yeoman.dist %>',
                     src: [
                         'scripts/*.js',
-                        'scripts/modernizr/*.js',
                         '*.html',
                         'feeds/{,*/}*',
                         '*.{ico,png,txt}',
@@ -315,16 +314,6 @@ module.exports = function (grunt) {
             }
 
         },
-        modernizr: {
-            devFile: '<%= yeoman.app %>/scripts/modernizr/modernizr.js',
-            outputFile: '<%= yeoman.dist %>/scripts/modernizr/modernizr.js',
-            files: [
-                '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                '<%= yeoman.dist %>/styles/{,*/}*.css',
-                '!<%= yeoman.dist %>/scripts/vendor/*'
-            ],
-            uglify: true
-        },
         concurrent: {
             server: [
                 'compass',
@@ -351,7 +340,18 @@ module.exports = function (grunt) {
         }
     });
 
+/*
+  grunt.registerTask('run', 'Start Silex', function () {
+      var server = require('./dist/server/server.js');
+      console.log('Start Silex', server);
+  });
+*/
+
     grunt.registerTask('server', function (target) {
+
+        var server = require('./server/unifile.js');
+        console.log('Start unifile', server);
+
         if (target === 'dist') {
             return grunt.task.run(['build', 'connect:dist:keepalive']);
         }
@@ -361,7 +361,7 @@ module.exports = function (grunt) {
             'haxe:build',
             'concurrent:server',
             'autoprefixer',
-            'connect:livereload',
+            //'connect:livereload',
             'watch'
         ]);
     });

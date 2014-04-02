@@ -42,6 +42,10 @@ html, body {
 
 			display: block;
 		}
+		.closeBtn {
+
+			display: block;
+		}
 	}
 
 	&.starting {
@@ -50,11 +54,19 @@ html, body {
 
 			display: block;
 		}
+		.closeBtn {
+
+			display: block;
+		}
 	}
 
 	&.browsing {
 
 		.browser {
+
+			display: block;
+		}
+		.closeBtn {
 
 			display: block;
 		}
