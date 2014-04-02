@@ -13,6 +13,8 @@ package ce.core.model;
 
 import ce.core.model.unifile.Service;
 
+import haxe.ds.StringMap;
+
 class State {
 
 	public function new() { }
@@ -21,7 +23,7 @@ class State {
 
 	public var displayState (default, set) : Bool = false;
 
-	public var serviceList (default, set) : Null<Array<Service>> = null;
+	public var serviceList (default, set) : Null<StringMap<Service>> = null;
 
 
 	///
@@ -39,7 +41,7 @@ class State {
 	// SETTERS
 	//
 
-	public function set_serviceList(v : Null<Array<Service>>) : Null<Array<Service>> {
+	public function set_serviceList(v : Null<StringMap<Service>>) : Null<StringMap<Service>> {
 
 		if (v == serviceList) {
 

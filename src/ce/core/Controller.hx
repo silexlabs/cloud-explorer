@@ -21,6 +21,8 @@ import ce.core.model.State;
 
 import ce.core.service.UnifileSrv;
 
+import haxe.ds.StringMap;
+
 class Controller {
 
 	public function new(config : Config, iframe : js.html.IFrameElement) {
@@ -72,14 +74,17 @@ class Controller {
 
 			unifileSrv.listServices(function(sl : Array<ce.core.model.unifile.Service>) {
 
-					state.serviceList = sl;
+					var slm : StringMap<ce.core.model.unifile.Service> = new StringMap();
 
-					application.setLoaderDisplayed(false);
+					for (s in sl) {
 
-					for (s in state.serviceList) {
+						slm.set(s.name, s);
 
 						application.home.addService(s.name, s.displayName, s.description);
 					}
+					state.serviceList = slm;
+
+					application.setLoaderDisplayed(false);
 
 					application.setHomeDisplayed(true);
 
@@ -111,10 +116,35 @@ class Controller {
 				state.displayState = false;
 			}
 
-		application.onServiceClicked = function(srvIndex : Int) {
+		application.onServiceClicked = function(name : String) {
 
 				// TODO
-				trace(state.serviceList[srvIndex].displayName + " chosen");
+				trace("connecting " + name + " chosen");
+
+				unifileSrv.connect(name, function(cr : ce.core.model.unifile.ConnectResult) {
+
+						if (cr.success) {
+
+							state.serviceList.get(name).isConnected = true;
+
+							application.authPopup.setServerName(state.serviceList.get(name).displayName);
+
+							application.authPopup.onClicked = function(){
+
+									// TODO open popup
+									trace("open popup on "+cr.authorizeUrl);
+								}
+
+							application.setAuthPopupDisplayed(true);
+
+						} else {
+
+							state.serviceList.get(name).isConnected = false;
+
+							setError(cr.message);
+						}
+
+					}, setError);
 			}
 
 		state.onDisplayStateChanged = function() {

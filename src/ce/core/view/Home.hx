@@ -39,7 +39,7 @@ class Home {
 	// CALLBACK
 	//
 
-	public dynamic function onServiceClicked(srvIndex : Int) : Void { }
+	public dynamic function onServiceClicked(name : String) : Void { }
 
 
 	///
@@ -55,9 +55,7 @@ class Home {
 
 		// TODO description as tooltip ?
 
-		var srvIndex : Int = listElt.querySelectorAll(SELECTOR_SRV_ITEM_TMPL).length;
-
-		newSrvIt.addEventListener( "click", function(?_){ onServiceClicked(srvIndex); } );
+		newSrvIt.addEventListener( "click", function(?_){ onServiceClicked(name); } );
 
 		listElt.appendChild(newSrvIt);
 	}

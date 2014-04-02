@@ -22,11 +22,13 @@ class Application {
 	static inline var CLASS_LOADING : String = "loading";
 	static inline var CLASS_STARTING : String = "starting";
 	static inline var CLASS_BROWSING : String = "browsing";
+	static inline var CLASS_AUTHORIZING : String = "authorizing";
 
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
 	static inline var SELECTOR_HOME : String = ".home";
 	static inline var SELECTOR_BROWSER : String = ".browser";
+	static inline var SELECTOR_AUTH_POPUP : String = ".authPopup";
 
 
 
@@ -49,6 +51,8 @@ class Application {
 
 	public var browser (default, null) : Browser;
 
+	public var authPopup (default, null) : AuthPopup;
+
 
 	///
 	// CALLBACKS
@@ -60,7 +64,7 @@ class Application {
 
 	public dynamic function onCloseClicked() : Void { }
 
-	public dynamic function onServiceClicked(srvIndex : Int) : Void { }
+	public dynamic function onServiceClicked(name : String) : Void { }
 
 
 	///
@@ -85,6 +89,11 @@ class Application {
 	public function setBrowserDisplayed(v : Bool) : Void {
 
 		rootElt.toggleClass(CLASS_BROWSING , v);
+	}
+
+	public function setAuthPopupDisplayed(v : Bool) : Void {
+
+		rootElt.toggleClass(CLASS_AUTHORIZING , v);
 	}
 
 
@@ -119,6 +128,8 @@ class Application {
 		home.onServiceClicked = onServiceClicked;
 
 		browser = new Browser(rootElt.querySelector(SELECTOR_BROWSER));
+
+		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
 
 		onViewReady();
 	}

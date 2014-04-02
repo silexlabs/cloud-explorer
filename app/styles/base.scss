@@ -24,7 +24,8 @@ html, body {
 	.closeBtn,
 	.logoutBtn,
 	.home,
-	.browser
+	.browser,
+	.authPopup
 	{
 		display: none;
 	}
@@ -67,6 +68,14 @@ html, body {
 			display: block;
 		}
 		.closeBtn {
+
+			display: block;
+		}
+	}
+
+	&.authorizing {
+
+		.authPopup {
 
 			display: block;
 		}

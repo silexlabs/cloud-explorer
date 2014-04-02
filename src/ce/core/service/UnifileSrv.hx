@@ -14,15 +14,19 @@ package ce.core.service;
 import ce.core.config.Config;
 
 import ce.core.parser.unifile.Json2Service;
+import ce.core.parser.unifile.Json2ConnectResult;
 
 import ce.core.model.unifile.Service;
+import ce.core.model.unifile.ConnectResult;
 
 import haxe.Http;
+
+using StringTools;
 
 class UnifileSrv {
 
 	static inline var ENDPOINT_LIST_SERVICES : String = "services/list";
-	static inline var ENDPOINT_CONNECT : String = "connect";
+	static inline var ENDPOINT_CONNECT : String = "{srv}/connect";
 	static inline var ENDPOINT_LOGIN : String = "login";
 	static inline var ENDPOINT_LOGOUT : String = "logout";
 	static inline var ENDPOINT_LS : String = "exec/ls";
@@ -72,9 +76,18 @@ return $resource( serverUrl + ':service/:method/:command/:path ', {},
 		http.request(false);
 	}
 
-	public function connect() : Void {
+	public function connect(srv : String, onSuccess : ConnectResult -> Void, onError : String -> Void) : Void {
 
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_CONNECT.replace("{srv}", srv));
 
+		http.onData = function(data : String) {
+
+				onSuccess(Json2ConnectResult.parse(data));
+			}
+
+		http.onError = onError;
+
+		http.request(false);
 	}
 
 	public function login() : Void {
