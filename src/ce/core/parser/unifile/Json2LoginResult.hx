@@ -11,22 +11,20 @@
  */
 package ce.core.parser.unifile;
 
-import ce.core.model.unifile.ConnectResult;
+import ce.core.model.unifile.LoginResult;
 
 import ce.core.parser.json.Json2Primitive;
 
 import haxe.Json;
 
-class Json2ConnectResult {
+class Json2LoginResult {
 	
-	static public function parse(dataStr : String) : ConnectResult {
+	static public function parse(dataStr : String) : LoginResult {
 
 		var obj : Dynamic = Json.parse( dataStr );
 
 		return {
-				success: Json2Primitive.node2Bool(obj, "success", false),
-				message: Json2Primitive.node2String(obj, "message", false),
-				authorizeUrl: Json2Primitive.node2String(obj, "authorize_url", false),
+				success: Json2Primitive.node2Bool(obj, "success", false)
 			};
 	}
 }

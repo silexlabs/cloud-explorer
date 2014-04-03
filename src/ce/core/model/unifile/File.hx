@@ -11,9 +11,10 @@
  */
 package ce.core.model.unifile;
 
-typedef ConnectResult = {
+typedef File = {
 
-	var success : Bool;
-	var message : String;
-	var authorizeUrl : String;
+	var name : String;
+	var bytes : Int;
+	var modified : String; // FIXME would be better if unifile sent back a timestamp instead of "Wed, 08 Jan 2014 09:26:15 +0000",
+	var isDir : Bool;
 }

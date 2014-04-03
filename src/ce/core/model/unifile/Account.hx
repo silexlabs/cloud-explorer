@@ -11,9 +11,14 @@
  */
 package ce.core.model.unifile;
 
-typedef ConnectResult = {
+typedef QuotaInfo = {
 
-	var success : Bool;
-	var message : String;
-	var authorizeUrl : String;
+	var available : Int;
+	var used : Int;
+}
+
+typedef Account = {
+
+	var displayName : String;
+	var quotaInfo : QuotaInfo;
 }

@@ -11,6 +11,7 @@
  */
 package ce.core.view;
 
+import js.Browser;
 import js.html.Element;
 
 using ce.util.HtmlTools;
@@ -27,10 +28,8 @@ class Application {
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
 	static inline var SELECTOR_HOME : String = ".home";
-	static inline var SELECTOR_BROWSER : String = ".browser";
+	static inline var SELECTOR_FILE_BROWSER : String = ".fileBrowser";
 	static inline var SELECTOR_AUTH_POPUP : String = ".authPopup";
-
-
 
 	public function new(iframe : js.html.IFrameElement) {
 
@@ -49,7 +48,7 @@ class Application {
 
 	public var home (default, null) : Home;
 
-	public var browser (default, null) : Browser;
+	public var fileBrowser (default, null) : FileBrowser;
 
 	public var authPopup (default, null) : AuthPopup;
 
@@ -65,6 +64,10 @@ class Application {
 	public dynamic function onCloseClicked() : Void { }
 
 	public dynamic function onServiceClicked(name : String) : Void { }
+
+	public dynamic function onAuthorizationWindowBlocked() : Void { }
+
+	public dynamic function onServiceAuthorizationDone() : Void { }
 
 
 	///
@@ -83,10 +86,20 @@ class Application {
 
 	public function setHomeDisplayed(v : Bool) : Void {
 
+		if (v) {
+
+			cleanPreviousState();
+		}
+
 		rootElt.toggleClass(CLASS_STARTING , v);
 	}
 
-	public function setBrowserDisplayed(v : Bool) : Void {
+	public function setFileBrowserDisplayed(v : Bool) : Void {
+
+		if (v) {
+
+			cleanPreviousState();
+		}
 
 		rootElt.toggleClass(CLASS_BROWSING , v);
 	}
@@ -96,10 +109,62 @@ class Application {
 		rootElt.toggleClass(CLASS_AUTHORIZING , v);
 	}
 
+	public function openAuthorizationWindow(url : String) : Void {
+
+		// note: we might need to improve this method in order to have different possible sizes by cloud service
+		var authPopup = Browser.window.open(url, "authPopup", "height=829,width=1035");
+
+		if (authPopup == null || authPopup.closed || authPopup.closed == null) {
+			
+			onAuthorizationWindowBlocked();
+		
+		} else {
+
+			if (authPopup.focus != null) { authPopup.focus(); }
+
+			var timer = new haxe.Timer(500);
+			
+			timer.run = function() {
+
+					if (authPopup.closed) {
+
+						timer.stop();
+
+						onServiceAuthorizationDone();
+					}
+				}
+		}
+	}
+
 
 	///
 	// INTERNALS
 	//
+
+	function currentState() : Null<String> {
+
+		for (c in rootElt.className.split(" ")) {
+
+			if( Lambda.has([CLASS_STARTING, CLASS_BROWSING], c) ) {
+
+				return c;
+			}
+		}
+		// if we're here, we have a problem (no current state ?!)
+		return null;
+	}
+
+	private function cleanPreviousState() : Void {
+
+		var cs : Null<String> = currentState(); trace("cs= "+cs);
+
+		rootElt.toggleClass(CLASS_AUTHORIZING, false);
+		
+		if (cs != null) {
+
+			rootElt.toggleClass(cs, false);
+		}
+	}
 
 	private function initFrame() : Void {
 
@@ -127,7 +192,7 @@ class Application {
 		home = new Home(rootElt.querySelector(SELECTOR_HOME));
 		home.onServiceClicked = onServiceClicked;
 
-		browser = new Browser(rootElt.querySelector(SELECTOR_BROWSER));
+		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
 
 		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
 

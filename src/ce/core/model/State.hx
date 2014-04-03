@@ -12,6 +12,8 @@
 package ce.core.model;
 
 import ce.core.model.unifile.Service;
+import ce.core.model.unifile.File;
+import ce.core.model.Location;
 
 import haxe.ds.StringMap;
 
@@ -25,6 +27,10 @@ class State {
 
 	public var serviceList (default, set) : Null<StringMap<Service>> = null;
 
+	public var currentLocation (default, set) : Null<Location> = null;
+
+	public var currentFileList (default, set) : Null<Array<File>> = null;
+
 
 	///
 	// CALLBACKS
@@ -35,6 +41,14 @@ class State {
 	public dynamic function onDisplayStateChanged() { }
 
 	public dynamic function onServiceListChanged() { }
+
+	public dynamic function onCurrentLocationChanged() { }
+
+	public dynamic function onCurrentFileListChanged() { }
+
+	public dynamic function onServiceLoginStateChanged(srvName : String) { }
+
+	public dynamic function onServiceAccountChanged(srvName : String) { }
 
 
 	///
@@ -49,9 +63,29 @@ class State {
 		}
 		serviceList = v;
 
+		for (s in serviceList) {
+
+			s.onLoginStateChanged = function() { onServiceLoginStateChanged(s.name); }
+
+			s.onAccountChanged = function() { onServiceAccountChanged(s.name); }
+		}
+		
 		onServiceListChanged();
 
 		return serviceList;
+	}
+
+	public function set_currentFileList(v : Null<Array<File>>) : Null<Array<File>> {
+
+		if (v == currentFileList) {
+
+			return v;
+		}
+		currentFileList = v;
+		
+		onCurrentFileListChanged();
+
+		return currentFileList;
 	}
 
 	public function set_readyState(v : Bool) : Bool {
@@ -78,5 +112,20 @@ class State {
 		onDisplayStateChanged();
 
 		return displayState;
+	}
+
+	public function set_currentLocation(v : Location) : Location {
+
+		if (v == currentLocation) {
+
+			return v;
+		}
+		currentLocation = v;
+
+		currentLocation.onChanged = function() { onCurrentLocationChanged(); }
+
+		onCurrentLocationChanged();
+
+		return currentLocation;
 	}
 }

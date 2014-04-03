@@ -13,7 +13,9 @@ package ce.core.view;
 
 import js.html.Element;
 
-class Browser {
+import haxe.ds.StringMap;
+
+class FileBrowser {
 
 	static inline var SELECTOR_SRV_LIST : String = ".services ul";
 	static inline var SELECTOR_FILES_LIST : String = ".files ul";
@@ -25,6 +27,8 @@ class Browser {
 	public function new(elt : Element) {
 
 		this.elt = elt;
+
+		this.srvItemElts = new StringMap();
 
 		this.srvList = elt.querySelector(SELECTOR_SRV_LIST);
 		this.srvItemTmpl = srvList.querySelector(SELECTOR_SRV_ITEM_TMPL);
@@ -46,6 +50,8 @@ class Browser {
 	var fileItemTmpl : Element;
 	var folderItemTmpl : Element;
 
+	var srvItemElts : StringMap<Element>;
+
 
 	///
 	// CALLBACKS
@@ -59,6 +65,16 @@ class Browser {
 	///
 	// API
 	//
+/*
+	public function setEmptyMsgDisplay(v : Bool) : Void {
+
+
+	}
+*/
+	public function removeService(name : String) : Void {
+
+		srvList.removeChild(srvItemElts.get(name));
+	}
 
 	public function addService(name : String, displayName : String) : Void {
 
@@ -68,6 +84,16 @@ class Browser {
 		newItem.addEventListener( "click", function(?_){ onServiceClicked(name); } );
 
 		srvList.appendChild(newItem);
+
+		srvItemElts.set(name, newItem);
+	}
+
+	public function resetFileList() : Void {
+
+		while(fileList.childNodes.length > 0) {
+
+			fileList.removeChild(fileList.firstChild);
+		}
 	}
 
 	public function addFolder(name : String) : Void {

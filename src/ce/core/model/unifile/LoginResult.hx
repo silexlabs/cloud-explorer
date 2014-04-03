@@ -11,9 +11,7 @@
  */
 package ce.core.model.unifile;
 
-typedef ConnectResult = {
+typedef LoginResult = {
 
 	var success : Bool;
-	var message : String;
-	var authorizeUrl : String;
 }

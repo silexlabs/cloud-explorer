@@ -1,3 +1,14 @@
+/**
+ * Cloud Explorer, lightweight frontend component for file browsing with cloud storage services.
+ * @see https://github.com/silexlabs/cloud-explorer
+ *
+ * Cloud Explorer works as a frontend interface for the unifile node.js module:
+ * @see https://github.com/silexlabs/unifile
+ *
+ * @author Thomas Fétiveau, http://www.tokom.fr  &  Alexandre Hoyau, http://lexoyo.me
+ * Copyrights SilexLabs 2013 - http://www.silexlabs.org/ -
+ * License MIT
+ */
 package ce.core.parser.unifile;
 
 import ce.core.model.unifile.Service;
@@ -24,31 +35,15 @@ class Json2Service {
 
 	static public function parseService(obj : Dynamic) : Service {
 
-		return {
-			name: Json2Primitive.node2String(obj, "name", false),
-			displayName: Json2Primitive.node2String(obj, "display_name", false),
-			imageSmall: Json2Primitive.node2String(obj, "image_small", false),
-			description: Json2Primitive.node2String(obj, "description", false),
-			visible: Json2Primitive.node2Bool(obj, "visible", false),
-			isLoggedIn: Json2Primitive.node2Bool(obj, "isLoggedIn", false),
-			isConnected: Json2Primitive.node2Bool(obj, "isConnected", false),
-			user: Reflect.hasField(obj, "user") ? parseUser(Reflect.field(obj, "user")) : null
-		};
-	}
-
-	static public function parseUser(obj : Dynamic) : User {
-
-		return {
-			displayName: Json2Primitive.node2String(obj, "display_name", false),
-			quotaInfo: parseQuotaInfo(Reflect.field(obj, "quota_info"))
-		};
-	}
-
-	static public function parseQuotaInfo(obj : Dynamic) : QuotaInfo {
-
-		return {
-			available: Json2Primitive.node2Int(obj, "available", false),
-			used: Json2Primitive.node2Int(obj, "used", false)
-		};
+		return new Service(
+				Json2Primitive.node2String(obj, "name", false),
+				Json2Primitive.node2String(obj, "display_name", false),
+				Json2Primitive.node2String(obj, "image_small", false),
+				Json2Primitive.node2String(obj, "description", false),
+				Json2Primitive.node2Bool(obj, "visible", false),
+				Json2Primitive.node2Bool(obj, "isLoggedIn", false),
+				Json2Primitive.node2Bool(obj, "isConnected", false),
+				Reflect.hasField(obj, "user") ? Json2Account.parseAccount(null, Reflect.field(obj, "user")) : null
+			);
 	}
 }

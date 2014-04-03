@@ -15,9 +15,15 @@ import ce.core.config.Config;
 
 import ce.core.parser.unifile.Json2Service;
 import ce.core.parser.unifile.Json2ConnectResult;
+import ce.core.parser.unifile.Json2LoginResult;
+import ce.core.parser.unifile.Json2Account;
+import ce.core.parser.unifile.Json2File;
 
 import ce.core.model.unifile.Service;
 import ce.core.model.unifile.ConnectResult;
+import ce.core.model.unifile.LoginResult;
+import ce.core.model.unifile.Account;
+import ce.core.model.unifile.File;
 
 import haxe.Http;
 
@@ -27,9 +33,10 @@ class UnifileSrv {
 
 	static inline var ENDPOINT_LIST_SERVICES : String = "services/list";
 	static inline var ENDPOINT_CONNECT : String = "{srv}/connect";
-	static inline var ENDPOINT_LOGIN : String = "login";
+	static inline var ENDPOINT_LOGIN : String = "{srv}/login";
+	static inline var ENDPOINT_ACCOUNT : String = "{srv}/account";
 	static inline var ENDPOINT_LOGOUT : String = "logout";
-	static inline var ENDPOINT_LS : String = "exec/ls";
+	static inline var ENDPOINT_LS : String = "{srv}/exec/ls/{path}";
 	static inline var ENDPOINT_RM : String = "exec/rm";
 	static inline var ENDPOINT_MKDIR : String = "exec/mkdir";
 	static inline var ENDPOINT_CP : String = "exec/cp";
@@ -42,21 +49,7 @@ class UnifileSrv {
 	}
 
 	var config : Config;
-/*
-return $resource( serverUrl + ':service/:method/:command/:path ', {},
-			{  // *very ugly* FIXME added space to keep the '/' at the end of the url
-				listServices: {method:'GET', params:{service:'services', method:'list'}, isArray:true},
-				connect: {method:'GET', params:{method:'connect'}, isArray:false},
-				login: {method:'GET', params:{method:'login'}, isArray:false},
-				logout: {method:'GET', params:{method:'logout'}, isArray:false},
-				ls: {method:'GET', params:{method:'exec', command:'ls'}, isArray:true},
-				rm: {method:'GET', params:{method:'exec', command:'rm'}, isArray:false},
-				mkdir: {method:'GET', params:{method:'exec', command:'mkdir'}, isArray:false},
-				cp: {method:'GET', params:{method:'exec', command:'cp'}, isArray:false},
-				mv: {method:'GET', params:{method:'exec', command:'mv'}, isArray:false},
-				get: {method:'GET', params:{method:'exec', command:'get'}, isArray:false} // FIXME buggy
-			});
-*/
+
 
 	///
 	// API
@@ -90,9 +83,32 @@ return $resource( serverUrl + ':service/:method/:command/:path ', {},
 		http.request(false);
 	}
 
-	public function login() : Void {
+	public function login(srv : String, onSuccess : LoginResult -> Void, onError : String -> Void) : Void {
 
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LOGIN.replace("{srv}", srv));
 
+		http.onData = function(data : String) {
+
+				onSuccess(Json2LoginResult.parse(data));
+			}
+
+		http.onError = onError;
+
+		http.request(false);
+	}
+
+	public function account(srv : String, onSuccess : Account -> Void, onError : String -> Void) : Void {
+
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_ACCOUNT.replace("{srv}", srv));
+
+		http.onData = function(data : String) {
+
+				onSuccess(Json2Account.parseAccount(data));
+			}
+
+		http.onError = onError;
+
+		http.request(true);
 	}
 
 	public function logout() : Void {
@@ -100,9 +116,18 @@ return $resource( serverUrl + ':service/:method/:command/:path ', {},
 
 	}
 
-	public function ls() : Void {
+	public function ls(srv : String, path : String, onSuccess : Array<File> -> Void, onError : String -> Void) : Void {
 
-		
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LS.replace("{srv}", srv).replace("{path}", path));
+
+		http.onData = function(data : String) {
+
+				onSuccess(Json2File.parseFileCollection(data));
+			}
+
+		http.onError = onError;
+
+		http.request(false);
 	}
 
 	public function rm() : Void {

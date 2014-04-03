@@ -18,6 +18,7 @@ import ce.core.view.Application;
 import ce.core.model.CEBlob;
 import ce.core.model.CEError;
 import ce.core.model.State;
+import ce.core.model.Location;
 
 import ce.core.service.UnifileSrv;
 
@@ -118,8 +119,7 @@ class Controller {
 
 		application.onServiceClicked = function(name : String) {
 
-				// TODO
-				trace("connecting " + name + " chosen");
+				application.setLoaderDisplayed(true);
 
 				unifileSrv.connect(name, function(cr : ce.core.model.unifile.ConnectResult) {
 
@@ -131,8 +131,17 @@ class Controller {
 
 							application.authPopup.onClicked = function(){
 
-									// TODO open popup
-									trace("open popup on "+cr.authorizeUrl);
+									application.onAuthorizationWindowBlocked = function(){
+
+											setError("Can't open "+state.serviceList.get(name).displayName+" authorization window!");
+										}
+
+									application.onServiceAuthorizationDone = function() {
+
+											login(name);
+										}
+
+									application.openAuthorizationWindow(cr.authorizeUrl);
 								}
 
 							application.setAuthPopupDisplayed(true);
@@ -156,5 +165,114 @@ class Controller {
 
 
 			}
+
+		state.onServiceLoginStateChanged = function(srvName) {
+
+				if (!state.serviceList.get(srvName).isLoggedIn) {
+
+					application.fileBrowser.removeService(srvName);
+
+					if (state.currentLocation.service == "srvName") {
+
+						state.currentLocation = null;
+					}
+
+				} else {
+
+					if (state.serviceList.get(srvName).account == null) {
+
+						unifileSrv.account(srvName, function(a : ce.core.model.unifile.Account){
+
+								state.serviceList.get(srvName).account = a;
+
+							}, setError);
+					}
+					if (state.currentLocation == null) {
+
+						state.currentLocation = new Location(srvName, "/");
+					}
+					application.fileBrowser.addService(srvName, state.serviceList.get(srvName).displayName);
+				}
+			}
+
+		state.onServiceAccountChanged = function(srvName) {
+
+				// TODO
+			}
+
+		state.onCurrentLocationChanged = function() {
+
+				if (state.currentLocation == null) {
+
+					state.currentFileList = null;
+
+				} else {
+
+					cd(state.currentLocation.service , state.currentLocation.path );
+				}
+			}
+
+		state.onCurrentFileListChanged = function() {
+
+				application.fileBrowser.resetFileList();
+
+				if (state.currentFileList == null) {
+
+					//application.fileBrowser.setEmptyMsgDisplay(true);
+
+				} else {
+
+					//application.fileBrowser.setEmptyMsgDisplay(false);
+
+					for (f in state.currentFileList) {
+
+						if (f.isDir) {
+
+							application.fileBrowser.addFolder(f.name);
+
+						} else {
+
+							application.fileBrowser.addFile(f.name);
+						}
+					}
+				}
+			}
+	}
+
+	function cd(srvName : String, path : String) : Void {
+
+		application.setLoaderDisplayed(true);
+
+		unifileSrv.ls(srvName, path, function(files : Array<ce.core.model.unifile.File>){
+
+				application.setFileBrowserDisplayed(true);
+
+				application.setLoaderDisplayed(false);
+
+				state.currentFileList = files;
+
+			}, setError);
+	}
+
+	function login(srvName : String) : Void {
+
+		if (!state.serviceList.get(srvName).isLoggedIn) {
+
+			unifileSrv.login(srvName, function(lr : ce.core.model.unifile.LoginResult){
+
+					application.setLoaderDisplayed(false);
+
+					if (lr.success) {
+
+						state.serviceList.get(srvName).isLoggedIn = true;
+					
+					} else {
+
+						state.serviceList.get(srvName).isLoggedIn = false;
+						setError('Could not login. Please try again.');
+					}
+
+				}, setError);
+		}
 	}
 }
