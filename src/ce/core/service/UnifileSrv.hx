@@ -18,14 +18,18 @@ import ce.core.parser.unifile.Json2ConnectResult;
 import ce.core.parser.unifile.Json2LoginResult;
 import ce.core.parser.unifile.Json2Account;
 import ce.core.parser.unifile.Json2File;
+import ce.core.parser.unifile.Json2LogoutResult;
 
 import ce.core.model.unifile.Service;
 import ce.core.model.unifile.ConnectResult;
 import ce.core.model.unifile.LoginResult;
 import ce.core.model.unifile.Account;
 import ce.core.model.unifile.File;
+import ce.core.model.unifile.LogoutResult;
 
 import haxe.Http;
+
+import haxe.ds.StringMap;
 
 using StringTools;
 
@@ -35,7 +39,7 @@ class UnifileSrv {
 	static inline var ENDPOINT_CONNECT : String = "{srv}/connect";
 	static inline var ENDPOINT_LOGIN : String = "{srv}/login";
 	static inline var ENDPOINT_ACCOUNT : String = "{srv}/account";
-	static inline var ENDPOINT_LOGOUT : String = "logout";
+	static inline var ENDPOINT_LOGOUT : String = "{srv}/logout";
 	static inline var ENDPOINT_LS : String = "{srv}/exec/ls/{path}";
 	static inline var ENDPOINT_RM : String = "exec/rm";
 	static inline var ENDPOINT_MKDIR : String = "exec/mkdir";
@@ -55,13 +59,22 @@ class UnifileSrv {
 	// API
 	//
 
-	public function listServices(onSuccess : Array<Service> -> Void, onError : String -> Void) : Void {
+	public function listServices(onSuccess : StringMap<Service> -> Void, onError : String -> Void) : Void {
 
 		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LIST_SERVICES);
 
 		http.onData = function(data : String) {
 
-				onSuccess(Json2Service.parseServiceCollection(data));
+				var sl : Array<Service> = Json2Service.parseServiceCollection(data);
+
+				var slm : StringMap<Service> = new StringMap();
+
+				for (s in sl) {
+
+					slm.set(s.name, s);
+				}
+
+				onSuccess(slm);
 			}
 
 		http.onError = onError;
@@ -111,9 +124,18 @@ class UnifileSrv {
 		http.request(true);
 	}
 
-	public function logout() : Void {
+	public function logout(srv : String, onSuccess : LogoutResult -> Void, onError : String -> Void) : Void {
 
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LOGOUT.replace("{srv}", srv));
 
+		http.onData = function(data : String) {
+
+				onSuccess(Json2LogoutResult.parse(data));
+			}
+
+		http.onError = onError;
+
+		http.request(false);
 	}
 
 	public function ls(srv : String, path : String, onSuccess : Array<File> -> Void, onError : String -> Void) : Void {

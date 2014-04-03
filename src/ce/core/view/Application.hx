@@ -15,8 +15,11 @@ import js.Browser;
 import js.html.Element;
 
 using ce.util.HtmlTools;
+using StringTools;
 
 class Application {
+
+	static inline var PLACE_HOLDER_LOGOUT_NAME : String = "{name}";
 
 	static inline var ID_APPLICATION : String = "cloud-explorer";
 
@@ -24,6 +27,7 @@ class Application {
 	static inline var CLASS_STARTING : String = "starting";
 	static inline var CLASS_BROWSING : String = "browsing";
 	static inline var CLASS_AUTHORIZING : String = "authorizing";
+	static inline var CLASS_LOGGED_IN : String = "loggedIn";
 
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
@@ -43,6 +47,8 @@ class Application {
 	var rootElt : Element;
 
 	var logoutBtn : Element;
+	var logoutContentTmpl : String;
+
 	var closeBtn : Element;
 
 
@@ -74,6 +80,11 @@ class Application {
 	// API
 	//
 
+	public function setLogoutButtonContent(v : String) : Void {
+trace("setLogoutButtonContent "+v);
+		logoutBtn.textContent = logoutContentTmpl.replace(PLACE_HOLDER_LOGOUT_NAME, v);
+	}
+
 	public function setDisplayed(v : Bool) : Void {
 
 		iframe.style.display = v ? "block" : "none";
@@ -82,6 +93,11 @@ class Application {
 	public function setLoaderDisplayed(v : Bool) : Void {
 
 		rootElt.toggleClass(CLASS_LOADING , v);
+	}
+
+	public function setLogoutButtonDisplayed(v : Bool) : Void {
+
+		rootElt.toggleClass(CLASS_LOGGED_IN , v);
 	}
 
 	public function setHomeDisplayed(v : Bool) : Void {
@@ -126,7 +142,7 @@ class Application {
 			
 			timer.run = function() {
 
-					if (authPopup.closed) {
+					if (authPopup.closed) { trace("authPopup.closed= "+authPopup.closed);
 
 						timer.stop();
 
@@ -184,6 +200,7 @@ class Application {
 		rootElt = iframe.contentDocument.getElementById(ID_APPLICATION);
 
 		logoutBtn = rootElt.querySelector(SELECTOR_LOGOUT_BTN);
+		logoutContentTmpl = logoutBtn.textContent;
 		logoutBtn.addEventListener( "click", function(?_){ onLogoutClicked(); } );
 
 		closeBtn = rootElt.querySelector(SELECTOR_CLOSE_BTN);

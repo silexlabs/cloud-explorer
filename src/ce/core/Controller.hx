@@ -73,21 +73,11 @@ class Controller {
 
 			application.setLoaderDisplayed(true);
 
-			unifileSrv.listServices(function(sl : Array<ce.core.model.unifile.Service>) {
+			unifileSrv.listServices(function(slm : StringMap<ce.core.model.unifile.Service>) {
 
-					var slm : StringMap<ce.core.model.unifile.Service> = new StringMap();
-
-					for (s in sl) {
-
-						slm.set(s.name, s);
-
-						application.home.addService(s.name, s.displayName, s.description);
-					}
 					state.serviceList = slm;
 
 					application.setLoaderDisplayed(false);
-
-					application.setHomeDisplayed(true);
 
 				}, setError);
 
@@ -108,8 +98,31 @@ class Controller {
 
 		application.onLogoutClicked = function() {
 
-				// TODO
-				
+				// FIXME support logging out by service
+
+				var srvName : Null<String> = null;
+
+				for (s in state.serviceList) {
+
+					if (s.isLoggedIn) {
+
+						srvName = s.name;
+						break;
+					}
+				}
+				if (srvName != null) {
+
+					unifileSrv.logout(srvName, function(lr : ce.core.model.unifile.LogoutResult){
+
+							state.serviceList.get(srvName).isLoggedIn = false;
+
+							if (!lr.success) {
+
+								setError(lr.message);
+							}
+
+						}, setError);
+				}	
 			}
 
 		application.onCloseClicked = function() {
@@ -136,7 +149,7 @@ class Controller {
 											setError("Can't open "+state.serviceList.get(name).displayName+" authorization window!");
 										}
 
-									application.onServiceAuthorizationDone = function() {
+									application.onServiceAuthorizationDone = function() { trace("onServiceAuthorizationDone");
 
 											login(name);
 										}
@@ -156,6 +169,38 @@ class Controller {
 					}, setError);
 			}
 
+		state.onServiceListChanged = function() {
+
+				var lastConnectedService : Null<String> = null;
+
+				for (s in state.serviceList) {
+
+					application.home.addService(s.name, s.displayName, s.description);
+
+					if (s.isLoggedIn) {
+
+						lastConnectedService = s.name;
+
+						application.fileBrowser.addService(s.name, s.displayName);
+					}
+				}
+				if (lastConnectedService != null) {
+
+					if (state.currentLocation == null) {
+
+						state.currentLocation = new Location(lastConnectedService, "/");
+					}
+
+					application.setLogoutButtonDisplayed(true);
+
+					application.setFileBrowserDisplayed(true);
+
+				} else {
+
+					application.setHomeDisplayed(true);
+				}
+			}
+
 		state.onDisplayStateChanged = function() {
 
 				application.setDisplayed(state.displayState);
@@ -171,6 +216,8 @@ class Controller {
 				if (!state.serviceList.get(srvName).isLoggedIn) {
 
 					application.fileBrowser.removeService(srvName);
+
+					application.setLogoutButtonDisplayed(false); // FIXME dropdown list instead
 
 					if (state.currentLocation.service == "srvName") {
 
@@ -192,12 +239,14 @@ class Controller {
 						state.currentLocation = new Location(srvName, "/");
 					}
 					application.fileBrowser.addService(srvName, state.serviceList.get(srvName).displayName);
+
+					application.setLogoutButtonDisplayed(true);
 				}
 			}
 
 		state.onServiceAccountChanged = function(srvName) {
-
-				// TODO
+trace("onServiceAccountChanged");
+				application.setLogoutButtonContent(state.serviceList.get(srvName).account.displayName);
 			}
 
 		state.onCurrentLocationChanged = function() {
@@ -239,7 +288,7 @@ class Controller {
 			}
 	}
 
-	function cd(srvName : String, path : String) : Void {
+	private function cd(srvName : String, path : String) : Void {
 
 		application.setLoaderDisplayed(true);
 
@@ -254,8 +303,8 @@ class Controller {
 			}, setError);
 	}
 
-	function login(srvName : String) : Void {
-
+	private function login(srvName : String) : Void {
+trace("is logged in ? "+state.serviceList.get(srvName).isLoggedIn);
 		if (!state.serviceList.get(srvName).isLoggedIn) {
 
 			unifileSrv.login(srvName, function(lr : ce.core.model.unifile.LoginResult){
