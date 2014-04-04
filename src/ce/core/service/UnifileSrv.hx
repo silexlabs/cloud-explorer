@@ -45,7 +45,7 @@ class UnifileSrv {
 	static inline var ENDPOINT_MKDIR : String = "exec/mkdir";
 	static inline var ENDPOINT_CP : String = "exec/cp";
 	static inline var ENDPOINT_MV : String = "exec/mv";
-	static inline var ENDPOINT_GET : String = "exec/get";
+	static public inline var ENDPOINT_GET : String = "{srv}/exec/get/{uri}";
 
 	public function new(config : Config) : Void {
 
@@ -145,7 +145,7 @@ class UnifileSrv {
 		http.onData = function(data : String) {
 
 				var fa : Array<File> = Json2File.parseFileCollection(data);
-				
+
 				var fsm : StringMap<File> = new StringMap();
 
 				for (f in fa) {

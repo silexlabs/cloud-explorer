@@ -19,10 +19,14 @@ import ce.core.model.CEBlob;
 import ce.core.model.CEError;
 import ce.core.model.State;
 import ce.core.model.Location;
+import ce.core.model.SelectionMode;
 
 import ce.core.service.UnifileSrv;
 
 import haxe.ds.StringMap;
+
+using ce.util.FileTools;
+using StringTools;
 
 class Controller {
 
@@ -53,9 +57,9 @@ class Controller {
 
 	public function pick(? options : Dynamic, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
 
-		show();
+		state.currentSelectionMode = SingleFile(onSuccess, onError);
 
-		//application.setHomeDisplayed(true);
+		show();
 	}
 
 	public function setError(msg : String) : Void {
@@ -66,35 +70,6 @@ class Controller {
 	///
 	// INTERNALS
 	//
-
-	private function show() : Void {
-
-		if (state.serviceList == null) {
-
-			application.setLoaderDisplayed(true);
-
-			unifileSrv.listServices(function(slm : StringMap<ce.core.model.unifile.Service>) {
-
-					application.setLoaderDisplayed(false);
-
-					state.serviceList = slm;
-
-				}, setError);
-
-		} else {
-
-			if (state.currentFileList == null) {
-
-				application.setHomeDisplayed(true);
-			
-			} else {
-
-				application.setFileBrowserDisplayed(true);
-			}
-		}
-
-		state.displayState = true;
-	}
 
 	private function initMvc() : Void {
 
@@ -134,7 +109,7 @@ class Controller {
 
 		application.onCloseClicked = function() {
 
-				state.displayState = false;
+				hide();
 			}
 
 		application.onServiceClicked = function(name : String) {
@@ -189,9 +164,41 @@ class Controller {
 
 					cpd(state.currentLocation.service, state.currentLocation.path);
 
-				} else if (state.currentFileList.get(id).isDir) {
+				} else {
 
-					state.currentLocation.path += state.currentFileList.get(id).name + "/";
+					var f : ce.core.model.unifile.File = state.currentFileList.get(id);
+
+					if (state.currentSelectionMode == null) {
+
+						if (f.isDir) {
+
+							state.currentLocation.path += state.currentFileList.get(id).name + "/";
+						}
+						return;
+					}
+
+					switch (state.currentSelectionMode) {
+
+						case SingleFile(onSuccess, onError) if (!f.isDir):
+
+							onSuccess({
+									url: config.unifileEndpoint + UnifileSrv.ENDPOINT_GET.replace("{srv}", state.currentLocation.service)
+																						 .replace("{uri}", state.currentLocation.path.length > 1 ? state.currentLocation.path + "/" + f.name : f.name),
+									filename: f.name,
+									mimetype: f.name.getMimeType(),
+									size: f.bytes,
+									key: null, // FIXME not supported yet
+									container: null, // FIXME not supported yet
+									isWriteable: true, // FIXME not managed yet
+									path: state.currentLocation.path
+								});
+
+							hide();
+
+						default:
+
+							state.currentLocation.path += state.currentFileList.get(id).name + "/";
+					}
 				}
 			}
 
@@ -372,5 +379,39 @@ class Controller {
 				}, setError);
 		}
 		else trace("WON'T LOGIN "+srvName+" AS ALREADY LOGGED IN !!!");
+	}
+
+	private function hide() : Void {
+
+		state.displayState = false;
+	}
+
+	private function show() : Void {
+
+		if (state.serviceList == null) {
+
+			application.setLoaderDisplayed(true);
+
+			unifileSrv.listServices(function(slm : StringMap<ce.core.model.unifile.Service>) {
+
+					application.setLoaderDisplayed(false);
+
+					state.serviceList = slm;
+
+				}, setError);
+
+		} else {
+
+			if (state.currentFileList == null) {
+
+				application.setHomeDisplayed(true);
+			
+			} else {
+
+				application.setFileBrowserDisplayed(true);
+			}
+		}
+
+		state.displayState = true;
 	}
 }

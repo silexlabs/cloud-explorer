@@ -14,6 +14,7 @@ package ce.core.model;
 import ce.core.model.unifile.Service;
 import ce.core.model.unifile.File;
 import ce.core.model.Location;
+import ce.core.model.SelectionMode;
 
 import haxe.ds.StringMap;
 
@@ -30,6 +31,8 @@ class State {
 	public var currentLocation (default, set) : Null<Location> = null;
 
 	public var currentFileList (default, set) : Null<StringMap<File>> = null;
+
+	public var currentSelectionMode (default, default) : Null<SelectionMode> = null;
 
 
 	///

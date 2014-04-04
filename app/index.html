@@ -43,7 +43,13 @@
             
                 $('.pickBtn').click(function(){
 
-                        cloudExplorer.pick(function(b){ currentBlob = b; }, function(){ console.log("error"); });
+                        cloudExplorer.pick(function(b){
+
+                                currentBlob = b;
+
+                                console.log("currentBlob: " + JSON.stringify(currentBlob));
+
+                            }, function(e){ console.log("error " + JSON.stringify(e)); });
                     });
             });
 

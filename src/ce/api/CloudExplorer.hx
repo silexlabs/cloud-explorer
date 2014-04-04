@@ -39,6 +39,17 @@ class CloudExplorer {
 	 */
 	public function pick(? options : Dynamic, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
 
+		if (onError == null) {
+
+			untyped onError = onSuccess;
+			untyped onSuccess = options;
+			options = null;
+		}
+		if (onError == null) {
+
+			throw "Missing mandatory parameters for CloudExplorer.pick(onSuccess : CEBlob -> Void, onError : CEError -> Void)";
+		}
+trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 		ctrl.pick(options, onSuccess, onError);
 	}
 
