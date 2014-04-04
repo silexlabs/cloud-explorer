@@ -138,13 +138,22 @@ class UnifileSrv {
 		http.request(false);
 	}
 
-	public function ls(srv : String, path : String, onSuccess : Array<File> -> Void, onError : String -> Void) : Void {
+	public function ls(srv : String, path : String, onSuccess : StringMap<File> -> Void, onError : String -> Void) : Void {
 
 		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LS.replace("{srv}", srv).replace("{path}", path));
 
 		http.onData = function(data : String) {
 
-				onSuccess(Json2File.parseFileCollection(data));
+				var fa : Array<File> = Json2File.parseFileCollection(data);
+				
+				var fsm : StringMap<File> = new StringMap();
+
+				for (f in fa) {
+
+					fsm.set(f.name, f);
+				}
+
+				onSuccess(fsm);
 			}
 
 		http.onError = onError;

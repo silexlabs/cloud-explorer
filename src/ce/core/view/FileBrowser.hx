@@ -59,7 +59,7 @@ class FileBrowser {
 
 	public dynamic function onServiceClicked(name : String) : Void { }
 
-	public dynamic function onFileClicked(name : String) : Void { }
+	public dynamic function onFileClicked(id : String) : Void { }
 
 
 	///
@@ -96,22 +96,22 @@ class FileBrowser {
 		}
 	}
 
-	public function addFolder(name : String) : Void {
+	public function addFolder(id : String, name : String) : Void {
 
 		var newItem : Element = cast folderItemTmpl.cloneNode(true);
 		newItem.textContent = name;
 
-		newItem.addEventListener( "click", function(?_){ onFileClicked(name); } );
+		newItem.addEventListener( "click", function(?_){ onFileClicked(id); } );
 
 		fileList.appendChild(newItem);
 	}
 
-	public function addFile(name : String) : Void {
+	public function addFile(id : String, name : String) : Void {
 
 		var newItem : Element = cast fileItemTmpl.cloneNode(true);
 		newItem.textContent = name;
 
-		newItem.addEventListener( "click", function(?_){ onFileClicked(name); } );
+		newItem.addEventListener( "click", function(?_){ onFileClicked(id); } );
 
 		fileList.appendChild(newItem);
 	}

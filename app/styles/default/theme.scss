@@ -25,4 +25,20 @@ body {
 			padding: 20px;
 		}
 	}
+
+	.fileBrowser {
+
+		.folder
+		{
+			background: url('../images/folder.png') no-repeat;
+			padding-left:20px;
+			cursor:pointer;
+		}
+		.file
+		{
+			background:url('../images/file.png') no-repeat;
+			padding-left:20px;
+			cursor:pointer;
+		}
+	}
 }

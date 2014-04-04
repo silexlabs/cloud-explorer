@@ -71,6 +71,8 @@ class Application {
 
 	public dynamic function onServiceClicked(name : String) : Void { }
 
+	public dynamic function onFileClicked(id : String) : Void { }
+
 	public dynamic function onAuthorizationWindowBlocked() : Void { }
 
 	public dynamic function onServiceAuthorizationDone() : Void { }
@@ -172,7 +174,7 @@ trace("setLogoutButtonContent "+v);
 
 	private function cleanPreviousState() : Void {
 
-		var cs : Null<String> = currentState(); trace("cs= "+cs);
+		var cs : Null<String> = currentState(); trace("current state = "+cs);
 
 		rootElt.toggleClass(CLASS_AUTHORIZING, false);
 		
@@ -187,7 +189,8 @@ trace("setLogoutButtonContent "+v);
 		// init iframe
 		iframe.style.display = "none"; trace("initFrame");
 		iframe.style.position = "absolute";
-		iframe.style.top = iframe.style.left = iframe.style.bottom = iframe.style.right = "0";
+		iframe.style.top = iframe.style.left = "0";
+		iframe.style.width = iframe.style.height = "100%";
 
 		iframe.onload = function(?_){ initElts(); }
 
@@ -207,9 +210,11 @@ trace("setLogoutButtonContent "+v);
 		closeBtn.addEventListener( "click", function(?_){ onCloseClicked(); } );
 
 		home = new Home(rootElt.querySelector(SELECTOR_HOME));
-		home.onServiceClicked = onServiceClicked;
+		home.onServiceClicked = function(name : String) { onServiceClicked(name); }
 
 		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
+		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
+		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
 
 		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
 

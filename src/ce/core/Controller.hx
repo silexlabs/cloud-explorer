@@ -75,9 +75,9 @@ class Controller {
 
 			unifileSrv.listServices(function(slm : StringMap<ce.core.model.unifile.Service>) {
 
-					state.serviceList = slm;
-
 					application.setLoaderDisplayed(false);
+
+					state.serviceList = slm;
 
 				}, setError);
 
@@ -132,41 +132,60 @@ class Controller {
 
 		application.onServiceClicked = function(name : String) {
 
-				application.setLoaderDisplayed(true);
+				if (state.serviceList.get(name).isLoggedIn) {
 
-				unifileSrv.connect(name, function(cr : ce.core.model.unifile.ConnectResult) {
+					state.currentLocation = new Location(name, "/");
+				
+				} else {
 
-						if (cr.success) {
+					application.setLoaderDisplayed(true);
 
-							state.serviceList.get(name).isConnected = true;
+					unifileSrv.connect(name, function(cr : ce.core.model.unifile.ConnectResult) {
 
-							application.authPopup.setServerName(state.serviceList.get(name).displayName);
+							if (cr.success) {
 
-							application.authPopup.onClicked = function(){
+								state.serviceList.get(name).isConnected = true;
 
-									application.onAuthorizationWindowBlocked = function(){
+								application.authPopup.setServerName(state.serviceList.get(name).displayName);
 
-											setError("Can't open "+state.serviceList.get(name).displayName+" authorization window!");
-										}
+								application.authPopup.onClicked = function(){
 
-									application.onServiceAuthorizationDone = function() { trace("onServiceAuthorizationDone");
+										application.onAuthorizationWindowBlocked = function(){
 
-											login(name);
-										}
+												setError("Can't open "+state.serviceList.get(name).displayName+" authorization window!");
+											}
 
-									application.openAuthorizationWindow(cr.authorizeUrl);
-								}
+										application.onServiceAuthorizationDone = function() {
 
-							application.setAuthPopupDisplayed(true);
+												login(name);
+											}
 
-						} else {
+										application.openAuthorizationWindow(cr.authorizeUrl);
+									}
 
-							state.serviceList.get(name).isConnected = false;
+								application.setAuthPopupDisplayed(true);
 
-							setError(cr.message);
-						}
+							} else {
 
-					}, setError);
+								state.serviceList.get(name).isConnected = false;
+
+								setError(cr.message);
+							}
+
+						}, setError);
+				}
+			}
+
+		application.onFileClicked = function(id : String) {
+
+				if (id == "..") {
+
+					cpd(state.currentLocation.service, state.currentLocation.path);
+
+				} else if (state.currentFileList.get(id).isDir) {
+
+					state.currentLocation.path += state.currentFileList.get(id).name + "/";
+				}
 			}
 
 		state.onServiceListChanged = function() {
@@ -245,7 +264,7 @@ class Controller {
 			}
 
 		state.onServiceAccountChanged = function(srvName) {
-trace("onServiceAccountChanged");
+
 				application.setLogoutButtonContent(state.serviceList.get(srvName).account.displayName);
 			}
 
@@ -255,7 +274,7 @@ trace("onServiceAccountChanged");
 
 					state.currentFileList = null;
 
-				} else {
+				} else { trace("new location "+state.currentLocation.path);
 
 					cd(state.currentLocation.service , state.currentLocation.path );
 				}
@@ -273,43 +292,60 @@ trace("onServiceAccountChanged");
 
 					//application.fileBrowser.setEmptyMsgDisplay(false);
 
-					for (f in state.currentFileList) {
+					if (state.currentLocation.path != "/") {
 
-						if (f.isDir) {
+						application.fileBrowser.addFolder("..", "..");
+					}
 
-							application.fileBrowser.addFolder(f.name);
+					for (fid in state.currentFileList.keys()) {
+
+						if (state.currentFileList.get(fid).isDir) {
+
+							application.fileBrowser.addFolder(fid, state.currentFileList.get(fid).name);
 
 						} else {
 
-							application.fileBrowser.addFile(f.name);
+							application.fileBrowser.addFile(fid, state.currentFileList.get(fid).name);
 						}
 					}
 				}
 			}
 	}
 
+	private function cpd(srvName : String, path : String) : Void {
+
+		if (path.length > 1) {
+
+			if (path.lastIndexOf('/') == path.length - 1) path = path.substr(0, path.length - 2);
+			path = path.substr(0, path.lastIndexOf('/') + 1);
+
+			state.currentLocation.service = srvName;
+			state.currentLocation.path = path;
+		}
+	}
+
 	private function cd(srvName : String, path : String) : Void {
 
 		application.setLoaderDisplayed(true);
 
-		unifileSrv.ls(srvName, path, function(files : Array<ce.core.model.unifile.File>){
+		unifileSrv.ls(srvName, path, function(files : StringMap<ce.core.model.unifile.File>){
+
+				state.currentFileList = files;
 
 				application.setFileBrowserDisplayed(true);
 
 				application.setLoaderDisplayed(false);
 
-				state.currentFileList = files;
-
 			}, setError);
 	}
 
 	private function login(srvName : String) : Void {
-trace("is logged in ? "+state.serviceList.get(srvName).isLoggedIn);
+
 		if (!state.serviceList.get(srvName).isLoggedIn) {
 
-			unifileSrv.login(srvName, function(lr : ce.core.model.unifile.LoginResult){
+			application.setLoaderDisplayed(true);
 
-					application.setLoaderDisplayed(false);
+			unifileSrv.login(srvName, function(lr : ce.core.model.unifile.LoginResult){
 
 					if (lr.success) {
 
@@ -321,7 +357,10 @@ trace("is logged in ? "+state.serviceList.get(srvName).isLoggedIn);
 						setError('Could not login. Please try again.');
 					}
 
+					application.setLoaderDisplayed(false);
+
 				}, setError);
 		}
+		else trace("WON'T LOGIN "+srvName+" AS ALREADY LOGGED IN !!!");
 	}
 }

@@ -29,7 +29,7 @@ class State {
 
 	public var currentLocation (default, set) : Null<Location> = null;
 
-	public var currentFileList (default, set) : Null<Array<File>> = null;
+	public var currentFileList (default, set) : Null<StringMap<File>> = null;
 
 
 	///
@@ -82,7 +82,7 @@ class State {
 		return serviceList;
 	}
 
-	public function set_currentFileList(v : Null<Array<File>>) : Null<Array<File>> {
+	public function set_currentFileList(v : Null<StringMap<File>>) : Null<StringMap<File>> {
 
 		if (v == currentFileList) {
 
