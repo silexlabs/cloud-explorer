@@ -83,7 +83,14 @@ class Controller {
 
 		} else {
 
-			application.setHomeDisplayed(true);
+			if (state.currentFileList == null) {
+
+				application.setHomeDisplayed(true);
+			
+			} else {
+
+				application.setFileBrowserDisplayed(true);
+			}
 		}
 
 		state.displayState = true;
@@ -312,6 +319,9 @@ class Controller {
 			}
 	}
 
+	/**
+	 * Change to parent directory.
+	 */
 	private function cpd(srvName : String, path : String) : Void {
 
 		if (path.length > 1) {
