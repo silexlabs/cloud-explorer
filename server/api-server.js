@@ -15,7 +15,7 @@ var options = unifile.defaultConfig;
 options.staticFolders.push(
     // file browser
     {
-            name: "/",
+            name: "/cloud-explorer",
             path: "../../../../lib/"
     },
     // file browser tests

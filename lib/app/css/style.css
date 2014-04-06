@@ -21,24 +21,24 @@ ul{margin:0;padding:0;list-style:none;}
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.icon-folder:before {content: "\e601";}
-.icon-add_folder:before {content: "\e602";}
-.icon-cloud:before {content: "\e603";}
-.icon-suppr:before {content: "\e604";}
-.icon-import:before {content: "\e605";}
-.icon-export:before {content: "\e606";}
-.icon-cloudexplorer:before {content: "\e600";}
+div#CE .icon-folder:before {content: "\e601";}
+div#CE .icon-add_folder:before {content: "\e602";}
+div#CE .icon-cloud:before {content: "\e603";}
+div#CE .icon-suppr:before {content: "\e604";}
+div#CE .icon-import:before {content: "\e605";}
+div#CE .icon-export:before {content: "\e606";}
+div#CE .icon-cloudexplorer:before {content: "\e600";}
 
 /*General css class*/
-	button{cursor: pointer; font: inherit;}
-	.clear{clear: both;}
+div#CE button{cursor: pointer; font: inherit;}
+div#CE .clear{clear: both;}
 
-	.clearfix:before, .clearfix:after {content: " ";display: table;}
-	.clearfix:after{clear: both;}
-	/* IE6/7 support */
-	.clearfix {*zoom: 1;}
-	.left{float: left;}
-	.right{float: right;}
+div#CE .clearfix:before, .clearfix:after {content: " ";display: table;}
+div#CE .clearfix:after{clear: both;}
+/* IE6/7 support */
+div#CE .clearfix {*zoom: 1;}
+div#CE .left{float: left;}
+div#CE .right{float: right;}
 
 	*, *:before, *:after {-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;}
 	body{font-family: 'Roboto', arial, sans-serif; font-size: 14px; color: #727271;}
@@ -378,7 +378,7 @@ div#CE .file-uploader button /* TODO clean */
 div#CE .file-uploader{position: absolute; top: 0; left: 0; right: 0;}
 div#CE .file-uploader,
 div#CE .file-uploader button{
-	height: 100%; width: 100%; 
+	height: 100%; width: 100%;
 	opacity: 0; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 	cursor: pointer;
 }
@@ -494,7 +494,7 @@ div#CE .ce-log-console
 }
 
 div#CE .ce-right-pane .breadcrumLinkContent{
-	border:none; 
+	border:none;
 	color:#000;
 	float: left;
 	width: 90%;
@@ -515,8 +515,8 @@ div#CE .ce-right-pane .nbFiles{
 }
 .ce-item label{
 	display: inline-block;
-	display: block; 
-	height: 100%; 
+	display: block;
+	height: 100%;
 	width: 100%;
 	padding-left: 25px;
 }
