@@ -594,4 +594,18 @@ class FileTools {
 
 		return se == -1 ? null : mimeTypeByExt().get(filename.substr(se));
 	}
+
+	static public function getExtension(mimetype : String) : Null<String> {
+
+		var mtc : StringMap<String> = mimeTypeByExt();
+
+		for (ext in mtc.keys()) {
+
+			if (mtc.get(ext) == mimetype.toLowerCase()) {
+
+				return ext;
+			}
+		}
+		return null;
+	}
 }

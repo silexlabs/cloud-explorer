@@ -9,9 +9,9 @@
  * Copyrights SilexLabs 2013 - http://www.silexlabs.org/ -
  * License MIT
  */
-package ce.core.model;
+package ce.core.model.api;
 
-enum SelectionMode {
+typedef PickOptions = {
 
-	SingleFile(onSuccess : CEBlob -> Void, onError : CEError -> Void);
+
 }

@@ -19,9 +19,13 @@ import ce.core.model.CEBlob;
 import ce.core.model.CEError;
 import ce.core.model.State;
 import ce.core.model.Location;
-import ce.core.model.SelectionMode;
+import ce.core.model.Mode;
+
+import ce.core.model.api.ReadOptions;
+import ce.core.model.api.ExportOptions;
 
 import ce.core.service.UnifileSrv;
+import ce.core.service.FileSrv;
 
 import haxe.ds.StringMap;
 
@@ -37,6 +41,7 @@ class Controller {
 		this.state = new State();
 
 		this.unifileSrv = new UnifileSrv(config);
+		this.fileSrv = new FileSrv();
 
 		this.application = new Application(iframe);
 
@@ -49,6 +54,7 @@ class Controller {
 	var application : Application;
 	
 	var unifileSrv : UnifileSrv;
+	var fileSrv : FileSrv;
 
 
 	///
@@ -57,7 +63,30 @@ class Controller {
 
 	public function pick(? options : Dynamic, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
 
-		state.currentSelectionMode = SingleFile(onSuccess, onError);
+		state.currentMode = SingleFileSelection(onSuccess, onError);
+
+		show();
+	}
+
+	/**
+	 * TODO
+	 *	- manage URL, DOM File Object, or <input type="file"/> as inputs
+	 *  - manage options
+	 *  - manage onProgress
+	 */
+	public function read(input : CEBlob, options : Null<ReadOptions>, onSuccess : String -> Void, onError : CEError -> Void, 
+			onProgress : Int -> Void) {
+
+		fileSrv.get(input.url, onSuccess, setError);
+	}
+
+	/**
+	 * TODO
+	 * 	- support url inputs
+	 */
+	public function exportFile(input : CEBlob, options : Null<ExportOptions>, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
+
+		state.currentMode = SingleFileExport(onSuccess, onError, input, options);
 
 		show();
 	}
@@ -168,7 +197,7 @@ class Controller {
 
 					var f : ce.core.model.unifile.File = state.currentFileList.get(id);
 
-					if (state.currentSelectionMode == null) {
+					if (state.currentMode == null) {
 
 						if (f.isDir) {
 
@@ -177,13 +206,12 @@ class Controller {
 						return;
 					}
 
-					switch (state.currentSelectionMode) {
+					switch (state.currentMode) {
 
-						case SingleFile(onSuccess, onError) if (!f.isDir):
+						case SingleFileSelection(onSuccess, onError) if (!f.isDir):
 
 							onSuccess({
-									url: config.unifileEndpoint + UnifileSrv.ENDPOINT_GET.replace("{srv}", state.currentLocation.service)
-																						 .replace("{uri}", state.currentLocation.path.length > 1 ? state.currentLocation.path + "/" + f.name : f.name),
+									url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, f.name),
 									filename: f.name,
 									mimetype: f.name.getMimeType(),
 									size: f.bytes,
@@ -200,6 +228,19 @@ class Controller {
 							state.currentLocation.path += state.currentFileList.get(id).name + "/";
 					}
 				}
+			}
+
+		application.onSaveExportClicked = application.onOverwriteExportClicked = function() {
+
+				doExportFile();
+
+				hide();
+			}
+
+		application.onExportNameChanged = function() {
+
+				// TODO check name against file list to detect override
+				// application.setExportOverwriteDisplayed
 			}
 
 		state.onServiceListChanged = function() {
@@ -324,6 +365,70 @@ class Controller {
 					}
 				}
 			}
+
+		state.onCurrentModeChanged = function() {
+
+				if (state.currentMode != null) {
+
+					switch (state.currentMode) {
+
+						case SingleFileSelection(onSuccess, onError):
+
+							// nothing specific...
+
+						case SingleFileExport(onSuccess, onError, input, options):
+
+							var ext : Null<String> = options != null && options.mimetype != null ? FileTools.getExtension(options.mimetype) : null;
+
+							if (ext == null && options != null && options.extension != null) {
+
+								ext = (options.extension.indexOf('.') == 0) ? options.extension : "." + options.extension;
+							}
+							application.breadcrumb.ext = ext != null ? ext : "";
+					}
+				}
+
+				application.setModeState(state.currentMode);
+			}
+	}
+
+	/**
+	 * Actually exports a file.
+	 * FIXME the function actually writes nothing yet but just return a CEBlob
+	 */
+	private function doExportFile() : Void {
+
+		switch(state.currentMode) {
+
+			case SingleFileExport(onSuccess, onError, input, options):
+
+				// FIXME actually write the file
+				
+				var fname : String = application.breadcrumb.exportName;
+
+				if (options != null ) {
+
+					if (options.mimetype != null && options.mimetype.getExtension() != null) {
+
+						fname += options.mimetype.getExtension();
+
+					} else if (options.extension != null) {
+
+						fname += options.extension.indexOf(".") != 0 ? "." + options.extension : options.extension;
+					}
+				}
+
+				onSuccess({ url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, fname), 
+							filename: fname, 
+							mimetype: options != null && options.mimetype != null ? options.mimetype : fname.getMimeType(), 
+							size: null, 
+							key: null,
+							container: null,
+							isWriteable: true,
+							path: null });
+
+			default: // nothing
+		}
 	}
 
 	/**

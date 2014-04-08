@@ -14,7 +14,7 @@ package ce.core.model;
 import ce.core.model.unifile.Service;
 import ce.core.model.unifile.File;
 import ce.core.model.Location;
-import ce.core.model.SelectionMode;
+import ce.core.model.Mode;
 
 import haxe.ds.StringMap;
 
@@ -32,7 +32,7 @@ class State {
 
 	public var currentFileList (default, set) : Null<StringMap<File>> = null;
 
-	public var currentSelectionMode (default, default) : Null<SelectionMode> = null;
+	public var currentMode (default, set) : Null<Mode> = null;
 
 
 	///
@@ -48,6 +48,8 @@ class State {
 	public dynamic function onCurrentLocationChanged() { }
 
 	public dynamic function onCurrentFileListChanged() { }
+
+	public dynamic function onCurrentModeChanged() { }
 
 	public dynamic function onServiceLoginStateChanged(srvName : String) { }
 
@@ -96,6 +98,19 @@ class State {
 		onCurrentFileListChanged();
 
 		return currentFileList;
+	}
+
+	public function set_currentMode(v : Null<Mode>) : Null<Mode> {
+
+		if (v == currentMode) {
+
+			return v;
+		}
+		currentMode = v;
+		
+		onCurrentModeChanged();
+
+		return currentMode;
 	}
 
 	public function set_readyState(v : Bool) : Bool {

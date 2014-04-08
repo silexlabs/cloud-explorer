@@ -23,6 +23,7 @@ html, body {
 	.loader,
 	.closeBtn,
 	.logoutBtn,
+	.breadcrumb,
 	.home,
 	.browser,
 	.authPopup
@@ -66,6 +67,51 @@ html, body {
 		.closeBtn {
 
 			display: block;
+		}
+		.breadcrumb {
+
+			display: block;
+
+			.export {
+
+				display: none;
+			}
+			button {
+
+				display: none;
+			}
+		}
+	}
+
+	&.browsing.single-file-sel-mode {
+
+		
+	}
+
+	&.browsing.single-file-exp-mode {
+
+		.breadcrumb {
+
+			.export {
+
+				display: block;
+			}
+			button.save {
+
+				display: block;
+			}
+		}
+
+		&.exportOverwriting {
+
+			button.save {
+
+				display: none;
+			}
+			button.overwrite {
+
+				display: none;
+			}
 		}
 	}
 

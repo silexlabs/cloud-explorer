@@ -17,6 +17,10 @@ import ce.core.config.Config;
 import ce.core.model.CEBlob;
 import ce.core.model.CEError;
 
+import ce.core.model.api.PickOptions;
+import ce.core.model.api.ReadOptions;
+import ce.core.model.api.ExportOptions;
+
 import ce.core.Controller;
 
 @:expose("ce.api.CloudExplorer")
@@ -27,7 +31,7 @@ class CloudExplorer {
 	//
 
 	/**
-	 * 
+	 * Returns a fresh instance of Cloud Explorer
 	 */
 	static function get(? iframeEltId : Null<String>) : CloudExplorer {
 
@@ -51,6 +55,38 @@ class CloudExplorer {
 		}
 trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 		ctrl.pick(options, onSuccess, onError);
+	}
+
+	/**
+	 * @see https://developers.inkfilepicker.com/docs/web/#read
+	 */
+	//public function read(input : CEBlob, ? options : ReadOptions, onSuccess : String -> Void, onError : CEError -> Void, onProgress : Int -> Void) {
+	public function read(arg1 : Dynamic, arg2 : Dynamic, arg3 : Dynamic, ? arg4 : Dynamic, ? arg5 : Dynamic) {
+
+		var input : CEBlob = arg1; // TODO The object to read. Can be an CEBlob, a URL, a DOM File Object, or an <input type="file"/>.
+
+		var options : Null<ReadOptions> = (Reflect.isObject(arg2)) ? arg2 : null;
+
+		var onSuccess : String -> Void = options == null ? arg2 : arg3;
+		var onError : CEError -> Void = options == null ? arg3 : arg4;
+		var onProgress : Int -> Void = options == null ? arg4 : arg5;
+
+		ctrl.read(input, options, onSuccess, onError, onProgress);
+	}
+
+	/**
+	 * @see https://developers.inkfilepicker.com/docs/web/#export
+	 */
+	public function exportFile(arg1 : Dynamic, arg2 : Dynamic, arg3 : Dynamic, ? arg4 : Dynamic) : Void {
+
+		var input : CEBlob = arg1; // An InkBlob or URL pointing to data you'd like to export. If you have a DOM File object or raw data, you can use the filepicker.store call to first generate an InkBlob
+
+		var options : Null<ExportOptions> = (Reflect.isObject(arg2)) ? arg2 : null;
+
+		var onSuccess : CEBlob -> Void = options == null ? arg2 : arg3;
+		var onError : CEError -> Void = options == null ? arg3 : arg4;
+
+		ctrl.exportFile(input, options, onSuccess, onError);
 	}
 
 

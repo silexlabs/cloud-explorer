@@ -29,11 +29,17 @@ class Application {
 	static inline var CLASS_AUTHORIZING : String = "authorizing";
 	static inline var CLASS_LOGGED_IN : String = "loggedIn";
 
+	static inline var CLASS_EXPORT_OVERWRITING : String = "export-overwriting";
+
+	static inline var CLASS_MODE_SINGLE_FILE_SELECTION : String = "single-file-sel-mode";
+	static inline var CLASS_MODE_SINGLE_FILE_EXPORT : String = "single-file-exp-mode";
+
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
 	static inline var SELECTOR_HOME : String = ".home";
 	static inline var SELECTOR_FILE_BROWSER : String = ".fileBrowser";
 	static inline var SELECTOR_AUTH_POPUP : String = ".authPopup";
+	static inline var SELECTOR_BREADCRUMB : String = ".breadcrumb";
 
 	public function new(iframe : js.html.IFrameElement) {
 
@@ -58,6 +64,8 @@ class Application {
 
 	public var authPopup (default, null) : AuthPopup;
 
+	public var breadcrumb (default, null) : Breadcrumb;
+
 
 	///
 	// CALLBACKS
@@ -76,6 +84,12 @@ class Application {
 	public dynamic function onAuthorizationWindowBlocked() : Void { }
 
 	public dynamic function onServiceAuthorizationDone() : Void { }
+
+	public dynamic function onSaveExportClicked() : Void { }
+
+	public dynamic function onOverwriteExportClicked() : Void { }
+
+	public dynamic function onExportNameChanged() : Void { }
 
 
 	///
@@ -122,6 +136,11 @@ trace("setLogoutButtonContent "+v);
 		rootElt.toggleClass(CLASS_BROWSING , v);
 	}
 
+	public function setExportOverwriteDisplayed(v : Bool) : Void {
+
+		rootElt.toggleClass(CLASS_EXPORT_OVERWRITING , v);
+	}
+
 	public function setAuthPopupDisplayed(v : Bool) : Void {
 
 		rootElt.toggleClass(CLASS_AUTHORIZING , v);
@@ -154,10 +173,45 @@ trace("setLogoutButtonContent "+v);
 		}
 	}
 
+	public function setModeState(v : ce.core.model.Mode) : Void {
+
+		var cms : Null<String> = currentModeState();
+trace("current UI mode is: "+cms);
+		if (cms != null) {
+
+			rootElt.toggleClass(cms , false);
+		}
+		if (v != null) {
+
+			switch (v) {
+
+				case SingleFileSelection(_):
+
+					rootElt.toggleClass(CLASS_MODE_SINGLE_FILE_SELECTION , true);
+
+				case SingleFileExport(_):
+
+					rootElt.toggleClass(CLASS_MODE_SINGLE_FILE_EXPORT , true);
+			}
+		}
+	}
+
 
 	///
 	// INTERNALS
 	//
+
+	function currentModeState() : Null<String> {
+
+		for (c in rootElt.className.split(" ")) {
+trace("c= "+c);
+			if( Lambda.has([CLASS_MODE_SINGLE_FILE_SELECTION, CLASS_MODE_SINGLE_FILE_EXPORT], c) ) {
+
+				return c;
+			}
+		}
+		return null;
+	}
 
 	function currentState() : Null<String> {
 
@@ -208,6 +262,11 @@ trace("setLogoutButtonContent "+v);
 
 		closeBtn = rootElt.querySelector(SELECTOR_CLOSE_BTN);
 		closeBtn.addEventListener( "click", function(?_){ onCloseClicked(); } );
+
+		breadcrumb = new Breadcrumb(rootElt.querySelector(SELECTOR_BREADCRUMB));
+		breadcrumb.onSaveBtnClicked = function() { onSaveExportClicked(); }
+		breadcrumb.onOverwriteBtnClicked = function() { onOverwriteExportClicked(); }
+		breadcrumb.onExportNameChanged = function() { onExportNameChanged(); }
 
 		home = new Home(rootElt.querySelector(SELECTOR_HOME));
 		home.onServiceClicked = function(name : String) { onServiceClicked(name); }

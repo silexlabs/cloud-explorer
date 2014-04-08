@@ -45,7 +45,7 @@ class UnifileSrv {
 	static inline var ENDPOINT_MKDIR : String = "exec/mkdir";
 	static inline var ENDPOINT_CP : String = "exec/cp";
 	static inline var ENDPOINT_MV : String = "exec/mv";
-	static public inline var ENDPOINT_GET : String = "{srv}/exec/get/{uri}";
+	static inline var ENDPOINT_GET : String = "{srv}/exec/get/{uri}";
 
 	public function new(config : Config) : Void {
 
@@ -58,6 +58,12 @@ class UnifileSrv {
 	///
 	// API
 	//
+
+	public function generateUrl(srv : String, path : String, filename : String) : String {
+
+		return config.unifileEndpoint + ENDPOINT_GET.replace("{srv}", srv)
+													.replace("{uri}", path.length > 1 ? path + "/" + filename : filename);
+	}
 
 	public function listServices(onSuccess : StringMap<Service> -> Void, onError : String -> Void) : Void {
 
@@ -179,10 +185,5 @@ class UnifileSrv {
 	public function mv() : Void {
 
 		
-	}
-
-	public function get() : Void {
-
-
 	}
 }
