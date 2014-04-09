@@ -19,6 +19,7 @@ import ce.core.parser.unifile.Json2LoginResult;
 import ce.core.parser.unifile.Json2Account;
 import ce.core.parser.unifile.Json2File;
 import ce.core.parser.unifile.Json2LogoutResult;
+import ce.core.parser.unifile.Json2UploadResult;
 
 import ce.core.model.unifile.Service;
 import ce.core.model.unifile.ConnectResult;
@@ -26,6 +27,10 @@ import ce.core.model.unifile.LoginResult;
 import ce.core.model.unifile.Account;
 import ce.core.model.unifile.File;
 import ce.core.model.unifile.LogoutResult;
+import ce.core.model.unifile.UploadResult;
+
+import js.html.Blob;
+import js.html.DOMFormData;
 
 import haxe.Http;
 
@@ -46,6 +51,7 @@ class UnifileSrv {
 	static inline var ENDPOINT_CP : String = "exec/cp";
 	static inline var ENDPOINT_MV : String = "exec/mv";
 	static inline var ENDPOINT_GET : String = "{srv}/exec/get/{uri}";
+	static inline var ENDPOINT_PUT : String = "{srv}/exec/put/{path}";
 
 	public function new(config : Config) : Void {
 
@@ -63,6 +69,38 @@ class UnifileSrv {
 
 		return config.unifileEndpoint + ENDPOINT_GET.replace("{srv}", srv)
 													.replace("{uri}", path.length > 1 ? path + "/" + filename : filename);
+	}
+
+	public function explodeUrl(url : String) : { srv : String, path : String, filename : String } {
+
+		if (url.indexOf(config.unifileEndpoint) != 0) {
+
+			throw "ERROR: can't convert url to path: " + url;
+		}
+		var parsedUrl : String = url.substr(config.unifileEndpoint.length);
+
+		if (parsedUrl.indexOf("/exec/get/") != parsedUrl.indexOf("/")) {
+
+			throw "ERROR: can't convert url to path: " + url;
+		}
+		var srv : String = parsedUrl.substr(0, parsedUrl.indexOf("/"));
+
+		parsedUrl = parsedUrl.substr(parsedUrl.indexOf("/exec/get/") + "/exec/get/".length);
+
+		var filename : String = "";
+		var path : String = "";
+
+		if (parsedUrl.lastIndexOf('/') > -1) {
+
+			filename = parsedUrl.substr(parsedUrl.lastIndexOf('/')+1);
+			path = parsedUrl.substr(0, parsedUrl.lastIndexOf('/')+1);
+		
+		} else {
+
+			filename = parsedUrl;
+		}
+
+		return { 'srv': srv, 'path': path, 'filename': filename };
 	}
 
 	public function listServices(onSuccess : StringMap<Service> -> Void, onError : String -> Void) : Void {
@@ -185,5 +223,53 @@ class UnifileSrv {
 	public function mv() : Void {
 
 		
+	}
+
+	public function upload(files : StringMap<Blob>, srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
+
+		// enforce path as a folder path
+		if (path != "" && path.lastIndexOf('/') != path.length - 1) { // TODO check in unifile if it's not a bug
+
+			path += '/';
+		}
+		if (Lambda.count(files) == 1) { // FIXME this is a temporary workaround for following issue on FF: https://bugzilla.mozilla.org/show_bug.cgi?id=690659
+
+			path += files.keys().next();
+		}
+
+		var formData : DOMFormData = new DOMFormData();
+
+		for (fn in files.keys()) {
+
+			if (Reflect.isObject(files.get(fn))) { // raw data from drop event or input[type=file] contains methods we need to filter
+
+				untyped __js__("formData.append('data', files.get(fn), fn);"); // @see https://github.com/HaxeFoundation/haxe/issues/2867
+			}
+		}
+
+		var xhttp : js.html.XMLHttpRequest = new js.html.XMLHttpRequest();
+
+		xhttp.open("POST", config.unifileEndpoint + ENDPOINT_PUT.replace("{srv}", srv).replace("{path}", path));
+
+		xhttp.onload = function(?_) {
+
+				var resp : UploadResult = Json2UploadResult.parse(xhttp.responseText);
+
+				if (xhttp.status == 200 && resp.success) {
+				
+					onSuccess();
+				
+				} else {
+				
+					onError("Error " + xhttp.status + " occurred uploading your file(s)");
+				}
+			};
+
+		xhttp.onerror = function(?_) {
+
+				onError("Error " + xhttp.status + " occurred uploading your file(s)");
+			}
+
+		xhttp.send(formData);
 	}
 }

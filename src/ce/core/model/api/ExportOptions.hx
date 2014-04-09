@@ -20,11 +20,11 @@ typedef ExportOptions = {
 	 * it as whatever extension they choose, which may cause issues (if they try to save text to 
 	 * Facebook, for instance).
 	 */
-	var mimetype : Null<String>;
+	@:optional var mimetype : Null<String>;
 
 	/**
 	 * Specify the type of the file by extension rather than mimetype. Don't use this option with 
 	 * mimetype(s) specified as well.
 	 */
-	var extension : Null<String>;
+	@:optional var extension : Null<String>;
 }

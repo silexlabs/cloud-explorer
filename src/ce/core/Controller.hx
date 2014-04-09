@@ -23,6 +23,7 @@ import ce.core.model.Mode;
 
 import ce.core.model.api.ReadOptions;
 import ce.core.model.api.ExportOptions;
+import ce.core.model.api.WriteOptions;
 
 import ce.core.service.UnifileSrv;
 import ce.core.service.FileSrv;
@@ -89,6 +90,25 @@ class Controller {
 		state.currentMode = SingleFileExport(onSuccess, onError, input, options);
 
 		show();
+	}
+
+	/**
+	 * TODO
+	 *  - data => Can be raw data, a CEBlob, a DOM File Object, or an <input type="file"/>.
+	 */
+	public function write(target : CEBlob, data : Dynamic, options : Null<WriteOptions>, onSuccess : CEBlob -> Void, onError : CEError -> Void, onProgress : Null<Int -> Void>) : Void {
+
+		var explodedUrl : { srv : String, path : String, filename : String } = unifileSrv.explodeUrl(target.url);
+
+		var fileBlob : js.html.Blob = new js.html.Blob([data], { "type": target.mimetype });
+
+		unifileSrv.upload([explodedUrl.filename => fileBlob], explodedUrl.srv, explodedUrl.path, function() {
+
+				trace("file uploaded with success");
+
+				onSuccess(target);
+
+			}, setError);
 	}
 
 	public function setError(msg : String) : Void {

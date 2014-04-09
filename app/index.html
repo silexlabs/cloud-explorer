@@ -76,7 +76,7 @@
 
                     $('.exportBtn').click(function(){
 
-                            cloudExplorer.exportFile(currentBlob, function(b){
+                            cloudExplorer.exportFile(currentBlob, { mimetype: "text/html" }, function(b){
 
                                     currentBlob = b;
 
@@ -104,7 +104,13 @@
 
                     $('.writeBtn').click(function(){
 
-                            //
+                            cloudExplorer.write(currentBlob, "write() test succeeded", function(ceb){
+
+                                    currentBlob = ceb;
+
+                                    textarea.val(textarea.val() + "\nwrite operation successful!");
+
+                                }, function(e){ console.log("error " + JSON.stringify(e)); });
 
                         });
 

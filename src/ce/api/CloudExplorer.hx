@@ -20,6 +20,7 @@ import ce.core.model.CEError;
 import ce.core.model.api.PickOptions;
 import ce.core.model.api.ReadOptions;
 import ce.core.model.api.ExportOptions;
+import ce.core.model.api.WriteOptions;
 
 import ce.core.Controller;
 
@@ -87,6 +88,23 @@ trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 		var onError : CEError -> Void = options == null ? arg3 : arg4;
 
 		ctrl.exportFile(input, options, onSuccess, onError);
+	}
+
+	/**
+	 * @see https://developers.inkfilepicker.com/docs/web/#write
+	 */
+	public function write(arg1 : Dynamic, arg2 : Dynamic, arg3 : Dynamic, arg4 : Dynamic, ? arg5 : Dynamic, ? arg6 : Dynamic) : Void {
+	
+		var target : CEBlob = arg1;
+		var data : Dynamic = arg2;
+
+		var options : Null<WriteOptions> = (Reflect.isObject(arg3)) ? arg3 : null;
+
+		var onSuccess : CEBlob -> Void = options == null ? arg3 : arg4;
+		var onError : CEError -> Void = options == null ? arg4 : arg5;
+		var onProgress : Null<Int -> Void> = options == null ? arg5 : arg6;
+
+		ctrl.write(target, data, options, onSuccess, onError, onProgress);
 	}
 
 
