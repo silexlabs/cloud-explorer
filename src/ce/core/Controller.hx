@@ -263,6 +263,17 @@ class Controller {
 				// application.setExportOverwriteDisplayed
 			}
 
+		application.onInputFilesChanged = function() {
+
+				unifileSrv.upload(application.dropzone.inputElt.files, state.currentLocation.service, state.currentLocation.path, function() {
+
+					trace("file(s) uploaded with success");
+
+					refreshFilesList();
+
+				}, setError);
+			}
+
 		state.onServiceListChanged = function() {
 
 				var lastConnectedService : Null<String> = null;
@@ -464,6 +475,11 @@ class Controller {
 			state.currentLocation.service = srvName;
 			state.currentLocation.path = path;
 		}
+	}
+
+	private function refreshFilesList() : Void {
+
+		cd(state.currentLocation.service , state.currentLocation.path );
 	}
 
 	private function cd(srvName : String, path : String) : Void {

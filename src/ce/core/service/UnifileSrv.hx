@@ -225,25 +225,34 @@ class UnifileSrv {
 		
 	}
 
-	public function upload(files : StringMap<Blob>, srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
+	public function upload(? blobs : StringMap<Blob>, ? files : js.html.FileList, srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
 
 		// enforce path as a folder path
 		if (path != "" && path.lastIndexOf('/') != path.length - 1) { // TODO check in unifile if it's not a bug
 
 			path += '/';
 		}
-		if (Lambda.count(files) == 1) { // FIXME this is a temporary workaround for following issue on FF: https://bugzilla.mozilla.org/show_bug.cgi?id=690659
-
-			path += files.keys().next();
-		}
-
 		var formData : DOMFormData = new DOMFormData();
 
-		for (fn in files.keys()) {
+		if (files != null) {
 
-			if (Reflect.isObject(files.get(fn))) { // raw data from drop event or input[type=file] contains methods we need to filter
+			for (f in files) {
 
-				untyped __js__("formData.append('data', files.get(fn), fn);"); // @see https://github.com/HaxeFoundation/haxe/issues/2867
+				if (Reflect.isObject(f)) { // raw data from drop event or input[type=file] contains methods we need to filter
+
+					untyped __js__("formData.append('data', f, f.name);"); // @see https://github.com/HaxeFoundation/haxe/issues/2867
+				}
+			}
+		}
+		if (blobs != null) {
+
+			if (Lambda.count(blobs) == 1) { // FIXME this is a temporary workaround for following issue on FF: https://bugzilla.mozilla.org/show_bug.cgi?id=690659
+
+				path += blobs.keys().next();
+			}
+			for (fn in blobs.keys()) {
+
+				untyped __js__("formData.append('data', blobs.get(fn), fn);"); // @see https://github.com/HaxeFoundation/haxe/issues/2867
 			}
 		}
 
@@ -253,9 +262,10 @@ class UnifileSrv {
 
 		xhttp.onload = function(?_) {
 
-				var resp : UploadResult = Json2UploadResult.parse(xhttp.responseText);
+				// FIXME check UploadResult (fix on unifile side difference between one file and several files upload results)
+				//var resp : UploadResult = Json2UploadResult.parse(xhttp.responseText); 
 
-				if (xhttp.status == 200 && resp.success) {
+				if (xhttp.status == 200) {
 				
 					onSuccess();
 				

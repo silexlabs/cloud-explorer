@@ -14,4 +14,21 @@ package ce.core.model.unifile;
 typedef UploadResult = {
 
 	var success : Bool;
+
 }
+/* FIXME can also be :
+[
+  {
+    "path": "//logo.png",
+    "status": {
+      "success": true
+    }
+  },
+  {
+    "path": "//header.png",
+    "status": {
+      "success": true
+    }
+  }
+]
+*/

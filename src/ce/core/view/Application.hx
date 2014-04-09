@@ -40,6 +40,7 @@ class Application {
 	static inline var SELECTOR_FILE_BROWSER : String = ".fileBrowser";
 	static inline var SELECTOR_AUTH_POPUP : String = ".authPopup";
 	static inline var SELECTOR_BREADCRUMB : String = ".breadcrumb";
+	static inline var SELECTOR_DROPZONE : String = ".dropzone";
 
 	public function new(iframe : js.html.IFrameElement) {
 
@@ -66,6 +67,8 @@ class Application {
 
 	public var breadcrumb (default, null) : Breadcrumb;
 
+	public var dropzone (default, null) : DropZone;
+
 
 	///
 	// CALLBACKS
@@ -90,6 +93,8 @@ class Application {
 	public dynamic function onOverwriteExportClicked() : Void { }
 
 	public dynamic function onExportNameChanged() : Void { }
+
+	public dynamic function onInputFilesChanged() : Void { }
 
 
 	///
@@ -274,6 +279,9 @@ trace("c= "+c);
 		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
 		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
 		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
+
+		dropzone = new DropZone(rootElt.querySelector(SELECTOR_DROPZONE));
+		dropzone.onInputFilesChanged = function() { onInputFilesChanged(); }
 
 		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
 
