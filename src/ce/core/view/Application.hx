@@ -90,6 +90,8 @@ class Application {
 
 	public dynamic function onFileClicked(id : String) : Void { }
 
+	public dynamic function onNavBtnClicked(srv : String, path : String) : Void { }
+
 	public dynamic function onAuthorizationWindowBlocked() : Void { }
 
 	public dynamic function onServiceAuthorizationDone() : Void { }
@@ -283,6 +285,7 @@ trace("c= "+c);
 		breadcrumb.onSaveBtnClicked = function() { onSaveExportClicked(); }
 		breadcrumb.onOverwriteBtnClicked = function() { onOverwriteExportClicked(); }
 		breadcrumb.onExportNameChanged = function() { onExportNameChanged(); }
+		breadcrumb.onNavBtnClicked = function(srv : String, path : String) { onNavBtnClicked(srv, path); }
 
 		home = new Home(rootElt.querySelector(SELECTOR_HOME));
 		home.onServiceClicked = function(name : String) { onServiceClicked(name); }

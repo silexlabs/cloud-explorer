@@ -16,6 +16,22 @@ body {
 	font-style: normal;
 }
 
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;font-style: normal;font-weight: normal;font-variant: normal;text-transform: none;line-height: 1;
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-folder:before {content: "\e601";}
+.icon-add_folder:before {content: "\e602";}
+.icon-cloud:before {content: "\e603";}
+.icon-suppr:before {content: "\e604";}
+.icon-import:before {content: "\e605";}
+.icon-export:before {content: "\e606";}
+.icon-cloudexplorer:before {content: "\e600";}
+
 .explorer-bg {
 	background-color: black; opacity: .5;
 	position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
@@ -85,6 +101,21 @@ body {
 		font: {
 			weight: bold;
 			size: 16px;
+		}
+	}
+
+	.breadcrumb {
+
+		.path {
+
+			.pathIt {
+
+				cursor: pointer;
+			}
+			.pathIt:hover {
+
+				text-decoration: underline;
+			}
 		}
 	}
 

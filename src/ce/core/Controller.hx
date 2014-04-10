@@ -286,6 +286,11 @@ class Controller {
 				application.setAlertPopupDisplayed(false);
 			}
 
+		application.onNavBtnClicked = function(srv : String, path : String) {
+
+				state.currentLocation = new Location(srv, path);
+			}
+
 		state.onServiceListChanged = function() {
 
 				var lastConnectedService : Null<String> = null;
@@ -373,6 +378,8 @@ class Controller {
 					state.currentFileList = null;
 
 				} else { trace("new location "+state.currentLocation.path);
+
+					application.breadcrumb.setBreadcrumbPath(state.currentLocation.service, state.currentLocation.path);
 
 					cd(state.currentLocation.service , state.currentLocation.path );
 				}
