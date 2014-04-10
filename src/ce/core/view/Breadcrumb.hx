@@ -12,7 +12,6 @@
 package ce.core.view;
 
 import js.html.Element;
-import js.html.InputElement;
 
 using StringTools;
 
@@ -21,10 +20,6 @@ class Breadcrumb {
 	static inline var SELECTOR_PATH : String = "span.path";
 	static inline var SELECTOR_PATH_ITEM_TMPL : String = "span.pathIt";
 	static inline var SELECTOR_PATH_SEP_TMPL : String = "span.sep";
-	static inline var SELECTOR_EXPORT_INPUT : String = ".export input";
-	static inline var SELECTOR_EXPORT_EXT : String = ".export span";
-	static inline var SELECTOR_SAVE_BUTTON : String = "button.save";
-	static inline var SELECTOR_OVERWRITE_BUTTON : String = "button.overwrite";
 
 	public function new(elt : Element) {
 
@@ -35,33 +30,13 @@ class Breadcrumb {
 		pathElt.removeChild(pathItemTmpl);
 		this.pathSepTmpl = pathElt.querySelector(SELECTOR_PATH_SEP_TMPL);
 		pathElt.removeChild(pathSepTmpl);
-
-		this.exportInputElt = cast elt.querySelector(SELECTOR_EXPORT_INPUT);
-		exportInputElt.addEventListener("change", function(?_) { onExportNameChanged(); });
-
-		this.exportExtElt = elt.querySelector(SELECTOR_EXPORT_EXT);
-
-		this.saveBtnElt = elt.querySelector(SELECTOR_SAVE_BUTTON);
-		saveBtnElt.addEventListener("click", function(?_){ onSaveBtnClicked(); });
-
-		this.overwriteBtnElt = elt.querySelector(SELECTOR_OVERWRITE_BUTTON);
-		overwriteBtnElt.addEventListener("click", function(?_){ onOverwriteBtnClicked(); });
 	}
 
 	var elt : Element;
 
-	var exportInputElt : InputElement;
-	var exportExtElt : Element;
-	var saveBtnElt : Element;
-	var overwriteBtnElt : Element;
-
 	var pathElt : Element;
 	var pathItemTmpl : Element;
 	var pathSepTmpl : Element;
-
-	public var exportName (get, set) : Null<String>;
-
-	public var ext (null, set) : Null<String>;
 
 
 	///
@@ -70,15 +45,9 @@ class Breadcrumb {
 
 	public dynamic function onNavBtnClicked(srv : String, path : String) : Void { }
 
-	public dynamic function onSaveBtnClicked() : Void { }
-
-	public dynamic function onOverwriteBtnClicked() : Void { }
-
-	public dynamic function onExportNameChanged() : Void { }
-
 
 	///
-	// GETTERS / SETTERS
+	// API
 	//
 
 	public function setBreadcrumbPath(srv : String, path : String) : Void {
@@ -120,32 +89,4 @@ class Breadcrumb {
 			pathElt.appendChild(pathItems.pop());
 		}
 	}
-
-	public function get_exportName() : Null<String> {
-		
-		return exportInputElt.value;
-	}
-
-	public function set_exportName(v : Null<String>) : Null<String> {
-
-		exportInputElt.value = v;
-
-		return v;
-	}
-
-	public function set_ext(v : Null<String>) : Null<String> {
-
-		exportExtElt.textContent = v;
-
-		return v;
-	}
-
-
-	///
-	// API
-	//
-
-	//public function setService	TODO
-
-	//public function setPath		TODO
 }

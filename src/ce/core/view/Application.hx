@@ -43,6 +43,7 @@ class Application {
 	static inline var SELECTOR_AUTH_POPUP : String = ".authPopup";
 	static inline var SELECTOR_BREADCRUMB : String = ".breadcrumb";
 	static inline var SELECTOR_DROPZONE : String = ".dropzone";
+	static inline var SELECTOR_EXPORT : String = ".export";
 
 	public function new(iframe : js.html.IFrameElement) {
 
@@ -72,6 +73,8 @@ class Application {
 	public var breadcrumb (default, null) : Breadcrumb;
 
 	public var dropzone (default, null) : DropZone;
+
+	public var export (default, null) : Export;
 
 
 	///
@@ -282,10 +285,12 @@ trace("c= "+c);
 		closeBtn.addEventListener( "click", function(?_){ onCloseClicked(); } );
 
 		breadcrumb = new Breadcrumb(rootElt.querySelector(SELECTOR_BREADCRUMB));
-		breadcrumb.onSaveBtnClicked = function() { onSaveExportClicked(); }
-		breadcrumb.onOverwriteBtnClicked = function() { onOverwriteExportClicked(); }
-		breadcrumb.onExportNameChanged = function() { onExportNameChanged(); }
 		breadcrumb.onNavBtnClicked = function(srv : String, path : String) { onNavBtnClicked(srv, path); }
+
+		export = new Export(rootElt.querySelector(SELECTOR_EXPORT));
+		export.onSaveBtnClicked = function() { onSaveExportClicked(); }
+		export.onOverwriteBtnClicked = function() { onOverwriteExportClicked(); }
+		export.onExportNameChanged = function() { onExportNameChanged(); }
 
 		home = new Home(rootElt.querySelector(SELECTOR_HOME));
 		home.onServiceClicked = function(name : String) { onServiceClicked(name); }

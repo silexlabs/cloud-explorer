@@ -25,6 +25,7 @@ html, body {
 	.closeBtn,
 	.logoutBtn,
 	.breadcrumb,
+	.export,
 	.home,
 	.fileBrowser,
 	.alertPopup,
@@ -80,11 +81,9 @@ html, body {
 		.breadcrumb {
 
 			display: block;
+		}
+		.export {
 
-			.export {
-
-				display: none;
-			}
 			button {
 
 				display: none;
@@ -99,12 +98,10 @@ html, body {
 
 	&.browsing.single-file-exp-mode {
 
-		.breadcrumb {
+		.export {
 
-			.export {
+			display: block;
 
-				display: block;
-			}
 			button.save {
 
 				display: block;
@@ -113,13 +110,16 @@ html, body {
 
 		&.exportOverwriting {
 
-			button.save {
+			.export {
 
-				display: none;
-			}
-			button.overwrite {
+				button.save {
 
-				display: none;
+					display: none;
+				}
+				button.overwrite {
+
+					display: none;
+				}
 			}
 		}
 	}

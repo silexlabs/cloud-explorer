@@ -434,7 +434,7 @@ class Controller {
 
 								ext = (options.extension.indexOf('.') == 0) ? options.extension : "." + options.extension;
 							}
-							application.breadcrumb.ext = ext != null ? ext : "";
+							application.export.ext = ext != null ? ext : "";
 					}
 				}
 
@@ -454,7 +454,7 @@ class Controller {
 
 				// FIXME actually write the file
 				
-				var fname : String = application.breadcrumb.exportName;
+				var fname : String = application.export.exportName;
 
 				if (options != null ) {
 
