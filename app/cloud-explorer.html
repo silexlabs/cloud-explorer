@@ -24,15 +24,20 @@
             it should be set .placeholder{ display:none; } by the css
             -->
         </div>
+        <div class="explorer-bg"></div>
         <div id="cloud-explorer" class="explorer">
 
-            <button class="closeBtn">X</button>
+            <div class="header">
 
-            <button class="logoutBtn">({name}) Logout</button>
+                <button class="closeBtn"></button>
+
+                <button class="logoutBtn">({name}) Logout</button>
+
+                <img src='images/default/logo-cloudExplorer.png' alt='Cloud Explorer'/>
+
+            </div>
 
             <div class="loader">loading...</div>
-
-            <div class="breadcrumb">Cloud Explorer &gt; <div class="export"><input type="text" /><span></span></div> <button class="save">SAVE</button> <button class="overwrite">OVERWRITE</button></div>
 
             <div class="alertPopup"></div>
 
@@ -60,20 +65,32 @@
                 
                 <div class="files">
 
+                    <div class="breadcrumb">
+                        Cloud Explorer &gt; 
+
+                        <div class="export">
+                            <input type="text" />
+                            <span></span>
+                        </div>
+                        <button class="save">SAVE</button>
+                        <button class="overwrite">OVERWRITE</button>
+                    </div>
+
+                    <div class="list">
                     <!-- <span class="emptyMsg">Cliquez</span> -->
+                        <ul>
+                            <li class="folder"></li>
+                            <li class="file"></li>
+                        </ul>
+                    </div>
 
-                    <ul>
-                        <li class="folder"></li>
-                        <li class="file"></li>
-                    </ul>
+                    <div class="dropzone">
 
-                </div>
+                        <h2>Drop your file(s) here</h2>
 
-                <div class="dropzone">
+                        <div><input type="file" multiple /><button>Select your file(s) to upload</button></div>
 
-                    <h2>Drop your file(s) here</h2>
-
-                    <div><input type="file" multiple /><button>Select your file(s) to upload</button></div>
+                    </div>
 
                 </div>
 
