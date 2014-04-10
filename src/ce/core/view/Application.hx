@@ -27,7 +27,8 @@ class Application {
 	static inline var CLASS_STARTING : String = "starting";
 	static inline var CLASS_BROWSING : String = "browsing";
 	static inline var CLASS_AUTHORIZING : String = "authorizing";
-	static inline var CLASS_LOGGED_IN : String = "loggedIn";
+	static inline var CLASS_LOGGED_IN : String = "loggedin";
+	static inline var CLASS_ALERTING : String = "alerting";
 
 	static inline var CLASS_EXPORT_OVERWRITING : String = "export-overwriting";
 
@@ -38,6 +39,7 @@ class Application {
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
 	static inline var SELECTOR_HOME : String = ".home";
 	static inline var SELECTOR_FILE_BROWSER : String = ".fileBrowser";
+	static inline var SELECTOR_ALERT_POPUP : String = ".alertPopup";
 	static inline var SELECTOR_AUTH_POPUP : String = ".authPopup";
 	static inline var SELECTOR_BREADCRUMB : String = ".breadcrumb";
 	static inline var SELECTOR_DROPZONE : String = ".dropzone";
@@ -65,6 +67,8 @@ class Application {
 
 	public var authPopup (default, null) : AuthPopup;
 
+	public var alertPopup (default, null) : AlertPopup;
+
 	public var breadcrumb (default, null) : Breadcrumb;
 
 	public var dropzone (default, null) : DropZone;
@@ -73,6 +77,8 @@ class Application {
 	///
 	// CALLBACKS
 	//
+
+	public dynamic function onClicked() : Void { }
 
 	public dynamic function onViewReady() : Void { }
 
@@ -151,6 +157,11 @@ trace("setLogoutButtonContent "+v);
 		rootElt.toggleClass(CLASS_AUTHORIZING , v);
 	}
 
+	public function setAlertPopupDisplayed(v : Bool) : Void {
+
+		rootElt.toggleClass(CLASS_ALERTING , v);
+	}
+
 	public function openAuthorizationWindow(url : String) : Void {
 
 		// note: we might need to improve this method in order to have different possible sizes by cloud service
@@ -168,7 +179,7 @@ trace("setLogoutButtonContent "+v);
 			
 			timer.run = function() {
 
-					if (authPopup.closed) { trace("authPopup.closed= "+authPopup.closed);
+					if (authPopup.closed) {
 
 						timer.stop();
 
@@ -284,6 +295,10 @@ trace("c= "+c);
 		dropzone.onInputFilesChanged = function() { onInputFilesChanged(); }
 
 		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
+
+		alertPopup = new AlertPopup(rootElt.querySelector(SELECTOR_ALERT_POPUP));
+
+		rootElt.addEventListener("click", function(?_){ onClicked(); });
 
 		onViewReady();
 	}

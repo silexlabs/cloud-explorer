@@ -1,21 +1,22 @@
 html, body {
+
 	font-family: sans-serif;
-	margin:0;
-	padding:0;
-	color:#000;
-	height:100%;
-	width:100%;
+	margin: 0;
+	padding: 0;
+	color: #000;
+	height: 100%; width: 100%;
 }
 
 @import "platforms.scss";
 
 .placeholder {
-	display:none;
+
+	display: none;
 }
 
 .explorer {
-	width:100%;
-	height:100%;
+
+	width: 100%; height: 100%;
 }
 
 .explorer {
@@ -25,7 +26,8 @@ html, body {
 	.logoutBtn,
 	.breadcrumb,
 	.home,
-	.browser,
+	.fileBrowser,
+	.alertPopup,
 	.authPopup
 	{
 		display: none;
@@ -60,7 +62,7 @@ html, body {
 
 	&.browsing {
 
-		.browser {
+		.fileBrowser {
 
 			display: block;
 		}
@@ -118,6 +120,14 @@ html, body {
 	&.authorizing {
 
 		.authPopup {
+
+			display: block;
+		}
+	}
+
+	&.alerting {
+
+		.alertPopup {
 
 			display: block;
 		}

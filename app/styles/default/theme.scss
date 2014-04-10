@@ -40,6 +40,17 @@ body {
 		}
 	}
 
+	.alertPopup {
+
+		width: 100%;
+		text-align: center;
+		background-color: red; color: black;
+		font: {
+			weight: bold;
+			size: 16px;
+		}
+	}
+
 	.fileBrowser {
 
 		.folder

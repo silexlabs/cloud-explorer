@@ -111,6 +111,13 @@ class Controller {
 			}, setError);
 	}
 
+	public function setAlert(msg : String) : Void {
+
+		application.alertPopup.setMsg(msg);
+
+		application.setAlertPopupDisplayed(true);
+	}
+
 	public function setError(msg : String) : Void {
 
 		trace("ERROR "+msg);
@@ -183,7 +190,7 @@ class Controller {
 
 										application.onAuthorizationWindowBlocked = function(){
 
-												setError("Can't open "+state.serviceList.get(name).displayName+" authorization window!");
+												setAlert("Popup Blocker is enabled! Please add this site to your exception list.");
 											}
 
 										application.onServiceAuthorizationDone = function() {
@@ -272,6 +279,11 @@ class Controller {
 					refreshFilesList();
 
 				}, setError);
+			}
+
+		application.onClicked = function() {
+
+				application.setAlertPopupDisplayed(false);
 			}
 
 		state.onServiceListChanged = function() {
