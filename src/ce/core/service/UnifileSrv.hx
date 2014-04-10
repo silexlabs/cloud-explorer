@@ -47,7 +47,7 @@ class UnifileSrv {
 	static inline var ENDPOINT_LOGOUT : String = "{srv}/logout";
 	static inline var ENDPOINT_LS : String = "{srv}/exec/ls/{path}";
 	static inline var ENDPOINT_RM : String = "exec/rm";
-	static inline var ENDPOINT_MKDIR : String = "exec/mkdir";
+	static inline var ENDPOINT_MKDIR : String = "{srv}/exec/mkdir/{path}";
 	static inline var ENDPOINT_CP : String = "exec/cp";
 	static inline var ENDPOINT_MV : String = "exec/mv";
 	static inline var ENDPOINT_GET : String = "{srv}/exec/get/{uri}";
@@ -210,9 +210,20 @@ class UnifileSrv {
 		
 	}
 
-	public function mkdir() : Void {
+	public function mkdir(srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
 
-		
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_MKDIR.replace("{srv}", srv).replace("{path}", path));
+
+		http.onData = function(data : String) {
+
+				trace("data= "+data);
+
+				onSuccess();
+			}
+
+		http.onError = onError;
+
+		http.request(false);
 	}
 
 	public function cp() : Void {

@@ -12,6 +12,8 @@
 package ce.core.view;
 
 import js.html.Element;
+import js.html.InputElement;
+import js.html.KeyboardEvent;
 
 import haxe.ds.StringMap;
 
@@ -21,6 +23,7 @@ class FileBrowser {
 	static inline var SELECTOR_FILES_LIST : String = ".files ul";
 
 	static inline var SELECTOR_SRV_ITEM_TMPL : String = "li";
+	static inline var SELECTOR_NEW_FOLDER_ITEM : String = ".folder.new";
 	static inline var SELECTOR_FOLDER_ITEM_TMPL : String = ".folder";
 	static inline var SELECTOR_FILE_ITEM_TMPL : String = ".file";
 
@@ -35,8 +38,22 @@ class FileBrowser {
 		srvList.removeChild(srvItemTmpl);
 
 		this.fileList = elt.querySelector(SELECTOR_FILES_LIST);
+
 		fileItemTmpl = fileList.querySelector(SELECTOR_FILE_ITEM_TMPL);
 		fileList.removeChild(fileItemTmpl);
+		
+		newFolderItem = fileList.querySelector(SELECTOR_NEW_FOLDER_ITEM);
+		fileList.removeChild(newFolderItem);
+		newFolderInput = cast newFolderItem.querySelector("input");
+		newFolderInput.addEventListener("keydown", function(e : KeyboardEvent){
+
+				if (e.keyIdentifier.toLowerCase() == "enter") {
+
+			        onNewFolderName();
+			    }
+			});
+		newFolderInput.addEventListener("focusout", function(?_){ onNewFolderName(); });
+		
 		folderItemTmpl = fileList.querySelector(SELECTOR_FOLDER_ITEM_TMPL);
 		fileList.removeChild(folderItemTmpl);
 	}
@@ -49,8 +66,29 @@ class FileBrowser {
 	var srvItemTmpl : Element;
 	var fileItemTmpl : Element;
 	var folderItemTmpl : Element;
+	var newFolderItem : Element;
+	var newFolderInput : InputElement;
 
 	var srvItemElts : StringMap<Element>;
+
+	public var newFolderName (get, set) : Null<String>;
+
+
+	///
+	// GETTERS / SETTERS
+	//
+
+	public function get_newFolderName() : Null<String> {
+
+		return newFolderInput.value;
+	}
+
+	public function set_newFolderName(v : Null<String>) : Null<String> {
+
+		newFolderInput.value = v;
+
+		return v;
+	}
 
 
 	///
@@ -60,6 +98,8 @@ class FileBrowser {
 	public dynamic function onServiceClicked(name : String) : Void { }
 
 	public dynamic function onFileClicked(id : String) : Void { }
+
+	public dynamic function onNewFolderName() : Void { }
 
 
 	///
@@ -94,6 +134,7 @@ class FileBrowser {
 
 			fileList.removeChild(fileList.firstChild);
 		}
+		fileList.appendChild(newFolderItem);
 	}
 
 	public function addFolder(id : String, name : String) : Void {
@@ -103,7 +144,7 @@ class FileBrowser {
 
 		newItem.addEventListener( "click", function(?_){ onFileClicked(id); } );
 
-		fileList.appendChild(newItem);
+		fileList.insertBefore(newItem, newFolderItem);
 	}
 
 	public function addFile(id : String, name : String) : Void {
@@ -113,6 +154,11 @@ class FileBrowser {
 
 		newItem.addEventListener( "click", function(?_){ onFileClicked(id); } );
 
-		fileList.appendChild(newItem);
+		fileList.insertBefore(newItem, newFolderItem);
+	}
+
+	public function focusOnNewFolder() : Void {
+
+		newFolderInput.focus();
 	}
 }

@@ -291,6 +291,47 @@ class Controller {
 				state.currentLocation = new Location(srv, path);
 			}
 
+		application.onNewFolderClicked = function() {
+
+				application.setNewFolderDisplayed(true);
+			}
+
+		application.onDeleteClicked = function() {
+
+				// TODO
+			}
+
+		application.onNewFolderName = function() {
+
+				var name = application.fileBrowser.newFolderName;
+
+				// TODO check name sanity
+
+				if (name.trim() == "") {
+
+
+				} else {
+
+					var mkDirPath : String = state.currentLocation.path;
+
+					mkDirPath = (mkDirPath == "/" || mkDirPath == "") ? name : mkDirPath + "/" + name;
+
+					unifileSrv.mkdir(state.currentLocation.service, mkDirPath, function(){
+
+							application.setNewFolderDisplayed(false);
+
+							refreshFilesList();
+
+						}, function(e : String){ 
+
+							application.setNewFolderDisplayed(false);
+
+							setError(e);
+
+						});
+				}
+			}
+
 		state.onServiceListChanged = function() {
 
 				var lastConnectedService : Null<String> = null;

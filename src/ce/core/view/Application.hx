@@ -29,6 +29,7 @@ class Application {
 	static inline var CLASS_AUTHORIZING : String = "authorizing";
 	static inline var CLASS_LOGGED_IN : String = "loggedin";
 	static inline var CLASS_ALERTING : String = "alerting";
+	static inline var CLASS_MAKING_NEW_FOLDER : String = "making-new-folder";
 
 	static inline var CLASS_EXPORT_OVERWRITING : String = "export-overwriting";
 
@@ -44,6 +45,8 @@ class Application {
 	static inline var SELECTOR_BREADCRUMB : String = ".breadcrumb";
 	static inline var SELECTOR_DROPZONE : String = ".dropzone";
 	static inline var SELECTOR_EXPORT : String = ".export";
+	static inline var SELECTOR_NEW_FOLDER_BTN : String = ".newFolderBtn";
+	static inline var SELECTOR_DELETE_BTN : String = ".deleteBtn";
 
 	public function new(iframe : js.html.IFrameElement) {
 
@@ -107,6 +110,12 @@ class Application {
 
 	public dynamic function onInputFilesChanged() : Void { }
 
+	public dynamic function onNewFolderClicked() : Void { }
+
+	public dynamic function onDeleteClicked() : Void { }
+
+	public dynamic function onNewFolderName() : Void { }
+
 
 	///
 	// API
@@ -165,6 +174,20 @@ trace("setLogoutButtonContent "+v);
 	public function setAlertPopupDisplayed(v : Bool) : Void {
 
 		rootElt.toggleClass(CLASS_ALERTING , v);
+	}
+
+	public function setNewFolderDisplayed(v : Bool) : Void {
+
+		if (!v) {
+
+			fileBrowser.newFolderName = "";
+		}
+		rootElt.toggleClass(CLASS_MAKING_NEW_FOLDER , v);
+
+		if (v) {
+
+			fileBrowser.focusOnNewFolder();
+		}
 	}
 
 	public function openAuthorizationWindow(url : String) : Void {
@@ -298,6 +321,7 @@ trace("c= "+c);
 		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
 		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
 		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
+		fileBrowser.onNewFolderName = function() { onNewFolderName(); }
 
 		dropzone = new DropZone(rootElt.querySelector(SELECTOR_DROPZONE));
 		dropzone.onInputFilesChanged = function() { onInputFilesChanged(); }
@@ -305,6 +329,12 @@ trace("c= "+c);
 		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
 
 		alertPopup = new AlertPopup(rootElt.querySelector(SELECTOR_ALERT_POPUP));
+
+		var newFolderBtnElt : Element = rootElt.querySelector(SELECTOR_NEW_FOLDER_BTN);
+		newFolderBtnElt.addEventListener("click", function(?_){ onNewFolderClicked(); });
+
+		var deleteBtnElt : Element = rootElt.querySelector(SELECTOR_DELETE_BTN);
+		deleteBtnElt.addEventListener("click", function(?_){ onDeleteClicked(); });
 
 		rootElt.addEventListener("click", function(?_){ onClicked(); });
 

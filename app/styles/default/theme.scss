@@ -144,6 +144,35 @@ body {
 
 				display: block; height: 350px; overflow-y: auto;
 			}
+			.controls {
+
+				min-height: 60px;
+				padding: 10px 10px 10px 30%;
+				background: #b4dff8;
+
+				button.newFolderBtn, button.deleteBtn {
+
+					border-radius: 5px; background: #fff; height: 40px; padding: 10px;
+					display: inline-block; border: 0; margin-right: 15px;
+					font-size: 18px; font-weight: 300; color: #444; text-transform: lowercase;
+				}
+				button.deleteBtn {
+
+					float: right;
+				}
+				button.newFolderBtn {
+
+					float: left;
+					
+					.icon-add_folder {
+
+						font-size: 27px;
+						vertical-align: middle;
+						position: relative;
+						top: -2px;
+					}
+				}
+			}
 		}
 		.folder {
 
