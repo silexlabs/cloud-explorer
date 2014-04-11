@@ -156,4 +156,43 @@ html, body {
 			display: block;
 		}
 	}
+
+
+	/**
+	
+	Components states
+
+	**/
+
+	.fileBrowser {
+
+		.files {
+
+			.list {
+
+				ul {
+
+					li {
+
+						input[type="text"] {
+
+							display: none;
+						}
+
+						&.renaming {
+
+							.fileName {
+
+								display: none;
+							}
+							input[type="text"] {
+
+								display: inline-block;
+							}
+						}
+					} 
+				}
+			}
+		}
+	}
 }

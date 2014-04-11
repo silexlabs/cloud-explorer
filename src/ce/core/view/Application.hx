@@ -96,6 +96,10 @@ class Application {
 
 	public dynamic function onFileClicked(id : String) : Void { }
 
+	public dynamic function onFileDeleteClicked(id : String) : Void { }
+
+	public dynamic function onFileRenameRequested(id : String, value : String) : Void { }
+
 	public dynamic function onNavBtnClicked(srv : String, path : String) : Void { }
 
 	public dynamic function onAuthorizationWindowBlocked() : Void { }
@@ -248,7 +252,7 @@ trace("current UI mode is: "+cms);
 	function currentModeState() : Null<String> {
 
 		for (c in rootElt.className.split(" ")) {
-trace("c= "+c);
+
 			if( Lambda.has([CLASS_MODE_SINGLE_FILE_SELECTION, CLASS_MODE_SINGLE_FILE_EXPORT], c) ) {
 
 				return c;
@@ -321,6 +325,8 @@ trace("c= "+c);
 		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
 		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
 		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
+		fileBrowser.onFileDeleteClicked = function(id : String) { onFileDeleteClicked(id); }
+		fileBrowser.onFileRenameRequested = function(id : String, value : String) { onFileRenameRequested(id, value); }
 		fileBrowser.onNewFolderName = function() { onNewFolderName(); }
 
 		dropzone = new DropZone(rootElt.querySelector(SELECTOR_DROPZONE));

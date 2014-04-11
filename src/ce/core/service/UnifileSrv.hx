@@ -46,10 +46,10 @@ class UnifileSrv {
 	static inline var ENDPOINT_ACCOUNT : String = "{srv}/account";
 	static inline var ENDPOINT_LOGOUT : String = "{srv}/logout";
 	static inline var ENDPOINT_LS : String = "{srv}/exec/ls/{path}";
-	static inline var ENDPOINT_RM : String = "exec/rm";
+	static inline var ENDPOINT_RM : String = "{srv}/exec/rm/{path}";
 	static inline var ENDPOINT_MKDIR : String = "{srv}/exec/mkdir/{path}";
 	static inline var ENDPOINT_CP : String = "exec/cp";
-	static inline var ENDPOINT_MV : String = "exec/mv";
+	static inline var ENDPOINT_MV : String = "{srv}/exec/mv/{path}";
 	static inline var ENDPOINT_GET : String = "{srv}/exec/get/{uri}";
 	static inline var ENDPOINT_PUT : String = "{srv}/exec/put/{path}";
 
@@ -205,9 +205,18 @@ class UnifileSrv {
 		http.request(false);
 	}
 
-	public function rm() : Void {
+	public function rm(srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
 
-		
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_RM.replace("{srv}", srv).replace("{path}", path));
+
+		http.onData = function(?_) {
+
+				onSuccess();
+			}
+
+		http.onError = onError;
+
+		http.request(false);
 	}
 
 	public function mkdir(srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
@@ -231,9 +240,18 @@ class UnifileSrv {
 		
 	}
 
-	public function mv() : Void {
+	public function mv(srv : String, oldPath : String, newPath : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
 
-		
+		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_MV.replace("{srv}", srv).replace("{path}", oldPath + ":" + newPath));
+
+		http.onData = function(?_) {
+
+				onSuccess();
+			}
+
+		http.onError = onError;
+
+		http.request(false);
 	}
 
 	public function upload(? blobs : StringMap<Blob>, ? files : js.html.FileList, srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {

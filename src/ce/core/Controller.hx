@@ -257,6 +257,51 @@ class Controller {
 				}
 			}
 
+		application.onFileDeleteClicked = function(id : String) {
+
+				// TODO display dialog box first
+				var f : ce.core.model.unifile.File = state.currentFileList.get(id);
+
+				var rmDirPath : String = state.currentLocation.path;
+
+				rmDirPath = (rmDirPath == "/" || rmDirPath == "") ? f.name : rmDirPath + "/" + f.name;
+
+				application.setLoaderDisplayed(true);
+
+				unifileSrv.rm(state.currentLocation.service, rmDirPath, function() {
+
+						application.setLoaderDisplayed(false);
+
+						refreshFilesList();
+
+					}, setError);
+			}
+
+		application.onFileRenameRequested = function(id : String, value : String) {
+
+				var f : ce.core.model.unifile.File = state.currentFileList.get(id);
+
+				if (value != f.name) {
+
+					var oldPath : String = state.currentLocation.path;
+					var newPath : String = state.currentLocation.path;
+
+					// make it a reusable util
+					oldPath = (oldPath == "/" || oldPath == "") ? f.name : oldPath + "/" + f.name;
+					newPath = (newPath == "/" || newPath == "") ? value : newPath + "/" + value;
+
+					application.setLoaderDisplayed(true);
+
+					unifileSrv.mv(state.currentLocation.service, oldPath, newPath, function() {
+
+							application.setLoaderDisplayed(false);
+
+							refreshFilesList();
+
+						}, setError);
+				}
+			}
+
 		application.onSaveExportClicked = application.onOverwriteExportClicked = function() {
 
 				doExportFile();

@@ -123,6 +123,10 @@ class FileBrowser {
 
 	public dynamic function onFileClicked(id : String) : Void { }
 
+	public dynamic function onFileDeleteClicked(id : String) : Void { }
+
+	public dynamic function onFileRenameRequested(id : String, value : String) : Void { }
+
 	public dynamic function onNewFolderName() : Void { }
 
 
@@ -168,6 +172,8 @@ class FileBrowser {
 		fli.name = name;
 		fli.lastUpdate = lastUpdate;
 		fli.onClicked = function() { onFileClicked(id); }
+		fli.onDeleteClicked = function() { onFileDeleteClicked(id); }
+		fli.onRenameRequested = function() { onFileRenameRequested(id, fli.renameValue); }
 
 		fileListItems.push(fli);
 
@@ -186,6 +192,8 @@ class FileBrowser {
 		}
 		fli.lastUpdate = lastUpdate;
 		fli.onClicked = function() { onFileClicked(id); }
+		fli.onDeleteClicked = function() { onFileDeleteClicked(id); }
+		fli.onRenameRequested = function() { onFileRenameRequested(id, fli.renameValue); }
 
 		fileListItems.push(fli);
 
@@ -291,23 +299,56 @@ class FileBrowser {
 
 class FileListItem {
 
+	static inline var CLASS_RENAMING : String = "renaming";
+
 	public function new(elt : Element) {
 
 		this.elt = elt;
 
-		this.checkBoxElt = cast elt.querySelector("input");
+		this.checkBoxElt = cast elt.querySelector("input[type='checkbox']");
 
 		this.nameElt = elt.querySelector("span.fileName");
 		nameElt.addEventListener( "click", function(?_){ onClicked(); } );
 
+		this.renameInput = cast elt.querySelector("input[type='text']");
+		renameInput.addEventListener("keydown", function(e : KeyboardEvent){
+
+				if (e.keyIdentifier.toLowerCase() == "enter") {
+
+					elt.toggleClass(CLASS_RENAMING, false);
+					onRenameRequested();
+				}
+			});
+		renameInput.addEventListener("focusout", function(?_){
+
+				elt.toggleClass(CLASS_RENAMING, false);
+				onRenameRequested();
+			});
+
 		this.typeElt = elt.querySelector("span.fileType");
 		this.dateElt = elt.querySelector("span.lastUpdate");
+
+		this.renameBtn = elt.querySelector("button.rename");
+		this.renameBtn.addEventListener( "click", function(?_){
+
+				elt.toggleClass(CLASS_RENAMING, true);
+
+				renameInput.value = nameElt.textContent;
+				renameInput.focus();
+			});
+
+		this.deleteBtn = elt.querySelector("button.delete");
+		this.deleteBtn.addEventListener( "click", function(?_){ onDeleteClicked(); } );
 	}
 
 	var checkBoxElt : InputElement;
 	var nameElt : Element;
+	var renameInput : InputElement;
 	var typeElt : Element;
 	var dateElt : Element;
+
+	var renameBtn : Element;
+	var deleteBtn : Element;
 
 	///
 	// PROPERTIES
@@ -318,6 +359,8 @@ class FileListItem {
 	public var isChecked (get, null) : Bool;
 
 	public var name (get, set) : String;
+
+	public var renameValue (get, set) : String;
 
 	public var type (get, set) : String;
 
@@ -330,6 +373,18 @@ class FileListItem {
 	public function get_isChecked() : Bool {
 
 		return checkBoxElt.checked;
+	}
+
+	public function get_renameValue() : String {
+		
+		return renameInput.value;
+	}
+
+	public function set_renameValue(v : String) : String {
+		
+		renameInput.value = v;
+
+		return v;
 	}
 
 	public function get_name() : String {
@@ -377,6 +432,10 @@ class FileListItem {
 	//
 
 	public dynamic function onCheckedStatusChanged() : Void { }
+
+	public dynamic function onDeleteClicked() : Void { }
+
+	public dynamic function onRenameRequested() : Void { }
 
 	public dynamic function onClicked() : Void { }
 }

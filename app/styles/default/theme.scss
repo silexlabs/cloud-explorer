@@ -1,7 +1,7 @@
 ul { margin: 0; padding: 0; list-style: none; }
 
 *, *:before, *:after { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
-body {
+body, input[type="text"] {
 	font-family: 'Roboto', arial, sans-serif; font-size: 14px; color: #727271;
 }
 
@@ -74,6 +74,11 @@ body {
 			background: url("../images/default/close.png") no-repeat center center;
 			background-size: 11px 11px;width:30px;
 		}
+	}
+
+	.logoutBtn {
+
+		font-size: 16px;
 	}
 	
 	.authPopup {
@@ -154,6 +159,7 @@ body {
 		.services {
 
 			width: 15%; overflow-y: auto;
+			border-right: 1px solid rgb(229, 229, 229);
 		}
 		.files {
 
@@ -161,7 +167,7 @@ body {
 
 			.list {
 
-				display: block; height: 350px; overflow-y: auto;
+				display: block; height: 350px;
 
 				.titles {
 
@@ -189,6 +195,8 @@ body {
 				}
 				ul {
 
+					height: 300px; overflow-y: auto; border-top: 1px solid rgb(229, 229, 229);
+
 					li .fileName {
 						cursor: pointer;
 						-ms-text-overflow: ellipsis; /* Required for IE8 */ -o-text-overflow: ellipsis; /* Required for Opera */ text-overflow: ellipsis;
@@ -207,7 +215,25 @@ body {
 						white-space: nowrap;
 					}
 					li {
-						clear: both;
+						clear: both; height: 36px; padding-top: 10px; padding-bottom: 10px;
+						border-bottom: 1px solid rgb(229, 229, 229);
+						input {
+							vertical-align: top;
+						}
+						input[type="text"] {
+							border: 0; margin: 0;
+						}
+						button {
+							background: url("../images/default/editortoolbar.png") no-repeat;
+							width: 16px; height: 16px;
+							border: 0; padding: 0; margin-left: 10px;
+						}
+						button.rename {
+							background-position: -336px 0;
+						}
+						button.delete {
+							background-position: -528px 0;
+						}
 					}
 					.folder {
 
@@ -217,14 +243,17 @@ body {
 							padding-left: 20px;
 							cursor: pointer;
 						}
-						input[type="text"] {
+						&.new {
 
-							margin-left: 20px;
+							input[type="text"] {
+
+								margin-left: 20px;
+							}
 						}
 					}
 					.file {
 
-						span.fileName {
+						span.fileName, input[type="text"] {
 
 							background: url('../images/default/file.png') no-repeat;
 							padding-left: 20px;
