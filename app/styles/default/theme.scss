@@ -32,6 +32,11 @@ body {
 .icon-export:before {content: "\e606";}
 .icon-cloudexplorer:before {content: "\e600";}
 
+.clearfix:before, .clearfix:after { content: " "; display: table; }
+.clearfix:after { clear: both; }
+/* IE6/7 support */
+.clearfix { *zoom: 1; }
+
 .explorer-bg {
 	background-color: black; opacity: .5;
 	position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
@@ -106,17 +111,31 @@ body {
 
 	.breadcrumb {
 
+		padding: 10px;
+		font-size: 14px;
+
 		.path {
 
 			.pathIt {
-
 				font-style: italic;
 				cursor: pointer;
 				color: #727271;
 			}
 			.pathIt:hover {
-
 				text-decoration: underline;
+			}
+		}
+		.title {
+			font-size: 22px;
+			color: #222;
+			padding: 10px 0 0 10px;
+
+			.icon-folder {
+
+				font-size: 32px;
+				color: #dd4b39;
+				vertical-align: middle;
+				margin-right: 5px;
 			}
 		}
 	}
@@ -143,6 +162,76 @@ body {
 			.list {
 
 				display: block; height: 350px; overflow-y: auto;
+
+				.titles {
+
+					color: #dd4b39; font-size: 14px; padding-top: 10px; padding-bottom: 10px;
+					span {
+						display: inline-block;
+						cursor: pointer; user-select: none;
+					}
+					span:hover {
+						text-decoration: underline;
+					}
+					.lastUpdate {
+						width: 150px;
+					}
+					.fileName {
+						margin-left: 20px; padding-left: 35px;
+						width: 210px;
+					}
+					.fileType{
+						width: 60px;
+					}
+					.lastUpdate, .fileType {
+						float: right; text-align: center;
+					}
+				}
+				ul {
+
+					li .fileName {
+						cursor: pointer;
+						-ms-text-overflow: ellipsis; /* Required for IE8 */ -o-text-overflow: ellipsis; /* Required for Opera */ text-overflow: ellipsis;
+					}
+					li .fileType {
+						width: 60px;
+					}
+					li .lastUpdate {
+						width: 150px;
+					}
+					li .fileType, li .lastUpdate {
+						float: right; text-align: center;
+					}
+					li span {
+						display: inline-block; overflow: hidden;
+						white-space: nowrap;
+					}
+					li {
+						clear: both;
+					}
+					.folder {
+
+						span.fileName, input[type="text"] {
+
+							background: url('../images/default/folder.png') no-repeat;
+							padding-left: 20px;
+							cursor: pointer;
+						}
+						input[type="text"] {
+
+							margin-left: 20px;
+						}
+					}
+					.file {
+
+						span.fileName {
+
+							background: url('../images/default/file.png') no-repeat;
+							padding-left: 20px;
+							cursor: pointer;
+						}
+					}
+				}
 			}
 			.controls {
 
@@ -158,11 +247,11 @@ body {
 				}
 				button.deleteBtn {
 
-					float: right;
+					
 				}
 				button.newFolderBtn {
 
-					float: left;
+					
 					
 					.icon-add_folder {
 
@@ -172,19 +261,11 @@ body {
 						top: -2px;
 					}
 				}
+				div.export {
+
+
+				}
 			}
-		}
-		.folder {
-
-			background: url('../images/default/folder.png') no-repeat;
-			padding-left: 20px;
-			cursor: pointer;
-		}
-		.file {
-
-			background: url('../images/default/file.png') no-repeat;
-			padding-left: 20px;
-			cursor: pointer;
 		}
 	}
 

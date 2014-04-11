@@ -35,10 +35,12 @@ class Json2File {
 
 	static public function parseFile(obj : Dynamic) : File {
 
+		var dStr : String = Json2Primitive.node2String(obj, "modified", false);
+
 		return {
 				name: Json2Primitive.node2String(obj, "name", false),
 				bytes: Json2Primitive.node2Int(obj, "bytes", false),
-				modified: Json2Primitive.node2String(obj, "modified", false), // FIXME would be better to get a timestamp from unifie
+				modified: dStr != null ? Date.fromTime( untyped __js__("new Date(dStr).getTime()") ) : null, // FIXME would be better to get a timestamp from unifie
 				isDir: Json2Primitive.node2Bool(obj, "is_dir", false)
 			};
 	}

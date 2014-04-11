@@ -20,6 +20,7 @@ class Breadcrumb {
 	static inline var SELECTOR_PATH : String = "span.path";
 	static inline var SELECTOR_PATH_ITEM_TMPL : String = "span.pathIt";
 	static inline var SELECTOR_PATH_SEP_TMPL : String = "span.sep";
+	static inline var SELECTOR_TITLE : String = ".title span";
 
 	public function new(elt : Element) {
 
@@ -30,6 +31,8 @@ class Breadcrumb {
 		pathElt.removeChild(pathItemTmpl);
 		this.pathSepTmpl = pathElt.querySelector(SELECTOR_PATH_SEP_TMPL);
 		pathElt.removeChild(pathSepTmpl);
+	
+		this.titleElt = elt.querySelector(SELECTOR_TITLE);
 	}
 
 	var elt : Element;
@@ -37,6 +40,8 @@ class Breadcrumb {
 	var pathElt : Element;
 	var pathItemTmpl : Element;
 	var pathSepTmpl : Element;
+
+	var titleElt : Element;
 
 
 	///
@@ -49,6 +54,11 @@ class Breadcrumb {
 	///
 	// API
 	//
+
+	public function setTitle(v : String) : Void {
+
+		titleElt.textContent = v;
+	}
 
 	public function setBreadcrumbPath(srv : String, path : String) : Void {
 

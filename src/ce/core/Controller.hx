@@ -309,6 +309,7 @@ class Controller {
 
 				if (name.trim() == "") {
 
+					application.setNewFolderDisplayed(false);
 
 				} else {
 
@@ -420,6 +421,12 @@ class Controller {
 
 				} else { trace("new location "+state.currentLocation.path);
 
+					// TODO make util to manipulate easily and safely file pathes (getFolderName(), getPath(), ...)
+					var p = state.currentLocation.path;
+					while (p.length > 0 && p.lastIndexOf("/") == p.length - 1) p = p.substr(0, p.length - 1);
+	
+					application.breadcrumb.setTitle(p.length > 1 ? p.substr(p.lastIndexOf('/')+1) : state.currentLocation.service);
+
 					application.breadcrumb.setBreadcrumbPath(state.currentLocation.service, state.currentLocation.path);
 
 					cd(state.currentLocation.service , state.currentLocation.path );
@@ -447,11 +454,11 @@ class Controller {
 
 						if (state.currentFileList.get(fid).isDir) {
 
-							application.fileBrowser.addFolder(fid, state.currentFileList.get(fid).name);
+							application.fileBrowser.addFolder(fid, state.currentFileList.get(fid).name, state.currentFileList.get(fid).modified);
 
 						} else {
 
-							application.fileBrowser.addFile(fid, state.currentFileList.get(fid).name);
+							application.fileBrowser.addFile(fid, state.currentFileList.get(fid).name, state.currentFileList.get(fid).name.getMimeType(), state.currentFileList.get(fid).modified);
 						}
 					}
 				}

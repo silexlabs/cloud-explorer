@@ -80,14 +80,31 @@
 
                     <div class="breadcrumb">
                         <i class='icon-cloud'></i> <span class="path"><span class="pathIt"></span><span class="sep"> / </span></span>
+                        <div class="title"><i class='icon-folder'></i> <span></span></div>
                     </div>
 
                     <div class="list">
                     <!-- <span class="emptyMsg">Cliquez</span> -->
+
+                        <div class="titles">
+                            <span class='fileName'> Name </span>
+                            <span class='lastUpdate'> Last update </span>
+                            <span class='fileType'> Type </span>
+                        </div>
                         <ul>
                             <li class="folder new"><input type="text" /></li>
-                            <li class="folder"></li>
-                            <li class="file"></li>
+                            <li class="folder">
+                                <input type='checkbox' />
+                                <span class='fileName'></span>
+                                <span class='lastUpdate'></span>
+                                <span class='fileType'>folder</span>
+                            </li>
+                            <li class="file">
+                                <input type='checkbox' />
+                                <span class='fileName'></span>
+                                <span class='lastUpdate'></span>
+                                <span class='fileType'></span>
+                            </li>
                         </ul>
                     </div>
 
