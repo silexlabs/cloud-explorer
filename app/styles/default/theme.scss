@@ -224,6 +224,7 @@ body, input[type="text"] {
 							border: 0; margin: 0;
 						}
 						button {
+							display: none;
 							background: url("../images/default/editortoolbar.png") no-repeat;
 							width: 16px; height: 16px;
 							border: 0; padding: 0; margin-left: 10px;
@@ -233,6 +234,11 @@ body, input[type="text"] {
 						}
 						button.delete {
 							background-position: -528px 0;
+						}
+					}
+					li:hover {
+						button {
+							display: inline-block;
 						}
 					}
 					.folder {
@@ -265,23 +271,21 @@ body, input[type="text"] {
 			.controls {
 
 				min-height: 60px;
-				padding: 10px 10px 10px 30%;
+				padding: 10px 10px 10px 10px;
 				background: #b4dff8;
 
 				button.newFolderBtn, button.deleteBtn {
 
 					border-radius: 5px; background: #fff; height: 40px; padding: 10px;
-					display: inline-block; border: 0; margin-right: 15px;
+					border: 0; margin-right: 15px;
 					font-size: 18px; font-weight: 300; color: #444; text-transform: lowercase;
 				}
 				button.deleteBtn {
 
-					
+					float: right;
 				}
 				button.newFolderBtn {
 
-					
-					
 					.icon-add_folder {
 
 						font-size: 27px;

@@ -277,6 +277,19 @@ class Controller {
 					}, setError);
 			}
 
+		application.onFileCheckedStatusChanged = function(?_) {
+
+				for (f in application.fileBrowser.fileListItems) {
+
+					if (f.isChecked) {
+
+						application.setSelecting(true);
+						return;
+					}
+				}
+				application.setSelecting(false);
+			}
+
 		application.onFileRenameRequested = function(id : String, value : String) {
 
 				var f : ce.core.model.unifile.File = state.currentFileList.get(id);
@@ -343,7 +356,34 @@ class Controller {
 
 		application.onDeleteClicked = function() {
 
-				// TODO
+				var toDelCnt : Int = 0;
+
+				for (f in application.fileBrowser.fileListItems) {
+
+					if (f.isChecked) {
+
+						toDelCnt++;
+
+						var rmDirPath : String = state.currentLocation.path;
+
+						rmDirPath = (rmDirPath == "/" || rmDirPath == "") ? f.name : rmDirPath + "/" + f.name;
+
+						application.setLoaderDisplayed(true);
+
+						unifileSrv.rm(state.currentLocation.service, rmDirPath, function(){
+
+								toDelCnt--;
+
+								if (toDelCnt == 0) {
+
+									application.setLoaderDisplayed(false);
+
+									refreshFilesList();
+								}
+
+							}, setError);
+					}
+				}
 			}
 
 		application.onNewFolderName = function() {

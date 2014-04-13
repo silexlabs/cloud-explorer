@@ -30,6 +30,7 @@ class Application {
 	static inline var CLASS_LOGGED_IN : String = "loggedin";
 	static inline var CLASS_ALERTING : String = "alerting";
 	static inline var CLASS_MAKING_NEW_FOLDER : String = "making-new-folder";
+	static inline var CLASS_SELECTING : String = "selecting";
 
 	static inline var CLASS_EXPORT_OVERWRITING : String = "export-overwriting";
 
@@ -99,6 +100,8 @@ class Application {
 	public dynamic function onFileDeleteClicked(id : String) : Void { }
 
 	public dynamic function onFileRenameRequested(id : String, value : String) : Void { }
+
+	public dynamic function onFileCheckedStatusChanged(id : String) : Void { }
 
 	public dynamic function onNavBtnClicked(srv : String, path : String) : Void { }
 
@@ -192,6 +195,11 @@ trace("setLogoutButtonContent "+v);
 
 			fileBrowser.focusOnNewFolder();
 		}
+	}
+
+	public function setSelecting(v : Bool) : Void {
+
+		rootElt.toggleClass(CLASS_SELECTING , v);
 	}
 
 	public function openAuthorizationWindow(url : String) : Void {
@@ -326,6 +334,7 @@ trace("current UI mode is: "+cms);
 		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
 		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
 		fileBrowser.onFileDeleteClicked = function(id : String) { onFileDeleteClicked(id); }
+		fileBrowser.onFileCheckedStatusChanged = function(id : String) { onFileCheckedStatusChanged(id); }
 		fileBrowser.onFileRenameRequested = function(id : String, value : String) { onFileRenameRequested(id, value); }
 		fileBrowser.onNewFolderName = function() { onNewFolderName(); }
 

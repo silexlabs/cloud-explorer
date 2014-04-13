@@ -93,7 +93,7 @@ class FileBrowser {
 
 	var srvItemElts : StringMap<Element>;
 
-	var fileListItems : Array<FileListItem>;
+	public var fileListItems (default, null) : Array<FileListItem>;
 
 	public var newFolderName (get, set) : Null<String>;
 
@@ -121,9 +121,13 @@ class FileBrowser {
 
 	public dynamic function onServiceClicked(name : String) : Void { }
 
+	public dynamic function onFileSelected(id : String) : Void { }
+
 	public dynamic function onFileClicked(id : String) : Void { }
 
 	public dynamic function onFileDeleteClicked(id : String) : Void { }
+
+	public dynamic function onFileCheckedStatusChanged(id : String) : Void { }
 
 	public dynamic function onFileRenameRequested(id : String, value : String) : Void { }
 
@@ -194,6 +198,7 @@ class FileBrowser {
 		fli.onClicked = function() { onFileClicked(id); }
 		fli.onDeleteClicked = function() { onFileDeleteClicked(id); }
 		fli.onRenameRequested = function() { onFileRenameRequested(id, fli.renameValue); }
+		fli.onCheckedStatusChanged = function() { onFileCheckedStatusChanged(id); }
 
 		fileListItems.push(fli);
 
@@ -306,6 +311,7 @@ class FileListItem {
 		this.elt = elt;
 
 		this.checkBoxElt = cast elt.querySelector("input[type='checkbox']");
+		checkBoxElt.addEventListener("change", function(?_){ onCheckedStatusChanged(); });
 
 		this.nameElt = elt.querySelector("span.fileName");
 		nameElt.addEventListener( "click", function(?_){ onClicked(); } );

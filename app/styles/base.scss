@@ -193,6 +193,30 @@ html, body {
 					} 
 				}
 			}
+			.controls {
+
+				button.deleteBtn {
+
+					display: none;
+				}
+			}
+		}
+	}
+
+	&.selecting {
+
+		.fileBrowser {
+
+			.files {
+
+				.controls {
+
+					button.deleteBtn {
+
+						display: inline-block;
+					}
+				}
+			}
 		}
 	}
 }
