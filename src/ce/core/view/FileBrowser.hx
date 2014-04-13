@@ -151,6 +151,7 @@ class FileBrowser {
 	public function addService(name : String, displayName : String) : Void {
 
 		var newItem : Element = cast srvItemTmpl.cloneNode(true);
+		newItem.className = name;
 		newItem.textContent = displayName;
 
 		newItem.addEventListener( "click", function(?_){ onServiceClicked(name); } );

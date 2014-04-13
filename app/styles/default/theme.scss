@@ -160,6 +160,21 @@ body, input[type="text"] {
 
 			width: 15%; overflow-y: auto;
 			border-right: 1px solid rgb(229, 229, 229);
+
+			ul {
+				height: 300px; overflow-y: auto;
+
+				li {
+
+					height: 36px; padding-left: 26px; padding-top: 10px; padding-bottom: 10px;
+					user-select: none;
+					cursor: pointer;
+				}
+				li.dropbox {
+
+					background: url("../images/default/dropbox.png") no-repeat 5% 50% / auto 50%;
+				}
+			}
 		}
 		.files {
 
