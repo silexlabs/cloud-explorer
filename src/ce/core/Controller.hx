@@ -104,7 +104,10 @@ class Controller {
 
 		unifileSrv.upload([explodedUrl.filename => fileBlob], explodedUrl.srv, explodedUrl.path, function() {
 
-				trace("file uploaded with success");
+				if (state.currentFileList.get(explodedUrl.filename) == null) {
+
+					refreshFilesList();
+				}
 
 				onSuccess(target);
 
@@ -428,7 +431,7 @@ class Controller {
 
 				unifileSrv.upload(application.dropzone.inputElt.files, state.currentLocation.service, state.currentLocation.path, function() {
 
-					trace("file(s) uploaded with success");
+					//trace("file(s) uploaded with success");
 
 					refreshFilesList();
 
@@ -573,7 +576,7 @@ class Controller {
 
 					state.currentFileList = null;
 
-				} else { trace("new location "+state.currentLocation.path);
+				} else { //trace("new location "+state.currentLocation.path);
 
 					// TODO make util to manipulate easily and safely file pathes (getFolderName(), getPath(), ...)
 					var p = state.currentLocation.path;
