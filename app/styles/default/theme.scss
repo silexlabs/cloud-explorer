@@ -336,12 +336,17 @@ body, input[type="text"] {
 				min-height: 60px;
 				padding: 10px 10px 10px 10px;
 				background: #b4dff8;
+				font-size: 18px;
 
-				button.newFolderBtn, button.deleteBtn {
+				button.newFolderBtn, button.deleteBtn, div.export .saveBtn, div.export .overwriteBtn {
 
 					border-radius: 5px; background: #fff; height: 40px; padding: 10px;
 					border: 0;
-					font-size: 18px; font-weight: 300; color: #444; text-transform: lowercase;
+					font: {
+						weight: 300;
+						size: 18px;
+					}
+					color: #444; text-transform: lowercase;
 				}
 				button.deleteBtn {
 
@@ -351,7 +356,6 @@ body, input[type="text"] {
 
 					.icon-add_folder {
 
-						font-size: 27px;
 						vertical-align: middle;
 						position: relative;
 						top: -2px;
@@ -359,7 +363,15 @@ body, input[type="text"] {
 				}
 				div.export {
 
+					.saveBtn, .overwriteBtn {
 
+					}
+					.overwriteBtn {
+						background: orange;
+					}
+					.saveBtn {
+						background: green;
+					}
 				}
 			}
 		}

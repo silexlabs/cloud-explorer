@@ -21,15 +21,15 @@ class Export {
 	static inline var SELECTOR_INPUT : String = "input";
 	static inline var SELECTOR_PATH : String = "span.path";
 	static inline var SELECTOR_EXT : String = "span.ext";
-	static inline var SELECTOR_SAVE_BUTTON : String = "button.save";
-	static inline var SELECTOR_OVERWRITE_BUTTON : String = "button.overwrite";
+	static inline var SELECTOR_SAVE_BUTTON : String = ".saveBtn";
+	static inline var SELECTOR_OVERWRITE_BUTTON : String = ".overwriteBtn";
 
 	public function new(elt : Element) {
 
 		this.elt = elt;
 
 		this.inputElt = cast elt.querySelector(SELECTOR_INPUT);
-		inputElt.addEventListener("change", function(?_) { onExportNameChanged(); });
+		inputElt.addEventListener("input", function(?_) { onExportNameChanged(); });
 
 		this.pathElt = elt.querySelector(SELECTOR_PATH);
 

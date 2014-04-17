@@ -101,25 +101,29 @@ html, body {
 
 		.export {
 
-			display: block;
+			display: inline-block;
 
-			button.save {
+			.saveBtn {
 
-				display: block;
+				display: inline-block;
+			}
+			.overwriteBtn {
+
+				display: none;
 			}
 		}
 
-		&.exportOverwriting {
+		&.export-overwriting {
 
 			.export {
 
-				button.save {
+				.saveBtn {
 
 					display: none;
 				}
-				button.overwrite {
+				.overwriteBtn {
 
-					display: none;
+					display: inline-block;
 				}
 			}
 		}

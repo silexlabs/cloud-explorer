@@ -335,7 +335,51 @@ class Controller {
 				}
 			}
 
-		application.onSaveExportClicked = application.onOverwriteExportClicked = function() {
+		application.onOverwriteExportClicked = function() {
+
+				switch(state.currentMode) {
+
+					case SingleFileExport(onSuccess, onError, input, options):
+
+						var fname : String = application.export.exportName;
+
+						if (options != null ) {	// FIXME find a way to avoid doing that each time we need the full filename
+
+							if (options.mimetype != null && options.mimetype.getExtension() != null) {
+
+								fname += options.mimetype.getExtension();
+
+							} else if (options.extension != null) {
+
+								fname += options.extension.indexOf(".") != 0 ? "." + options.extension : options.extension;
+							}
+						}
+
+						setAlert("Do you confirm overwriting of " + fname + "?", 1, [
+							{
+								msg: "Yes, do overwrite it.",
+								cb: function() {
+
+										application.setAlertPopupDisplayed(false);
+
+										doExportFile();
+
+										hide();
+									}
+							},
+							{
+								msg: "No, do not overwrite it.",
+								cb: function() {
+
+										application.setAlertPopupDisplayed(false);
+									}
+							}]);
+
+					default: throw "unexpected mode "+state.currentMode;
+				}
+			}
+
+		application.onSaveExportClicked = function() {
 
 				doExportFile();
 
@@ -344,8 +388,40 @@ class Controller {
 
 		application.onExportNameChanged = function() {
 
-				// TODO check name against file list to detect override
-				// application.setExportOverwriteDisplayed
+				if (application.export.exportName != "") {
+
+					switch(state.currentMode) {
+
+						case SingleFileExport(onSuccess, onError, input, options):
+
+							// FIXME actually write the file
+							
+							var fname : String = application.export.exportName;
+
+							if (options != null ) {
+
+								if (options.mimetype != null && options.mimetype.getExtension() != null) {
+
+									fname += options.mimetype.getExtension();
+
+								} else if (options.extension != null) {
+
+									fname += options.extension.indexOf(".") != 0 ? "." + options.extension : options.extension;
+								}
+							}
+							for (f in state.currentFileList) {
+
+								if (f.name == fname) {
+
+									application.setExportOverwriteDisplayed(true);
+									return;
+								}
+							}
+							application.setExportOverwriteDisplayed(false);
+
+						default: throw "unexpected mode "+state.currentMode;
+					}
+				}
 			}
 
 		application.onInputFilesChanged = function() {
@@ -561,6 +637,10 @@ class Controller {
 								ext = (options.extension.indexOf('.') == 0) ? options.extension : "." + options.extension;
 							}
 							application.export.ext = ext != null ? ext : "";
+
+							application.export.exportName = "";
+
+							application.setExportOverwriteDisplayed(false);
 					}
 				}
 
