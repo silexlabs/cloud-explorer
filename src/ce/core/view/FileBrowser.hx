@@ -179,6 +179,7 @@ class FileBrowser {
 		fli.onClicked = function() { onFileClicked(id); }
 		fli.onDeleteClicked = function() { onFileDeleteClicked(id); }
 		fli.onRenameRequested = function() { onFileRenameRequested(id, fli.renameValue); }
+		fli.onCheckedStatusChanged = function() { onFileCheckedStatusChanged(id); }
 
 		fileListItems.push(fli);
 

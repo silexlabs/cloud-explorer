@@ -111,9 +111,21 @@ class Controller {
 			}, setError);
 	}
 
-	public function setAlert(msg : String) : Void {
+	public function setAlert(msg : String, ? level : Int = 2, ? choices : Array<{ msg : String, cb : Void -> Void }>) : Void {
 
-		application.alertPopup.setMsg(msg);
+		if (choices == null || choices.length == 0) {
+
+			application.onClicked = function() {
+
+					application.setAlertPopupDisplayed(false);
+				}
+
+		} else {
+
+			application.onClicked = function() { }
+		}
+
+		application.alertPopup.setMsg(msg, level, choices);
 
 		application.setAlertPopupDisplayed(true);
 	}
@@ -190,7 +202,7 @@ class Controller {
 
 										application.onAuthorizationWindowBlocked = function(){
 
-												setAlert("Popup Blocker is enabled! Please add this site to your exception list.");
+												setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
 											}
 
 										application.onServiceAuthorizationDone = function() {
@@ -259,22 +271,30 @@ class Controller {
 
 		application.onFileDeleteClicked = function(id : String) {
 
-				// TODO display dialog box first
 				var f : ce.core.model.unifile.File = state.currentFileList.get(id);
 
-				var rmDirPath : String = state.currentLocation.path;
+				setAlert("Are you sure you want to delete " + f.name + " from your " +
+							state.serviceList.get(state.currentLocation.service).displayName + " storage?",
+								1, [
+									{
+										msg: "Yes, delete it",
+										cb: function(){
 
-				rmDirPath = (rmDirPath == "/" || rmDirPath == "") ? f.name : rmDirPath + "/" + f.name;
+												application.setAlertPopupDisplayed(false);
 
-				application.setLoaderDisplayed(true);
+												deleteFile(id);
+											}
+									},
+									{
+										msg: "No, do not delete it",
 
-				unifileSrv.rm(state.currentLocation.service, rmDirPath, function() {
+										cb: function(){
 
-						application.setLoaderDisplayed(false);
+												application.setAlertPopupDisplayed(false);
 
-						refreshFilesList();
-
-					}, setError);
+											}
+									}
+								]);
 			}
 
 		application.onFileCheckedStatusChanged = function(?_) {
@@ -339,11 +359,6 @@ class Controller {
 				}, setError);
 			}
 
-		application.onClicked = function() {
-
-				application.setAlertPopupDisplayed(false);
-			}
-
 		application.onNavBtnClicked = function(srv : String, path : String) {
 
 				state.currentLocation = new Location(srv, path);
@@ -356,34 +371,12 @@ class Controller {
 
 		application.onDeleteClicked = function() {
 
-				var toDelCnt : Int = 0;
-
-				for (f in application.fileBrowser.fileListItems) {
-
-					if (f.isChecked) {
-
-						toDelCnt++;
-
-						var rmDirPath : String = state.currentLocation.path;
-
-						rmDirPath = (rmDirPath == "/" || rmDirPath == "") ? f.name : rmDirPath + "/" + f.name;
-
-						application.setLoaderDisplayed(true);
-
-						unifileSrv.rm(state.currentLocation.service, rmDirPath, function(){
-
-								toDelCnt--;
-
-								if (toDelCnt == 0) {
-
-									application.setLoaderDisplayed(false);
-
-									refreshFilesList();
-								}
-
-							}, setError);
-					}
-				}
+				setAlert("Are you sure you want to delete the selected files from your " +
+					state.serviceList.get(state.currentLocation.service).displayName + " storage?", 1,
+						[
+							{ msg: "Yes, delete the selected files", cb: function(){ application.setAlertPopupDisplayed(false); deleteSelectedFiles(); }}, 
+							{ msg: "No, do not delete the selected files", cb: function(){ application.setAlertPopupDisplayed(false); }}
+						]);
 			}
 
 		application.onNewFolderName = function() {
@@ -573,6 +566,57 @@ class Controller {
 
 				application.setModeState(state.currentMode);
 			}
+	}
+
+	private function deleteSelectedFiles() : Void {
+
+		var toDelCnt : Int = 0;
+
+		for (f in application.fileBrowser.fileListItems) {
+
+			if (f.isChecked) {
+
+				toDelCnt++;
+
+				var rmDirPath : String = state.currentLocation.path;
+
+				rmDirPath = (rmDirPath == "/" || rmDirPath == "") ? f.name : rmDirPath + "/" + f.name;
+
+				application.setLoaderDisplayed(true);
+
+				unifileSrv.rm(state.currentLocation.service, rmDirPath, function(){
+
+						toDelCnt--;
+
+						if (toDelCnt == 0) {
+
+							application.setLoaderDisplayed(false);
+
+							refreshFilesList();
+						}
+
+					}, setError);
+			}
+		}
+	}
+
+	private function deleteFile(id : String) : Void {
+
+		var f : ce.core.model.unifile.File = state.currentFileList.get(id);
+
+		var rmDirPath : String = state.currentLocation.path;
+
+		rmDirPath = (rmDirPath == "/" || rmDirPath == "") ? f.name : rmDirPath + "/" + f.name;
+
+		application.setLoaderDisplayed(true);
+
+		unifileSrv.rm(state.currentLocation.service, rmDirPath, function() {
+
+				application.setLoaderDisplayed(false);
+
+				refreshFilesList();
+
+			}, setError);
 	}
 
 	/**
