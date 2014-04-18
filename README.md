@@ -25,12 +25,12 @@ The project is not mature yet and doesn't provide half of what is provided by In
 
 Cloud Explorer is licensed under the MIT license.
 
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot01.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot02.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot03.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot04.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot05.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot06.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot01.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot02.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot03.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot04.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot05.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot06.png)
 
 ##Setup
 
