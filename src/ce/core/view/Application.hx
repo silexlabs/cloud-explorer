@@ -218,7 +218,7 @@ class Application {
 			var timer = new haxe.Timer(500);
 			
 			timer.run = function() {
-
+trace("authPopup= "+authPopup+"  authPopup.closed= "+authPopup.closed);
 					if (authPopup.closed) {
 
 						timer.stop();

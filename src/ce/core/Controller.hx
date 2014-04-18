@@ -155,23 +155,11 @@ trace("ERROR HAPPENED");
 
 		application.onLogoutClicked = function() {
 
-				// FIXME support logging out by service
+				if (state.currentLocation != null && state.serviceList.get(state.currentLocation.service).isLoggedIn) {
 
-				var srvName : Null<String> = null;
+					unifileSrv.logout(state.currentLocation.service, function(lr : ce.core.model.unifile.LogoutResult){
 
-				for (s in state.serviceList) {
-
-					if (s.isLoggedIn) {
-
-						srvName = s.name;
-						break;
-					}
-				}
-				if (srvName != null) {
-
-					unifileSrv.logout(srvName, function(lr : ce.core.model.unifile.LogoutResult){
-
-							state.serviceList.get(srvName).isLoggedIn = false;
+							state.serviceList.get(state.currentLocation.service).isLoggedIn = false;
 
 							if (!lr.success) {
 
@@ -209,10 +197,14 @@ trace("ERROR HAPPENED");
 
 										application.onAuthorizationWindowBlocked = function(){
 
+												application.setAuthPopupDisplayed(false);
+
 												setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
 											}
 
 										application.onServiceAuthorizationDone = function() {
+
+												application.setAuthPopupDisplayed(false);
 
 												login(name);
 											}
@@ -544,22 +536,18 @@ trace("ERROR HAPPENED");
 
 				if (!state.serviceList.get(srvName).isLoggedIn) {
 
-					application.fileBrowser.removeService(srvName);
+					if (state.currentLocation.service == srvName) {
 
-					application.setLogoutButtonDisplayed(false); // FIXME dropdown list instead
+						for (s in state.serviceList) {
 
-					if (state.currentLocation.service == "srvName") {
+							if (s.isLoggedIn) {
 
+								state.currentLocation = new Location(s.name, "/");
+								return;
+							}
+						}
 						state.currentLocation = null;
 					}
-					for (s in state.serviceList) {
-
-						if (s.isLoggedIn) {
-
-							return;
-						}
-					}
-					application.setHomeDisplayed(true);
 
 				} else {
 
@@ -571,19 +559,13 @@ trace("ERROR HAPPENED");
 
 							}, setError);
 					}
-					if (state.currentLocation == null) {
-
-						state.currentLocation = new Location(srvName, "/");
-					}
-					//application.fileBrowser.addService(srvName, state.serviceList.get(srvName).displayName);
-
-					application.setLogoutButtonDisplayed(true);
+					state.currentLocation = new Location(srvName, "/");
 				}
 			}
 
 		state.onServiceAccountChanged = function(srvName) {
 
-				application.setLogoutButtonContent(state.serviceList.get(srvName).account.displayName);
+				setLogoutBtnContent(srvName);
 			}
 
 		state.onCurrentLocationChanged = function() {
@@ -591,6 +573,10 @@ trace("ERROR HAPPENED");
 				if (state.currentLocation == null) {
 
 					state.currentFileList = null;
+
+					application.setLogoutButtonDisplayed(false);
+
+					application.setHomeDisplayed(true);
 
 				} else { //trace("new location "+state.currentLocation.path);
 
@@ -601,6 +587,13 @@ trace("ERROR HAPPENED");
 					application.breadcrumb.setTitle(p.length > 1 ? p.substr(p.lastIndexOf('/')+1) : state.currentLocation.service);
 
 					application.breadcrumb.setBreadcrumbPath(state.currentLocation.service, state.currentLocation.path);
+
+					if (state.serviceList.get(state.currentLocation.service).isLoggedIn) {
+
+						setLogoutBtnContent(state.currentLocation.service);
+
+						application.setLogoutButtonDisplayed(true);
+					}
 
 					cd(state.currentLocation.service , state.currentLocation.path );
 				}
@@ -665,6 +658,18 @@ trace("ERROR HAPPENED");
 
 				application.setModeState(state.currentMode);
 			}
+	}
+
+	private function setLogoutBtnContent(srvName) : Void {
+
+		var logoutStr : String = state.serviceList.get(srvName).displayName;
+
+		if (state.serviceList.get(srvName).account != null && 
+			state.serviceList.get(srvName).account.displayName != null) {
+
+			logoutStr += " - " + state.serviceList.get(srvName).account.displayName;
+		}
+		application.setLogoutButtonContent(logoutStr);
 	}
 
 	private function deleteSelectedFiles() : Void {

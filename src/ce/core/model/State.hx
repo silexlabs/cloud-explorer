@@ -144,7 +144,10 @@ class State {
 		}
 		currentLocation = v;
 
-		currentLocation.onChanged = function() { onCurrentLocationChanged(); }
+		if (currentLocation != null) {
+
+			currentLocation.onChanged = function() { onCurrentLocationChanged(); }
+		}
 
 		onCurrentLocationChanged();
 

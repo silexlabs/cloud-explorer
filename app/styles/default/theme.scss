@@ -126,6 +126,8 @@ body, input[type="text"] {
 				vertical-align: top;
 				margin: 4px;
 				border-radius: 10px;
+				cursor: pointer;
+				user-select: none;
 			}
 			li.dropbox {
 				padding-top: 5px;
@@ -159,7 +161,7 @@ body, input[type="text"] {
 
 		img {
 			display: block;
-			margin: 0 auto;
+			margin-left: 25%;
 		}
 		button {
 			border: 0; padding: 0; margin-left: 15px;
@@ -171,7 +173,9 @@ body, input[type="text"] {
 		}
 		.closeBtn {
 			background: url("../images/default/close.png") no-repeat center center;
-			background-size: 11px 11px;width:30px;
+			background-size: 11px 11px; width: 30px;
+			border: 2px solid #fff;
+			border-radius: 15px;
 		}
 	}
 
