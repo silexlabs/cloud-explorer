@@ -1,9 +1,11 @@
-#Cloud Explorer, your users pick their files from the cloud
+#Cloud Explorer, file picker in the cloud
+Cloud Explorer, your users pick their files from the cloud.
+
 This is a free and open source project [powered by Silex Labs](http://www.silexlabs.org/).
 
 Authored by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alexandre Hoyau [@lexoyo](https://twitter.com/lexoyo).
 
-##About the cloud explorer
+##About Cloud Explorer
 
 Cloud Explorer aims to provide an open source client library that exposes the same API as [Ink File Picker API](https://developers.inkfilepicker.com/docs/web/).
 
@@ -33,7 +35,7 @@ Prerequisite :
 * [NPM installed](https://npmjs.org/)
 * [Haxe compiler installed](http://haxe.org/download)
 
-Cloud Explorer default development environment uses (grunt)[http://gruntjs.com/] (nodejs), (compass)[http://compass-style.org/] and few other little tools that aim to make developping CE easier and faster.
+Cloud Explorer default development environment uses [grunt](http://gruntjs.com/) (nodejs), [compass](http://compass-style.org/) and few other little tools that aim to make developping CE easier and faster.
 
 For early testers and contributors, here are the setup steps to follow in order to run this version of CE:
 

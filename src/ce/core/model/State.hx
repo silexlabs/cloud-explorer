@@ -70,10 +70,7 @@ class State {
 
 		for (s in serviceList) {
 
-			s.onLoginStateChanged = function() {
-
-				onServiceLoginStateChanged(s.name);
-			}
+			s.onLoginStateChanged = function() { onServiceLoginStateChanged(s.name); }
 			s.onAccountChanged = function() { onServiceAccountChanged(s.name); }
 
 			if (s.account != null) {

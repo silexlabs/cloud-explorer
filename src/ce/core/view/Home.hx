@@ -46,6 +46,14 @@ class Home {
 	// API
 	//
 
+	public function resetList() : Void {
+
+		while(listElt.childNodes.length > 0) {
+
+			listElt.removeChild(listElt.firstChild);
+		}
+	}
+
 	public function addService(name : String, displayName : String, description : String) : Void {
 
 		var newSrvIt : Element = cast srvItemTmpl.cloneNode(true);

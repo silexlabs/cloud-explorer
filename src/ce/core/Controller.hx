@@ -494,6 +494,8 @@ class Controller {
 
 				var lastConnectedService : Null<String> = null;
 
+				application.home.resetList();
+
 				for (s in state.serviceList) {
 
 					application.home.addService(s.name, s.displayName, s.description);
@@ -505,7 +507,7 @@ class Controller {
 						application.fileBrowser.addService(s.name, s.displayName);
 					}
 				}
-				if (lastConnectedService != null) { trace("1");
+				if (lastConnectedService != null) {
 
 					if (state.currentLocation == null) {
 
@@ -516,7 +518,7 @@ class Controller {
 
 					application.setFileBrowserDisplayed(true);
 
-				} else { trace("2");
+				} else {
 
 					application.setLogoutButtonDisplayed(false);
 
@@ -546,6 +548,14 @@ class Controller {
 
 						state.currentLocation = null;
 					}
+					for (s in state.serviceList) {
+
+						if (s.isLoggedIn) {
+
+							return;
+						}
+					}
+					application.setHomeDisplayed(true);
 
 				} else {
 
@@ -810,7 +820,24 @@ class Controller {
 
 	private function show() : Void {
 
+		var goHome : Bool = false;
+
 		if (state.serviceList == null) {
+
+			goHome = true;
+		
+		} else {
+
+			for (s in state.serviceList) {
+
+				if (!s.isLoggedIn) {
+
+					goHome = true;
+					break;
+				}
+			}
+		}
+		if (goHome) {
 
 			application.setLoaderDisplayed(true);
 
