@@ -128,9 +128,9 @@ class Application {
 	// API
 	//
 
-	public function setLogoutButtonContent(v : String) : Void {
-trace("setLogoutButtonContent "+v);
-		logoutBtn.textContent = logoutContentTmpl.replace(PLACE_HOLDER_LOGOUT_NAME, v);
+	public function setLogoutButtonContent(v : Null<String>) : Void {
+
+		logoutBtn.textContent = logoutContentTmpl.replace(PLACE_HOLDER_LOGOUT_NAME, v != null ? v : "");
 	}
 
 	public function setDisplayed(v : Bool) : Void {

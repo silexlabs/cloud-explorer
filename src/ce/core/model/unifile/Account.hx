@@ -20,5 +20,5 @@ typedef QuotaInfo = {
 typedef Account = {
 
 	var displayName : String;
-	var quotaInfo : QuotaInfo;
+	var quotaInfo : Null<QuotaInfo>;
 }

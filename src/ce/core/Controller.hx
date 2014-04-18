@@ -503,9 +503,9 @@ class Controller {
 					if (s.isLoggedIn) {
 
 						lastConnectedService = s.name;
-
-						application.fileBrowser.addService(s.name, s.displayName);
 					}
+
+					application.fileBrowser.addService(s.name, s.displayName);
 				}
 				if (lastConnectedService != null) {
 
@@ -571,7 +571,7 @@ class Controller {
 
 						state.currentLocation = new Location(srvName, "/");
 					}
-					application.fileBrowser.addService(srvName, state.serviceList.get(srvName).displayName);
+					//application.fileBrowser.addService(srvName, state.serviceList.get(srvName).displayName);
 
 					application.setLogoutButtonDisplayed(true);
 				}
@@ -820,24 +820,20 @@ class Controller {
 
 	private function show() : Void {
 
-		var goHome : Bool = false;
+		var goHome : Bool = true;
 
-		if (state.serviceList == null) {
-
-			goHome = true;
-		
-		} else {
+		if (state.serviceList != null) {
 
 			for (s in state.serviceList) {
 
-				if (!s.isLoggedIn) {
+				if (s.isLoggedIn) {
 
-					goHome = true;
+					goHome = false;
 					break;
 				}
 			}
 		}
-		if (goHome) {
+		if (goHome || state.currentFileList == null) {
 
 			application.setLoaderDisplayed(true);
 
@@ -851,14 +847,7 @@ class Controller {
 
 		} else {
 
-			if (state.currentFileList == null) {
-
-				application.setHomeDisplayed(true);
-			
-			} else {
-
-				application.setFileBrowserDisplayed(true);
-			}
+			application.setFileBrowserDisplayed(true);
 		}
 
 		state.displayState = true;

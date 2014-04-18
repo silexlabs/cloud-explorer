@@ -22,7 +22,7 @@ class Json2Account {
 	static public function parseAccount(? dataStr : String, ? obj : Dynamic) : Null<Account> {
 
 		if (obj == null) {
-trace(dataStr);
+
 			if (dataStr == null) return null;
 
 			obj = Json.parse( dataStr );
@@ -30,7 +30,7 @@ trace(dataStr);
 
 		return {
 			displayName: Json2Primitive.node2String(obj, "display_name", false),
-			quotaInfo: parseQuotaInfo(Reflect.field(obj, "quota_info"))
+			quotaInfo: Reflect.hasField(obj, "quota_info") ? parseQuotaInfo(Reflect.field(obj, "quota_info")) : null
 		};
 	}
 

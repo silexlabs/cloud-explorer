@@ -115,7 +115,7 @@ body, input[type="text"] {
 
 		span {
 			display: inline-block;
-			font-size: 20px; margin-top: 200px;
+			font-size: 20px; margin-top: 180px;
 		}
 		ul {
 			display: block; width: 400px;
@@ -123,6 +123,9 @@ body, input[type="text"] {
 			li {
 				display: inline-block;
 				width: 100px; height: 100px;
+				vertical-align: top;
+				margin: 4px;
+				border-radius: 10px;
 			}
 			li.dropbox {
 				padding-top: 5px;
@@ -132,7 +135,16 @@ body, input[type="text"] {
 					weight: 500;
 				}
 				background: #007ee5 url('../images/default/dropbox-white.png') no-repeat 50% 70% / 70% auto;
-				border-radius: 10px;
+			}
+			li.www {
+				background: url('../images/default/www.png') no-repeat 50% 70% / 60% auto;
+				border: 2px solid #333333;
+				color: #333333;
+				padding-top: 5px;
+				font: {
+					size: 15px;
+					weight: 600;
+				}
 			}
 		}
 	}
@@ -249,6 +261,9 @@ body, input[type="text"] {
 				li.dropbox {
 
 					background: url("../images/default/dropbox.png") no-repeat 5% 50% / auto 50%;
+				}
+				li.www {
+					background: url('../images/default/www.png') no-repeat 5% 50% / auto 40%;
 				}
 			}
 		}

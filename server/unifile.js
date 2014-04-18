@@ -11,6 +11,13 @@ var unifile = require('unifile');
 // config
 var options = unifile.defaultConfig;
 
+// change www root
+options.www.ROOT = "../../../../bin/";
+
+options.www.USERS = {
+    "admin": "admin"
+}
+
 // add static folders
 options.staticFolders.push(
     // file browser
