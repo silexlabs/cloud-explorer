@@ -505,7 +505,7 @@ class Controller {
 						application.fileBrowser.addService(s.name, s.displayName);
 					}
 				}
-				if (lastConnectedService != null) {
+				if (lastConnectedService != null) { trace("1");
 
 					if (state.currentLocation == null) {
 
@@ -516,7 +516,9 @@ class Controller {
 
 					application.setFileBrowserDisplayed(true);
 
-				} else {
+				} else { trace("2");
+
+					application.setLogoutButtonDisplayed(false);
 
 					application.setHomeDisplayed(true);
 				}
