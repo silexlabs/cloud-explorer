@@ -1,7 +1,7 @@
 #Cloud Explorer, file picker for the cloud
-Cloud Explorer, your users pick their files from the cloud.
+Cloud Explorer enable your application or website users with picking their files from the cloud.
 
-This is a free and open source project [powered by Silex Labs](http://www.silexlabs.org/).
+Cloud Explorer is a free and open source project [powered by Silex Labs](http://www.silexlabs.org/).
 
 Authored by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alexandre Hoyau [@lexoyo](https://twitter.com/lexoyo).
 
