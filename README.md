@@ -1,5 +1,5 @@
 #Cloud Explorer, file picker for the cloud
-Cloud Explorer enable your application or website users with picking their files from the cloud.
+Cloud Explorer enables your application or website users with picking their files from the cloud.
 
 Cloud Explorer is a free and open source project [powered by Silex Labs](http://www.silexlabs.org/).
 
@@ -7,13 +7,15 @@ Authored by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alexand
 
 ##About Cloud Explorer
 
-Cloud Explorer aims to provide an open source client library that exposes the same API as [Ink File Picker API](https://developers.inkfilepicker.com/docs/web/).
+Cloud Explorer aims to provide an open source client library that exposes the same API as the [Ink File Picker API](https://developers.inkfilepicker.com/docs/web/).
 
 Cloud Explorer is the front end client of the [unifile](https://github.com/silexlabs/unifile) backend, a nodejs server which provides a unified access to cloud services. This project uses nodejs and those modules: express, dbox, express, googleapis, logger, node-oauth, oauth, path.
 
 The backend is in node.js and the front end is in Javascript. Cloud Explorer is written with [Haxe](http://www.haxe.org), enabling a modern and elegant syntax as well as a strong typed and more reliable javascript source code.
 
 The project is not mature yet and doesn't provide half of what is provided by Ink File Picker. It's however under constant development and will provide more and more of the IPF API every week plus some extra features we've found useful for our projects but that were not offered by IPF.
+
+Cloud Explorer is also skinable with CSS and hostable in house.
 
 ###Discussions
 
@@ -39,8 +41,8 @@ Cloud Explorer is licensed under the MIT license.
 Prerequisite :
 
 * [node.js](http://nodejs.org/) installed
-* [NPM installed](https://npmjs.org/)
-* [Haxe compiler installed](http://haxe.org/download)
+* [NPM](https://npmjs.org/) installed
+* [Haxe compiler](http://haxe.org/download) installed
 
 Cloud Explorer default development environment uses [grunt](http://gruntjs.com/) (nodejs), [compass](http://compass-style.org/) and few other little tools that aim to make developping CE easier and faster.
 
@@ -92,7 +94,7 @@ To install and use Cloud Explorer in your projects, follow those steps :
 </html>
 ```
 
- - To use it from your project js code, first initalize a Cloud Explorer instance:
+ - To use it from your project js code, first initialize a Cloud Explorer instance:
 ```
 window.document.onload = function(e){
 
@@ -100,7 +102,7 @@ window.document.onload = function(e){
 }
 ```
 
-Note that you can also precise the iframe element id that will be used by Cloud Explorer:
+Note that you can also precise the iframe element id that will be used by Cloud Explorer. If not specified, one will be automatically generated.
 ```
 (...)
 		<iframe id="ce-js"
@@ -118,7 +120,7 @@ Note that you can also precise the iframe element id that will be used by Cloud 
 </script>
 ```
 
- - You then will be able to call it like you would call Ink File Picker:
+ - You will then be able to call it like you would call Ink File Picker:
 ```
 cloudExplorer.pick(function(b){
 
@@ -201,7 +203,7 @@ No option supported yet.
 
 ### Roadmap
 
-Current version is 1.0. It is a complete refactoring of the previous O.1 version that was dependant on JQuery and AngularJS. Version 1.0 has no client side dependency and is implemented with Haxe, allowing future ports of the basecode to native mobile/desktop, Flash/AIR, ...
+Current version is 1.0. It is a complete refactoring of the previous 0.1 version that was dependant on JQuery and AngularJS. Version 1.0 has no client side dependency and is implemented with Haxe, allowing future ports of the basecode to native mobile/desktop, Flash/AIR, ...
 
 The goals of version 1.1 are simple: implement the full Ink File Picker API (web version).
 
@@ -210,8 +212,8 @@ The goals of version 1.1 are simple: implement the full Ink File Picker API (web
 We love contributions and consider all kind of pull requests:
 
 * new themes or improvments of existing default theme
-* new components or functionnality
-* improvments of the documentations
+* new components or functionnalities
+* additions to the documentation
 * bug reports, fixes
 * any idea or suggestion
 
