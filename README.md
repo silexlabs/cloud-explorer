@@ -127,4 +127,92 @@ cloudExplorer.pick(function(b){
     }, function(e){ console.log("error " + JSON.stringify(e)); });
 ``` 
 
+## Current implementation state and roadmap
+
+### Currently supported cloud services
+
+* hosting server (www), transfer files from and to your own unifile server
+* [Dropbox](http://www.dropbox.com)
+
+More to come soon...
+
+### Currently supported features
+
+The currently implemented part of the IPF API in Cloud Explorer consists of:
+
+* [CEBlob](https://developers.inkfilepicker.com/docs/web/#inkblob)
+
+Supported fields: url, filename, mimetype, size
+
+Other fields will return null.
+
+* [Pick Files](https://developers.inkfilepicker.com/docs/web/#pick)
+```
+cloudExplorer.pick(function(b){
+
+        currentBlob = b;
+
+        textarea.val(textarea.val() + "\ncurrentBlob: " + JSON.stringify(currentBlob));
+
+    }, function(e){ console.log("error " + JSON.stringify(e)); });
+```
+
+No option supported yet. Will just pick a file from your favorite cloud service and give back a CEBlob instance.
+
+
+* [Read Files](https://developers.inkfilepicker.com/docs/web/#read)
+```
+cloudExplorer.exportFile(currentBlob, { mimetype: "text/html" }, function(b){
+
+        currentBlob = b;
+
+        textarea.val(textarea.val() + "\ncurrentBlob is now: " + JSON.stringify(currentBlob));
+
+    }, function(e){ console.log("error " + JSON.stringify(e)); });
+```
+
+Supported options are: mimetype, extension.
+
+This function doesn't work exactly like the IFP yet as it will need a call to write() after the call to export() to actually write the file. For now, it will just generate a CEBlob instance corresponding to the new file you want to create/store.
+
+* [Write back to a file](https://developers.inkfilepicker.com/docs/web/#write)
+```
+cloudExplorer.write(currentBlob, "write() test succeeded", function(ceb){
+
+        currentBlob = ceb;
+
+        textarea.val(textarea.val() + "\nwrite operation successful!");
+
+    }, function(e){ console.log("error " + JSON.stringify(e)); });
+```
+
+No option supported yet.
+
+* [Export](https://developers.inkfilepicker.com/docs/web/#export)
+```
+cloudExplorer.read(currentBlob, function(d){
+
+        textarea.val(textarea.val() + "\nread data: " + d);
+
+    }, function(e){ console.log("error " + JSON.stringify(e)); });
+```
+
+No option supported yet.
+
+### Roadmap
+
+Current version is 1.0. It is a complete refactoring of the previous O.1 version that was dependant on JQuery and AngularJS. Version 1.0 has no client side dependency and is implemented with Haxe, allowing future ports of the basecode to native mobile/desktop, Flash/AIR, ...
+
+The goals of version 1.1 are simple: implement the full Ink File Picker API (web version).
+
+## Contributions
+
+We love contributions and consider all kind of pull requests:
+
+* new themes or improvments of existing default theme
+* new components or functionnality
+* improvments of the documentations
+* bug reports, fixes
+* any idea or suggestion
+
 
