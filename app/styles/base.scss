@@ -194,7 +194,14 @@ html, body {
 								display: inline-block;
 							}
 						}
-					} 
+					}
+					li.new {
+
+						input[type="text"] {
+
+							display: inline-block;
+						}
+					}
 				}
 			}
 			.controls {

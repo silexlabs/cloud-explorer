@@ -135,7 +135,11 @@ class Controller {
 
 	public function setError(msg : String) : Void {
 
-		trace("ERROR "+msg);
+		application.setLoaderDisplayed(false); // FIXME should this be there ?
+trace("ERROR HAPPENED");
+		application.alertPopup.setMsg(msg, 0, [{ msg: "Continue", cb: function() { application.setAlertPopupDisplayed(false); }}]);
+
+		application.setAlertPopupDisplayed(true);
 	}
 
 	///
