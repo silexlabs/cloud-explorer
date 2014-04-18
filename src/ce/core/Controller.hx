@@ -603,6 +603,8 @@ trace("ERROR HAPPENED");
 
 				application.fileBrowser.resetFileList();
 
+				application.setSelecting(false);
+
 				if (state.currentFileList == null) {
 
 					//application.fileBrowser.setEmptyMsgDisplay(true);
