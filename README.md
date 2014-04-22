@@ -162,7 +162,7 @@ cloudExplorer.pick(function(b){
 No option supported yet. Will just pick a file from your favorite cloud service and give back a CEBlob instance.
 
 
-* [Read Files](https://developers.inkfilepicker.com/docs/web/#read)
+* [Export](https://developers.inkfilepicker.com/docs/web/#export)
 ```
 cloudExplorer.exportFile(currentBlob, { mimetype: "text/html" }, function(b){
 
@@ -189,8 +189,8 @@ cloudExplorer.write(currentBlob, "write() test succeeded", function(ceb){
 ```
 
 No option supported yet.
+* [Read Files](https://developers.inkfilepicker.com/docs/web/#read)
 
-* [Export](https://developers.inkfilepicker.com/docs/web/#export)
 ```
 cloudExplorer.read(currentBlob, function(d){
 
