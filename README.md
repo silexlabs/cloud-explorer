@@ -127,7 +127,24 @@ cloudExplorer.pick(function(b){
         console.log("my Blob: " + JSON.stringify(b));
 
     }, function(e){ console.log("error " + JSON.stringify(e)); });
-``` 
+```
+
+#### Configuration
+
+To pass configuration variables to Cloud Explorer, specify the iframe it will use as described earlier:
+```
+        <iframe id="ce-js"
+                frameborder="no" 
+                scrolling="no"
+                allowfullscreen="yes"
+                data-ce-unifile-url="http://cloud-explorer.herokuapp.com/api/1.0/">
+
+        </iframe>
+```
+This will allow you to add the below supported configuration properties: 
+
+* data-ce-unifile-url: the url of the unifile root endpoint your instance of Cloud Explorer will use.
+
 
 ## Current implementation state and roadmap
 

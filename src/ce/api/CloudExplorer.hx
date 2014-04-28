@@ -118,14 +118,27 @@ trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 
 		var ceIframe : IFrameElement = iframeEltId != null ? cast js.Browser.document.getElementById(iframeEltId) : null;
 
+		var config : Config = new Config(); // TODO
+
 		if (ceIframe == null) {
 
 			ceIframe = js.Browser.document.createIFrameElement();
 
 			js.Browser.document.appendChild(ceIframe);
-		}
+		
+		} else {
 
-		var config : Config = new Config(); // TODO
+			if (ceIframe.src != null) {
+
+				for (ca in ceIframe.attributes) {
+
+					if (ca.nodeName.indexOf("data-ce-") == 0) {
+
+						config.readProperty(ca.nodeName.substr(8), ca.nodeValue);
+					}
+				}
+			}
+		}
 
 		ctrl = new Controller(config, ceIframe);
 	}
