@@ -450,4 +450,21 @@ body, input[type="text"] {
 			position: absolute; top: 0; left: 0;
 		}
 	}
+
+
+	/*
+		STYLING BY STATE
+	*/
+
+	&.browsing.single-file-exp-mode {
+		.dropzone {
+			display: none;
+		}
+		.list {
+			height: 428px;
+			ul {
+				height: 396px;
+			}
+		}
+	}
 }
