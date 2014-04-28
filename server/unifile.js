@@ -11,6 +11,12 @@ var unifile = require('unifile');
 // config
 var options = unifile.defaultConfig;
 
+//enabled unifile services
+options.services = [
+    'dropbox',
+    'www'
+];
+
 // change www root
 options.www.ROOT = "../../../../bin/";
 
