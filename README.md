@@ -48,7 +48,7 @@ Cloud Explorer default development environment uses [grunt](http://gruntjs.com/)
 
 For early testers and contributors, here are the setup steps to follow in order to run this version of CE:
 
- - git clone this branch on your local file system,
+* git clone this branch on your local file system,
 ```
 git clone git@github.com:silexlabs/cloud-explorer.git cloud-explorer
 
@@ -57,34 +57,40 @@ git fetch
 git checkout -b haxe-refactoring
 ```
 
- - run the following command in a terminal to install the nodejs dependencies:
+* run the following command in a terminal to install the nodejs dependencies:
 ```
 npm install
 ```
 
- - run the following command in a terminal to start the local server:
+* run the following command in a terminal to start the local server:
 ```
 grunt server
 ```
 
- - compile the haxe js sources
+* compile the haxe js sources
 ```
 haxe build.hxml
 ```
 
- - open your favorite HTML5 browser on http://localhost:6805/ to have the test page displayed. From there, click the buttons corresponding to the API functions you want to test. Some of them are not yet implemented.
+* open your favorite HTML5 browser on http://localhost:6805/ to have the test page displayed. From there, click the buttons corresponding to the API functions you want to test. Some of them are not yet implemented.
 
 ### Production
 
 To install and use Cloud Explorer in your projects, follow those steps :
 
- - include the Cloud Explorer javascript file in your web page:
+* compile the Cloud Explorer library out of this repository:
+```
+grunt
+```
+You will then find the full Cloud Explorer library under bin/web. Place the entire bin/web directory in a subdirectory of your web app project (you may rename web into cloud-explorer).
+
+* include the Cloud Explorer javascript file in your web page:
 ```
 <!DOCTYPE html>
 <html>
     <head>
         <title>My project</title>
-        <script src="scripts/cloud-explorer.js"></script>
+        <script src="cloud-explorer/scripts/cloud-explorer.js"></script>
     </head>
     <body>
 
@@ -93,8 +99,9 @@ To install and use Cloud Explorer in your projects, follow those steps :
     </body>
 </html>
 ```
+We assume that you've pasted the Cloud Explorer lib files in the cloud-explorer sub directory.
 
- - To use it from your project js code, first initialize a Cloud Explorer instance:
+* To use it from your project js code, first initialize a Cloud Explorer instance:
 ```
 window.document.onload = function(e){
 
@@ -120,7 +127,7 @@ Note that you can also precise the iframe element id that will be used by Cloud 
 </script>
 ```
 
- - You will then be able to call it like you would call Ink File Picker:
+* You will then be able to call it like you would call Ink File Picker:
 ```
 cloudExplorer.pick(function(b){
 
