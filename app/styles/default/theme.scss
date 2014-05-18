@@ -59,7 +59,11 @@ body, input[type="text"] {
 			background-color: black; opacity: .5;
 		}
 		div.txt {
-			width: 450px; margin: auto; padding: 14px;
+			position: absolute;
+			top: 50%; height: 80px; margin-top: -40px;
+			left: 50%; width: 450px; margin-left: -225px;
+			padding: 20px;
+			background-color: white;
 			opacity: 1; border-radius: 10px;
 			text-align: center;
 			font: {
@@ -67,11 +71,7 @@ body, input[type="text"] {
 			}
 		}
 	}
-	.loader {
-		padding-top: 40%;
-	}
 	.alertPopup {
-		padding-top: 50%;
 		div.txt {
 			.choice {
 			 	padding: 6px; margin: 2px;
@@ -91,11 +91,6 @@ body, input[type="text"] {
 			.choice:nth-of-type(2):hover {
 				background: green; color: #FFF;
 			}
-		}
-	}
-	.loader, .alertPopup {
-		div.txt {
-			background-color: white;
 		}
 	}
 	.alertPopup.warning {
@@ -189,21 +184,21 @@ body, input[type="text"] {
 		position: absolute; z-index: 110;
 		top: 0; left: 0;
 		width: 100%; height: 100%;
-		padding-top: 330px;
 		background-color: rgba(0,0,0,.4); border-radius: 15px;
-		color: #727271;
-		text-align: center;
-		font: {
-			weight: bold;
-			size: 20px;
-		}
+
 		div {
-			display: block;
-			margin: auto; margin-top: -60px;
-			width: 450px;
+			position: absolute;
+			top: 50%; height: 80px; margin-top: -40px;
+			left: 50%; width: 450px; margin-left: -225px;
 			padding: 20px;
 			background-color: #FFFFFF;
 			border-radius: 10px;
+			color: #727271;
+			text-align: center;
+			font: {
+				weight: bold;
+				size: 20px;
+			}
 		}
 	}
 
