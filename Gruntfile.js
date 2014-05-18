@@ -18,7 +18,8 @@ module.exports = function (grunt) {
         yeoman: {
             app: 'app',
             dist: 'bin/web',
-            native: 'bin/native'
+            native: 'bin/native',
+            heroku: '../heroku'
         },
         watch: {
             compass: {
@@ -84,6 +85,17 @@ module.exports = function (grunt) {
             }
         },
         clean: {
+            heroku: {
+                options: { force: true },
+                files: [{
+                    dot: true,
+                    src: [
+                        '.tmp',
+                        '<%= yeoman.heroku %>/app/*',
+                        '!<%= yeoman.heroku %>/app/.git*'
+                    ]
+                }]
+            },
             dist: {
                 files: [{
                     dot: true,
@@ -259,6 +271,36 @@ module.exports = function (grunt) {
         },
         // Put files not handled in other tasks here
         copy: {
+            heroku: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.app %>',
+                    dest: '<%= yeoman.heroku %>/app/',
+                    src: [
+                        'scripts/*.js',
+                        'cloud-explorer.html',
+                        'demo.html',
+                        '*.{ico,png,txt}',
+                        '.htaccess',
+                        'images/{,*/}*.{webp,gif}',
+                        'fonts/{,*/}*.*',
+                        'cloud-explorer.swf',
+                        'images/{,*/}*.{png,jpg,jpeg}'
+                        //'bower_components/font-awesome/fonts/*'
+                    ]
+                },
+                // needed as we don't use cssmin anymore
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '.tmp',
+                    dest: '<%= yeoman.heroku %>/app/',
+                    src: [
+                        'styles/cloud-explorer.css'
+                    ]
+                }]
+            },
             dist: {
                 files: [{
                     expand: true,
@@ -271,14 +313,12 @@ module.exports = function (grunt) {
                         '*.{ico,png,txt}',
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}',
-                        'styles/fonts/{,*/}*.*',
-                        'styles/font-awesome/fonts/{,*/}*.*',
+                        'fonts/{,*/}*.*',
                         'cloud-explorer.swf',
                         'images/{,*/}*.{png,jpg,jpeg}'
                         //'bower_components/font-awesome/fonts/*'
                     ]
                 },
-
                 // needed as we don't use cssmin anymore
                 {
                     expand: true,
@@ -288,9 +328,7 @@ module.exports = function (grunt) {
                     src: [
                         'styles/cloud-explorer.css'
                     ]
-                }
-
-                ]
+                }]
             },
             styles: {
                 expand: true,
@@ -394,6 +432,16 @@ module.exports = function (grunt) {
         //'copy:styles',
         //'rev',
         //'usemin'
+    ]);
+
+    grunt.registerTask('heroku', [
+        'clean:heroku',
+        'haxe:build',
+        'useminPrepare',
+        'concurrent:dist',
+        'autoprefixer',
+        'concat',
+        'copy:heroku'
     ]);
 
     grunt.registerTask('default', [

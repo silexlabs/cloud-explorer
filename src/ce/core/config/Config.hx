@@ -17,7 +17,7 @@ TODO
 */
 class Config {
 
-	static inline var PROP_NAME_UNIFILE_ENDPOINT : String = "unfile-url";
+	static inline var PROP_NAME_UNIFILE_ENDPOINT : String = "unifile-url";
 
 	static inline var PROP_VALUE_DEFAULT_UNIFILE_ENDPOINT : String = "http://localhost:6805/api/1.0/";
 
