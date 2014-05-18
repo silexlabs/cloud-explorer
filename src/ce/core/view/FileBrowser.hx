@@ -56,10 +56,13 @@ class FileBrowser {
 		this.newFolderInput = cast newFolderItem.querySelector("input");
 		newFolderInput.addEventListener("keydown", function(e : KeyboardEvent){
 
-				if (e.keyIdentifier.toLowerCase() == "enter") {
+				untyped {
+					if (e.keyIdentifier != null && e.keyIdentifier.toLowerCase() == "enter" ||
+						e.key != null && e.key.toLowerCase() == "enter") {
 
-			        onNewFolderName();
-			    }
+				        onNewFolderName();
+				    }
+				}
 			});
 		newFolderInput.addEventListener("focusout", function(?_){ onNewFolderName(); });
 		
