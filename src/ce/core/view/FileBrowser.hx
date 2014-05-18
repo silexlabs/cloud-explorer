@@ -323,11 +323,13 @@ class FileListItem {
 
 		this.renameInput = cast elt.querySelector("input[type='text']");
 		renameInput.addEventListener("keydown", function(e : KeyboardEvent){
+				untyped {				
+					if (e.keyIdentifier != null && e.keyIdentifier.toLowerCase() == "enter" ||
+						e.key != null && e.key.toLowerCase() == "enter") {
 
-				if (e.keyIdentifier.toLowerCase() == "enter") {
-
-					elt.toggleClass(CLASS_RENAMING, false);
-					onRenameRequested();
+						elt.toggleClass(CLASS_RENAMING, false);
+						onRenameRequested();
+					}
 				}
 			});
 		renameInput.addEventListener("focusout", function(?_){

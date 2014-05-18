@@ -60,7 +60,7 @@ body, input[type="text"] {
 		}
 		div.txt {
 			position: absolute;
-			top: 50%; height: 80px; margin-top: -40px;
+			top: 50%;
 			left: 50%; width: 450px; margin-left: -225px;
 			padding: 20px;
 			background-color: white;
@@ -71,8 +71,14 @@ body, input[type="text"] {
 			}
 		}
 	}
+	.loader {
+		div.txt {
+			height: 80px; margin-top: -40px;
+		}
+	}
 	.alertPopup {
 		div.txt {
+			height: 160px; margin-top: -80px;
 			.choice {
 			 	padding: 6px; margin: 2px;
 				cursor: pointer;
