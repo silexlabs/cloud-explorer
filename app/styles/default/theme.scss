@@ -347,6 +347,14 @@ body, input[type="text"] {
 							background-position: -528px 0;
 						}
 					}
+					li.nosel {
+						input[type="checkbox"] {
+							display: none;
+						}
+						.fileName {
+							margin-left: 25px;
+						}
+					}
 					li:hover {
 						button {
 							display: inline-block;

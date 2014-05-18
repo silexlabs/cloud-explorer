@@ -615,7 +615,7 @@ trace("ERROR HAPPENED");
 
 					if (state.currentLocation.path != "/") {
 
-						application.fileBrowser.addFolder("..", "..");
+						application.fileBrowser.addFolder("..", "..", null, false);
 					}
 
 					for (fid in state.currentFileList.keys()) {

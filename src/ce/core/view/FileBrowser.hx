@@ -172,7 +172,7 @@ class FileBrowser {
 		}
 	}
 
-	public function addFolder(id : String, name : String, ? lastUpdate : Null<Date>) : Void {
+	public function addFolder(id : String, name : String, ? lastUpdate : Null<Date>, ? selectable : Bool = true) : Void {
 
 		var newItem : Element = cast folderItemTmpl.cloneNode(true);
 
@@ -183,6 +183,7 @@ class FileBrowser {
 		fli.onDeleteClicked = function() { onFileDeleteClicked(id); }
 		fli.onRenameRequested = function() { onFileRenameRequested(id, fli.renameValue); }
 		fli.onCheckedStatusChanged = function() { onFileCheckedStatusChanged(id); }
+		fli.selectable = selectable;
 
 		fileListItems.push(fli);
 
@@ -300,9 +301,22 @@ class FileBrowser {
 
 			});
 
+		var parentFolderItem : Null<FileListItem> = null;
+
 		for (fit in fileListItems) {
 
-			fileListElt.insertBefore(fit.elt, newFolderItem);
+			if (fit.name == "..") {
+			
+				parentFolderItem = fit;
+			
+			} else {
+			
+				fileListElt.insertBefore(fit.elt, newFolderItem);
+			}
+		}
+		if (parentFolderItem != null && fileListItems[0] != parentFolderItem) {
+
+			fileListElt.insertBefore(parentFolderItem.elt, fileListItems[0].elt);
 		}
 	}
 }
@@ -310,6 +324,7 @@ class FileBrowser {
 class FileListItem {
 
 	static inline var CLASS_RENAMING : String = "renaming";
+	static inline var CLASS_NOT_SELECTABLE : String = "nosel";
 
 	public function new(elt : Element) {
 
@@ -379,6 +394,8 @@ class FileListItem {
 
 	@:isVar public var lastUpdate (get, set) : Date;
 
+	public var selectable (get, set) : Bool;
+
 	///
 	// GETTERS / SETTERS
 	//
@@ -436,7 +453,23 @@ class FileListItem {
 		if (v != null) {
 
 			dateElt.textContent = DateTools.format(lastUpdate, "%d/%m/%Y"); // FIXME "%x %X" not implemented yet in haxe/js
+		
+		} else {
+
+			dateElt.innerHTML = "&nbsp;";
 		}
+		return v;
+	}
+
+	public function get_selectable() : Bool {
+
+		return !elt.hasClass(CLASS_NOT_SELECTABLE);
+	}
+
+	public function set_selectable(v : Bool) : Bool {
+
+		elt.toggleClass(CLASS_NOT_SELECTABLE, !v);
+
 		return v;
 	}
 
