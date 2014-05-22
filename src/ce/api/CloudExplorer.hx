@@ -124,7 +124,7 @@ trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 
 			ceIframe = js.Browser.document.createIFrameElement();
 
-			js.Browser.document.appendChild(ceIframe);
+			js.Browser.document.body.appendChild(ceIframe);
 		
 		} else {
 
