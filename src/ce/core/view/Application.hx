@@ -11,6 +11,8 @@
  */
 package ce.core.view;
 
+import ce.core.config.Config;
+
 import js.Browser;
 import js.html.Element;
 
@@ -49,12 +51,15 @@ class Application {
 	static inline var SELECTOR_NEW_FOLDER_BTN : String = ".newFolderBtn";
 	static inline var SELECTOR_DELETE_BTN : String = ".deleteBtn";
 
-	public function new(iframe : js.html.IFrameElement) {
+	public function new(iframe : js.html.IFrameElement, config : Config) {
 
 		this.iframe = iframe;
+		this.config = config;
 
 		initFrame();
 	}
+
+	var config : Config;
 
 	var iframe : js.html.IFrameElement;
 
@@ -297,14 +302,14 @@ trace("current UI mode is: "+cms);
 	private function initFrame() : Void {
 
 		// init iframe
-		iframe.style.display = "none"; trace("initFrame");
+		iframe.style.display = "none";
 		iframe.style.position = "absolute";
 		iframe.style.top = iframe.style.left = "0";
 		iframe.style.width = iframe.style.height = "100%";
 
 		iframe.onload = function(?_){ initElts(); }
 
-		iframe.src = "cloud-explorer.html";
+		iframe.src = config.path + "cloud-explorer.html";
 	}
 
 	private function initElts() : Void {

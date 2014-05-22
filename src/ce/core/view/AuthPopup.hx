@@ -30,7 +30,7 @@ class AuthPopup {
 		linkElt.addEventListener("click", function(?_){ onClicked(); });
 
 		this.textElt = elt.querySelector(SELECTOR_TEXT);
-		this.txtTmpl = textElt.textContent; trace("txtTmpl= "+txtTmpl);
+		this.txtTmpl = textElt.textContent;
 	}
 
 	var elt : Element;

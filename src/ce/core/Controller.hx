@@ -44,7 +44,7 @@ class Controller {
 		this.unifileSrv = new UnifileSrv(config);
 		this.fileSrv = new FileSrv();
 
-		this.application = new Application(iframe);
+		this.application = new Application(iframe, config);
 
 		initMvc();
 	}

@@ -19,7 +19,11 @@ class Config {
 
 	static inline var PROP_NAME_UNIFILE_ENDPOINT : String = "unifile-url";
 
+	static inline var PROP_NAME_CE_PATH : String = "path";
+
 	static inline var PROP_VALUE_DEFAULT_UNIFILE_ENDPOINT : String = "http://localhost:6805/api/1.0/";
+
+	static inline var PROP_VALUE_DEFAULT_CE_PATH : String = "";
 
 	public function new() { }
 
@@ -28,6 +32,11 @@ class Config {
 	 * @see https://github.com/silexlabs/unifile/
 	 */
 	public var unifileEndpoint (default, null) : String = PROP_VALUE_DEFAULT_UNIFILE_ENDPOINT;
+
+	/**
+	 * The cloud-explorer/ folder path
+	 */
+	public var path (default, null) : String = PROP_VALUE_DEFAULT_CE_PATH;
 
 	///
 	// API
@@ -40,6 +49,10 @@ class Config {
 			case PROP_NAME_UNIFILE_ENDPOINT:
 
 				unifileEndpoint = value;
+
+			case PROP_NAME_CE_PATH:
+
+				path = value;
 
 			default:
 
