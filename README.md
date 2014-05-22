@@ -151,7 +151,7 @@ To pass configuration variables to Cloud Explorer, specify the iframe it will us
 This will allow you to add the below supported configuration properties: 
 
 * data-ce-unifile-url: the url of the unifile root endpoint your instance of Cloud Explorer will use.
-
+* data-ce-path: path to the folder containing the cloud-explorer files on your server.
 
 ## Current implementation state and roadmap
 
