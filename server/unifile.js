@@ -14,7 +14,8 @@ var options = unifile.defaultConfig;
 //enabled unifile services
 options.services = [
     'dropbox',
-    'www'
+    'www',
+    'ftp'
 ];
 
 // change www root

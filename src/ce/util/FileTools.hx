@@ -15,6 +15,8 @@ import haxe.ds.StringMap;
 
 class FileTools {
 
+	static public inline var DIRECTORY_MIME_TYPE : String = "text/directory";
+
 	/**
 	 * Thanks to Samuel Neff for this list of file extension to mime type mappings.
 	 * @see http://stackoverflow.com/a/3393525/1255091

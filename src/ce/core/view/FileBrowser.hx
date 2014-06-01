@@ -18,6 +18,7 @@ import js.html.KeyboardEvent;
 import haxe.ds.StringMap;
 
 using ce.util.HtmlTools;
+using ce.util.FileTools;
 
 class FileBrowser {
 
@@ -35,6 +36,7 @@ class FileBrowser {
 
 	static inline var CLASS_SORT_ORDER_ASC : String = "asc";
 	static inline var CLASS_SORT_ORDER_DESC : String = "desc";
+	static inline var CLASS_SELECT_FOLDER : String = "selectFolders";
 	static inline var CLASS_PREFIX_SORTBY : String = "sortby-";
 
 	public function new(elt : Element) {
@@ -77,6 +79,8 @@ class FileBrowser {
 		dateBtn.addEventListener("click", function(?_){ toggleSort("lastUpdate"); });
 
 		this.fileListItems = [];
+
+		this.filters = null;
 	}
 
 	var elt : Element;
@@ -95,6 +99,8 @@ class FileBrowser {
 	var newFolderInput : InputElement;
 
 	var srvItemElts : StringMap<Element>;
+
+	public var filters (default, set) : Null<Array<String>>;
 
 	public var fileListItems (default, null) : Array<FileListItem>;
 
@@ -118,6 +124,30 @@ class FileBrowser {
 	}
 
 
+	public function set_filters(v : Null<Array<String>>) : Null<Array<String>> {
+
+		if (filters == v) {
+
+			return v;
+		}
+		filters = v;
+
+		if (filters != null && filters.indexOf(ce.util.FileTools.DIRECTORY_MIME_TYPE) > -1) {
+
+			elt.toggleClass(CLASS_SELECT_FOLDER, true);
+		
+		} else {
+
+			elt.toggleClass(CLASS_SELECT_FOLDER, false);
+		}
+		for (f in fileListItems) {
+
+			applyFilters(f);
+		}
+		return filters;
+	}
+
+
 	///
 	// CALLBACKS
 	//
@@ -127,6 +157,8 @@ class FileBrowser {
 	public dynamic function onFileSelected(id : String) : Void { }
 
 	public dynamic function onFileClicked(id : String) : Void { }
+
+	public dynamic function onFileSelectClicked(id : String) : Void { }
 
 	public dynamic function onFileDeleteClicked(id : String) : Void { }
 
@@ -146,6 +178,7 @@ class FileBrowser {
 
 	}
 */
+
 	public function removeService(name : String) : Void {
 
 		srvListElt.removeChild(srvItemElts.get(name));
@@ -180,6 +213,7 @@ class FileBrowser {
 		fli.name = name;
 		fli.lastUpdate = lastUpdate;
 		fli.onClicked = function() { onFileClicked(id); }
+		fli.onSelectClicked = function() { onFileSelectClicked(id); }
 		fli.onDeleteClicked = function() { onFileDeleteClicked(id); }
 		fli.onRenameRequested = function() { onFileRenameRequested(id, fli.renameValue); }
 		fli.onCheckedStatusChanged = function() { onFileCheckedStatusChanged(id); }
@@ -208,6 +242,8 @@ class FileBrowser {
 
 		fileListItems.push(fli);
 
+		applyFilters(fli);
+
 		fileListElt.insertBefore(newItem, newFolderItem);
 	}
 	/*
@@ -224,6 +260,21 @@ class FileBrowser {
 	///
 	// INTERNALS
 	//
+
+	private function applyFilters(f : FileListItem) : Void {
+
+		if (f.type != FileTools.DIRECTORY_MIME_TYPE) {
+
+			if (filters == null || filters.indexOf(f.type) != -1) {
+
+				f.filteredOut = false;
+
+			} else {
+
+				f.filteredOut = true;
+			}
+		}
+	}
 
 	private function currentSortBy() : Null<String> {
 
@@ -325,6 +376,8 @@ class FileListItem {
 
 	static inline var CLASS_RENAMING : String = "renaming";
 	static inline var CLASS_NOT_SELECTABLE : String = "nosel";
+	static inline var CLASS_FILTERED_OUT : String = "filteredOut";
+	static inline var CLASS_FOLDER : String = "folder"; // not ideal we have this in 3 constants FIXME
 
 	public function new(elt : Element) {
 
@@ -367,6 +420,11 @@ class FileListItem {
 
 		this.deleteBtn = elt.querySelector("button.delete");
 		this.deleteBtn.addEventListener( "click", function(?_){ onDeleteClicked(); } );
+
+		this.selectBtn = elt.querySelector("button.select");
+		if (selectBtn != null) {
+			selectBtn.addEventListener( "click", function(?_){ onSelectClicked(); } );
+		}
 	}
 
 	var checkBoxElt : InputElement;
@@ -377,6 +435,7 @@ class FileListItem {
 
 	var renameBtn : Element;
 	var deleteBtn : Element;
+	var selectBtn : Null<Element>;
 
 	///
 	// PROPERTIES
@@ -395,6 +454,8 @@ class FileListItem {
 	@:isVar public var lastUpdate (get, set) : Date;
 
 	public var selectable (get, set) : Bool;
+
+	public var filteredOut (get, set) : Bool;
 
 	///
 	// GETTERS / SETTERS
@@ -431,6 +492,10 @@ class FileListItem {
 
 	public function get_type() : String {
 
+		if (elt.hasClass(CLASS_FOLDER)) {
+
+			return FileTools.DIRECTORY_MIME_TYPE;
+		}
 		return typeElt.textContent;
 	}
 
@@ -473,6 +538,18 @@ class FileListItem {
 		return v;
 	}
 
+	public function get_filteredOut() : Bool {
+
+		return elt.hasClass(CLASS_FILTERED_OUT);
+	}
+
+	public function set_filteredOut(v : Bool) : Bool {
+
+		elt.toggleClass(CLASS_FILTERED_OUT, v);
+
+		return v;
+	}
+
 	///
 	// CALLBACKS
 	//
@@ -482,6 +559,8 @@ class FileListItem {
 	public dynamic function onDeleteClicked() : Void { }
 
 	public dynamic function onRenameRequested() : Void { }
+
+	public dynamic function onSelectClicked() : Void { }
 
 	public dynamic function onClicked() : Void { }
 }

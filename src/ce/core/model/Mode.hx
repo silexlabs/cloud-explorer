@@ -11,8 +11,11 @@
  */
 package ce.core.model;
 
+import ce.core.model.api.PickOptions;
+import ce.core.model.api.ExportOptions;
+
 enum Mode {
 
-	SingleFileSelection(onSuccess : CEBlob -> Void, onError : CEError -> Void);
-	SingleFileExport(onSuccess : CEBlob -> Void, onError : CEError -> Void, input : CEBlob, options : Null<ce.core.model.api.ExportOptions>);
+	SingleFileSelection(onSuccess : CEBlob -> Void, onError : CEError -> Void, options : Null<PickOptions>);
+	SingleFileExport(onSuccess : CEBlob -> Void, onError : CEError -> Void, input : CEBlob, options : Null<ExportOptions>);
 }

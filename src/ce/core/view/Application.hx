@@ -101,6 +101,8 @@ class Application {
 	public dynamic function onServiceClicked(name : String) : Void { }
 
 	public dynamic function onFileClicked(id : String) : Void { }
+	
+	public dynamic function onFileSelectClicked(id : String) : Void { }
 
 	public dynamic function onFileDeleteClicked(id : String) : Void { }
 
@@ -338,6 +340,7 @@ trace("current UI mode is: "+cms);
 		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
 		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
 		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
+		fileBrowser.onFileSelectClicked = function(id : String) { onFileSelectClicked(id); }
 		fileBrowser.onFileDeleteClicked = function(id : String) { onFileDeleteClicked(id); }
 		fileBrowser.onFileCheckedStatusChanged = function(id : String) { onFileCheckedStatusChanged(id); }
 		fileBrowser.onFileRenameRequested = function(id : String, value : String) { onFileRenameRequested(id, value); }

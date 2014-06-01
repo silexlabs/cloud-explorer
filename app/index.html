@@ -19,6 +19,8 @@
     <body>
 
         <button class="pickBtn">Pick</button>
+        <button class="pickImageBtn">Pick Image</button>
+        <button class="pickFolderBtn">Pick Folder</button>
         <button class="pickMultipleBtn">Pick Multiple</button>
         <button class="pickAndStoreBtn">Pick And Store</button>
         <button class="exportBtn">Export</button>
@@ -46,6 +48,28 @@
                     $('.pickBtn').click(function(){
 
                             cloudExplorer.pick(function(b){
+
+                                    currentBlob = b;
+
+                                    textarea.val(textarea.val() + "\ncurrentBlob: " + JSON.stringify(currentBlob));
+
+                                }, function(e){ console.log("error " + JSON.stringify(e)); });
+                        });
+                
+                    $('.pickImageBtn').click(function(){
+
+                            cloudExplorer.pick({ mimetype: "image/jpeg" }, function(b){
+
+                                    currentBlob = b;
+
+                                    textarea.val(textarea.val() + "\ncurrentBlob: " + JSON.stringify(currentBlob));
+
+                                }, function(e){ console.log("error " + JSON.stringify(e)); });
+                        });
+                
+                    $('.pickFolderBtn').click(function(){
+
+                            cloudExplorer.pick({ mimetype: "text/directory" }, function(b){
 
                                     currentBlob = b;
 

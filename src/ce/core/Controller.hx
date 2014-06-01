@@ -21,6 +21,7 @@ import ce.core.model.State;
 import ce.core.model.Location;
 import ce.core.model.Mode;
 
+import ce.core.model.api.PickOptions;
 import ce.core.model.api.ReadOptions;
 import ce.core.model.api.ExportOptions;
 import ce.core.model.api.WriteOptions;
@@ -62,9 +63,9 @@ class Controller {
 	// API
 	//
 
-	public function pick(? options : Dynamic, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
+	public function pick(? options : Null<PickOptions>, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
 
-		state.currentMode = SingleFileSelection(onSuccess, onError);
+		state.currentMode = SingleFileSelection(onSuccess, onError, options);
 
 		show();
 	}
@@ -225,6 +226,33 @@ trace("ERROR HAPPENED");
 				}
 			}
 
+		application.onFileSelectClicked = function(id : String) { // folder selection case
+
+				var f : ce.core.model.unifile.File = state.currentFileList.get(id);
+
+				switch (state.currentMode) {
+
+						case SingleFileSelection(onSuccess, onError, options) if (f.isDir):
+
+							onSuccess({
+									url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, f.name),
+									filename: f.name,
+									mimetype: ce.util.FileTools.DIRECTORY_MIME_TYPE,
+									size: null,
+									key: null, // FIXME not supported yet
+									container: null, // FIXME not supported yet
+									isWriteable: true, // FIXME not managed yet
+									path: state.currentLocation.path
+								});
+
+							hide();
+
+						default:
+
+							state.currentLocation.path += state.currentFileList.get(id).name + "/";
+					}
+			}
+
 		application.onFileClicked = function(id : String) {
 
 				if (id == "..") {
@@ -246,7 +274,7 @@ trace("ERROR HAPPENED");
 
 					switch (state.currentMode) {
 
-						case SingleFileSelection(onSuccess, onError) if (!f.isDir):
+						case SingleFileSelection(onSuccess, onError, options) if (!f.isDir):
 
 							onSuccess({
 									url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, f.name),
@@ -636,11 +664,75 @@ trace("ERROR HAPPENED");
 
 				if (state.currentMode != null) {
 
+					// reset file filtering
+					application.fileBrowser.filters = null;
+
 					switch (state.currentMode) {
 
-						case SingleFileSelection(onSuccess, onError):
+						case SingleFileSelection(onSuccess, onError, options):
 
-							// nothing specific...
+							if (options != null) {
+
+								if ((options.mimetype != null || options.mimetypes != null) &&
+									(options.extension != null || options.extensions != null)) {
+
+									throw "Cannot pass in both mimetype(s) and extension(s) parameters to the pick function";
+								}
+
+								var filters : Null<Array<String>> = null;
+
+								// check conflicts between filtering options
+								if (options.mimetype != null || options.mimetypes != null) {
+
+									if (options.mimetype != null) {
+
+										if (options.mimetypes != null) {
+
+											throw "Cannot pass in both mimetype and mimetypes parameters to the pick function";
+										}
+										filters = [options.mimetype];
+									
+									} else {
+
+										filters = options.mimetypes;
+									}
+
+								} else {
+
+									var extensions : Null<Array<String>> = null;
+
+									if (options.extension != null) {
+
+										if (options.extensions != null) {
+
+											throw "Cannot pass in both extension and extensions parameters to the pick function";
+										}
+										extensions = [options.extension];
+									
+									} else {
+
+										extensions = options.extensions;
+									}
+									if (extensions != null && extensions.length > 0) {
+
+										filters = [];
+
+										for (e in extensions) {
+
+											var mimetype : Null<String> = FileTools.getMimeType(e);
+											
+											if (mimetype != null && filters.indexOf(e) == -1) {
+
+												filters.push(mimetype);
+											}
+										}
+									}
+								}
+								if (filters != null) {
+trace("set filters= "+filters);
+									application.fileBrowser.filters = filters;
+								}
+							}
 
 						case SingleFileExport(onSuccess, onError, input, options):
 

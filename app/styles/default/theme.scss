@@ -149,6 +149,9 @@ body, input[type="text"] {
 					weight: 600;
 				}
 			}
+			li.ftp {
+				background: url('../images/default/ftp.png') no-repeat 50% 70% / 60% auto;
+			}
 		}
 	}
 
@@ -270,6 +273,9 @@ body, input[type="text"] {
 				li.www {
 					background: url('../images/default/www.png') no-repeat 8px 50% / auto 40%;
 				}
+				li.ftp {
+					background: url('../images/default/ftp.png') no-repeat 8px 50% / auto 40%;
+				}
 			}
 		}
 		.files {
@@ -336,9 +342,16 @@ body, input[type="text"] {
 						}
 						button {
 							display: none;
-							background: url("../images/default/editortoolbar.png") no-repeat;
 							width: 16px; height: 16px;
 							border: 0; padding: 0; margin-left: 10px;
+							cursor: pointer;
+						}
+						button.select {
+							background: url("../images/default/select.png") no-repeat;
+							background-size: auto 100%;
+						}
+						button.rename, button.delete {
+							background: url("../images/default/editortoolbar.png") no-repeat;
 						}
 						button.rename {
 							background-position: -336px 0;
@@ -356,7 +369,7 @@ body, input[type="text"] {
 						}
 					}
 					li:hover {
-						button {
+						button.rename, button.delete {
 							display: inline-block;
 						}
 					}
@@ -384,6 +397,9 @@ body, input[type="text"] {
 							padding-left: 20px;
 							cursor: pointer;
 						}
+					}
+					li.filteredOut {
+						display: none;
 					}
 				}
 			}
@@ -427,6 +443,19 @@ body, input[type="text"] {
 					}
 					.saveBtn {
 						background: green;
+					}
+				}
+			}
+		}
+		&.selectFolders {
+			.files {
+				.list {
+					ul {
+						li:hover {
+							button.select {
+								display: inline-block;
+							}
+						}
 					}
 				}
 			}

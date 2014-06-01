@@ -40,20 +40,18 @@ class CloudExplorer {
 	}
 
 	/**
+	 * filepicker.pick([options], onSuccess(CEBlob){}, onError(CEError){})
 	 * @see https://developers.inkfilepicker.com/docs/web/#pick
 	 */
-	public function pick(? options : Dynamic, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
+	public function pick(arg1 : Dynamic, arg2 : Dynamic, ? arg3 : Dynamic) {
 
-		if (onError == null) {
-
-			untyped onError = onSuccess;
-			untyped onSuccess = options;
-			options = null;
-		}
-		if (onError == null) {
+		if (arg1 == null || arg2 == null) {
 
 			throw "Missing mandatory parameters for CloudExplorer.pick(onSuccess : CEBlob -> Void, onError : CEError -> Void)";
 		}
+		var options : Null<PickOptions> = arg3 != null ? arg1 : null;
+		var onSuccess : CEBlob -> Void = options != null ? arg2 : arg1;
+		var onError : CEError -> Void = options != null ? arg3 : arg2;
 trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 		ctrl.pick(options, onSuccess, onError);
 	}
