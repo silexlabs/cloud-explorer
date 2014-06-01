@@ -719,7 +719,7 @@ trace("ERROR HAPPENED");
 
 										for (e in extensions) {
 
-											var mimetype : Null<String> = FileTools.getMimeType(e);
+											var mimetype : Null<String> = FileTools.getMimeType((e.indexOf('.') == 0) ? e : "." + e);
 											
 											if (mimetype != null && filters.indexOf(e) == -1) {
 
@@ -729,7 +729,7 @@ trace("ERROR HAPPENED");
 									}
 								}
 								if (filters != null) {
-trace("set filters= "+filters);
+
 									application.fileBrowser.filters = filters;
 								}
 							}
