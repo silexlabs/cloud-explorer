@@ -18,7 +18,7 @@ options.services = [
 ];
 
 // change www root
-options.www.ROOT = "../../../../bin/";
+options.www.ROOT = __dirname + "/../bin/";
 
 options.www.USERS = {
     "admin": "admin"
@@ -29,11 +29,11 @@ options.staticFolders.push(
     // file browser
     {
             name: "/",
-            path: "../../../../app/"
+            path: __dirname + "/../app/"
     },
     {
             name: "/styles/",
-            path: "../../../../.tmp/styles/"
+            path: __dirname + "/../.tmp/styles/"
     }
 );
 
