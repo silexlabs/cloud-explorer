@@ -43,6 +43,7 @@ class Json2Service {
 				Json2Primitive.node2Bool(obj, "visible", false),
 				Json2Primitive.node2Bool(obj, "isLoggedIn", false),
 				Json2Primitive.node2Bool(obj, "isConnected", false),
+				Json2Primitive.node2Bool(obj, "isOAuth", false),
 				Reflect.hasField(obj, "user") ? Json2Account.parseAccount(null, Reflect.field(obj, "user")) : null
 			);
 	}

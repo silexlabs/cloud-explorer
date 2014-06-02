@@ -25,6 +25,12 @@ options.www.USERS = {
     "admin": "admin"
 }
 
+/**
+ * Cloud Explorer's Dropbox app config
+ */
+options.dropbox.app_key = 'vqtcc89busxsb4q';
+options.dropbox.app_secret = 'm5vzfg08a063gpt';
+
 // add static folders
 options.staticFolders.push(
     // file browser

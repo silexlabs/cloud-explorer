@@ -9,24 +9,22 @@
  * Copyrights SilexLabs 2013 - http://www.silexlabs.org/ -
  * License MIT
  */
-package ce.core.service;
+package ce.core.model.oauth;
 
-import haxe.Http;
+typedef OAuthResult = {
 
-class FileSrv {
-
-	public function new() { }
-
-	public function get(url : String, onSuccess : String -> Void, onError : String -> Void) : Void {
-
-		var http : Http = new Http(url);
-
-		http.onData = onSuccess;
-
-		http.onError = onError;
-
-		http.onStatus = function(s){ trace("status "+s); }
-
-		http.request(false);
-	}
+	/**
+	 * true if the user chooses not to authorize the application.
+	 */
+	@:optional var notApproved : Bool;
+	
+	/**
+	 * The request token that was just authorized. The request token secret isn't sent back.
+	 */
+	@:optional var oauthToken : String;
+	
+	/**
+	 * The user's unique Dropbox ID.
+	 */
+	@:optional var uid : String;
 }

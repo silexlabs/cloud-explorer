@@ -21,10 +21,13 @@ import ce.core.model.State;
 import ce.core.model.Location;
 import ce.core.model.Mode;
 
+import ce.core.model.oauth.OAuthResult;
 import ce.core.model.api.PickOptions;
 import ce.core.model.api.ReadOptions;
 import ce.core.model.api.ExportOptions;
 import ce.core.model.api.WriteOptions;
+
+import ce.core.parser.oauth.Str2OAuthResult;
 
 import ce.core.service.UnifileSrv;
 import ce.core.service.FileSrv;
@@ -194,23 +197,41 @@ trace("ERROR HAPPENED");
 
 								application.authPopup.setServerName(state.serviceList.get(name).displayName);
 
-								application.authPopup.onClicked = function(){
+								application.authPopup.onClicked = function() {
 
-										application.onAuthorizationWindowBlocked = function(){
+										application.onAuthorizationWindowBlocked = function() {
 
 												application.setAuthPopupDisplayed(false);
 
 												setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
 											}
 
-										application.onServiceAuthorizationDone = function() {
+										application.onServiceAuthorizationDone = function(? result : Null<OAuthResult>) {
 
 												application.setAuthPopupDisplayed(false);
 
-												login(name);
+												if (state.serviceList.get(name).isOAuth) {
+
+													if (result != null && result.notApproved != true) {
+
+														login(name);
+
+													} else {
+
+														application.setLoaderDisplayed(false);
+													}
+
+												} else {
+
+													login(name);
+												}
 											}
 
-										application.openAuthorizationWindow(cr.authorizeUrl);
+										var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
+																	+ 'oauth_callback=' + StringTools.urlEncode(application.location
+																		+ '/' + config.path + '/oauth-cb.html');
+
+										application.openAuthorizationWindow(authUrl);
 									}
 
 								application.setAuthPopupDisplayed(true);

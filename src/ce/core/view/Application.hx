@@ -11,6 +11,9 @@
  */
 package ce.core.view;
 
+import ce.core.model.oauth.OAuthResult;
+import ce.core.parser.oauth.Str2OAuthResult;
+
 import ce.core.config.Config;
 
 import js.Browser;
@@ -20,6 +23,17 @@ using ce.util.HtmlTools;
 using StringTools;
 
 class Application {
+
+	static var oauthCbListener : String -> Void;
+
+	@:expose('CEoauthCb')
+	static function oauthCb(pStr : String) : Void { // FIXME this prevents from multi-instancing
+
+		if (oauthCbListener != null) {
+
+			oauthCbListener(pStr);
+		}
+	}
 
 	static inline var PLACE_HOLDER_LOGOUT_NAME : String = "{name}";
 
@@ -57,6 +71,8 @@ class Application {
 		this.config = config;
 
 		initFrame();
+
+		oauthCbListener = listenOAuthCb;
 	}
 
 	var config : Config;
@@ -69,21 +85,6 @@ class Application {
 	var logoutContentTmpl : String;
 
 	var closeBtn : Element;
-
-
-	public var home (default, null) : Home;
-
-	public var fileBrowser (default, null) : FileBrowser;
-
-	public var authPopup (default, null) : AuthPopup;
-
-	public var alertPopup (default, null) : AlertPopup;
-
-	public var breadcrumb (default, null) : Breadcrumb;
-
-	public var dropzone (default, null) : DropZone;
-
-	public var export (default, null) : Export;
 
 
 	///
@@ -114,7 +115,7 @@ class Application {
 
 	public dynamic function onAuthorizationWindowBlocked() : Void { }
 
-	public dynamic function onServiceAuthorizationDone() : Void { }
+	public dynamic function onServiceAuthorizationDone(? r : Null<OAuthResult>) : Void { }
 
 	public dynamic function onSaveExportClicked() : Void { }
 
@@ -134,6 +135,29 @@ class Application {
 	///
 	// API
 	//
+
+	public var home (default, null) : Home;
+
+	public var fileBrowser (default, null) : FileBrowser;
+
+	public var authPopup (default, null) : AuthPopup;
+
+	public var alertPopup (default, null) : AlertPopup;
+
+	public var breadcrumb (default, null) : Breadcrumb;
+
+	public var dropzone (default, null) : DropZone;
+
+	public var export (default, null) : Export;
+
+	public var location(get, null) : Null<String>;
+
+	public function get_location() : Null<String> {
+
+		if (iframe == null) return null;
+
+		return iframe.contentDocument.location.origin;
+	}
 
 	public function setLogoutButtonContent(v : Null<String>) : Void {
 
@@ -225,7 +249,7 @@ class Application {
 			var timer = new haxe.Timer(500);
 			
 			timer.run = function() {
-trace("authPopup= "+authPopup+"  authPopup.closed= "+authPopup.closed);
+//trace("authPopup= "+authPopup+"  authPopup.closed= "+authPopup.closed);
 					if (authPopup.closed) {
 
 						timer.stop();
@@ -239,7 +263,7 @@ trace("authPopup= "+authPopup+"  authPopup.closed= "+authPopup.closed);
 	public function setModeState(v : ce.core.model.Mode) : Void {
 
 		var cms : Null<String> = currentModeState();
-trace("current UI mode is: "+cms);
+//trace("current UI mode is: "+cms);
 		if (cms != null) {
 
 			rootElt.toggleClass(cms , false);
@@ -263,6 +287,13 @@ trace("current UI mode is: "+cms);
 	///
 	// INTERNALS
 	//
+
+	function listenOAuthCb(pStr : String) : Void {
+
+		var o : OAuthResult = Str2OAuthResult.parse(pStr);
+
+		onServiceAuthorizationDone(o);
+	}
 
 	function currentModeState() : Null<String> {
 
@@ -291,7 +322,7 @@ trace("current UI mode is: "+cms);
 
 	private function cleanPreviousState() : Void {
 
-		var cs : Null<String> = currentState(); trace("current state = "+cs);
+		var cs : Null<String> = currentState(); //trace("current state = "+cs);
 
 		rootElt.toggleClass(CLASS_AUTHORIZING, false);
 		
@@ -312,6 +343,8 @@ trace("current UI mode is: "+cms);
 		iframe.onload = function(?_){ initElts(); }
 
 		iframe.src = config.path + "cloud-explorer.html";
+
+		//Application.oauthCb = function(p : String) { trace("oauthCb p="+p); onServiceAuthorizationDone(p); } // FIXME that's not ideal and prevent from multi instancing
 	}
 
 	private function initElts() : Void {
