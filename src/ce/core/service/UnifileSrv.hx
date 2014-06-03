@@ -184,6 +184,9 @@ class UnifileSrv {
 
 	public function ls(srv : String, path : String, onSuccess : StringMap<File> -> Void, onError : String -> Void) : Void {
 
+		// on FF, ls// throws an error
+		path = path == '/' ? '' : path;
+
 		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LS.replace("{srv}", srv).replace("{path}", path));
 
 		http.onData = function(data : String) {
