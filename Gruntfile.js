@@ -280,6 +280,7 @@ module.exports = function (grunt) {
                     src: [
                         'scripts/*.js',
                         'cloud-explorer.html',
+                        'oauth-cb.html',
                         'demo.html',
                         '*.{ico,png,txt}',
                         '.htaccess',
@@ -310,6 +311,7 @@ module.exports = function (grunt) {
                     src: [
                         'scripts/*.js',
                         'cloud-explorer.html',
+                        'oauth-cb.html',
                         '*.{ico,png,txt}',
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}',

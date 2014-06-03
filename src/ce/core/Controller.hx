@@ -229,7 +229,8 @@ trace("ERROR HAPPENED");
 
 										var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
 																	+ 'oauth_callback=' + StringTools.urlEncode(application.location
-																		+ '/' + config.path + '/oauth-cb.html');
+																	+ (!application.location.endsWith('/') && !config.path.startsWith('/') ? '/' : '') + 
+																	config.path + (!config.path.endsWith('/') && config.path.length > 0 ? '/' : '') + 'oauth-cb.html');
 
 										application.openAuthorizationWindow(authUrl);
 									}
