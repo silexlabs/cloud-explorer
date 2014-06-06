@@ -68,7 +68,7 @@ class UnifileSrv {
 	public function generateUrl(srv : String, path : String, filename : String) : String {
 
 		return config.unifileEndpoint + ENDPOINT_GET.replace("{srv}", srv)
-													.replace("{uri}", path.length > 1 ? path + "/" + filename : filename);
+													.replace("{uri}", path.length > 1 ? path.substr(1) + filename : filename);
 	}
 
 	public function explodeUrl(url : String) : { srv : String, path : String, filename : String } {
