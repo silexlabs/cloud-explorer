@@ -27,12 +27,12 @@ Cloud Explorer is also skinable with CSS and hostable in house.
 
 Cloud Explorer is licensed under the MIT license.
 
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot01.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot02.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot03.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot04.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot05.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/haxe-refactoring/screenshot06.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot01.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot02.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot03.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot04.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot05.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot06.png)
 
 ##Setup
 
@@ -51,10 +51,6 @@ For early testers and contributors, here are the setup steps to follow in order 
 * git clone this branch on your local file system,
 ```
 git clone git@github.com:silexlabs/cloud-explorer.git cloud-explorer
-
-git fetch
-
-git checkout -b haxe-refactoring
 ```
 
 * run the following command in a terminal to install the nodejs dependencies:
