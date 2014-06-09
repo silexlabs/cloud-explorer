@@ -63,6 +63,7 @@ class Application {
 	static inline var SELECTOR_DROPZONE : String = ".dropzone";
 	static inline var SELECTOR_EXPORT : String = ".export";
 	static inline var SELECTOR_NEW_FOLDER_BTN : String = ".newFolderBtn";
+	static inline var SELECTOR_PARENT_FOLDER_BTN : String = ".parentFolderBtn";
 	static inline var SELECTOR_DELETE_BTN : String = ".deleteBtn";
 
 	public function new(iframe : js.html.IFrameElement, config : Config) {
@@ -80,11 +81,6 @@ class Application {
 	var iframe : js.html.IFrameElement;
 
 	var rootElt : Element;
-
-	var logoutBtn : Element;
-	var logoutContentTmpl : String;
-
-	var closeBtn : Element;
 
 
 	///
@@ -127,6 +123,8 @@ class Application {
 
 	public dynamic function onNewFolderClicked() : Void { }
 
+	public dynamic function onParentFolderClicked() : Void { }
+
 	public dynamic function onDeleteClicked() : Void { }
 
 	public dynamic function onNewFolderName() : Void { }
@@ -152,17 +150,15 @@ class Application {
 
 	public var location(get, null) : Null<String>;
 
-	public function get_location() : Null<String> {
+	public var closeBtn (default, null) : Button;
 
-		if (iframe == null) return null;
+	public var newFolderBtn (default, null) : Button;
 
-		return iframe.contentDocument.location.origin;
-	}
+	public var parentFolderBtn (default, null) : Button;
 
-	public function setLogoutButtonContent(v : Null<String>) : Void {
+	public var deleteBtn (default, null) : Button;
 
-		logoutBtn.textContent = logoutContentTmpl.replace(PLACE_HOLDER_LOGOUT_NAME, v != null ? v : "");
-	}
+	public var logoutBtn (default, null) : Button;
 
 	public function setDisplayed(v : Bool) : Void {
 
@@ -283,6 +279,17 @@ class Application {
 		}
 	}
 
+	///
+	// GETTER / SETTER
+	//
+
+	public function get_location() : Null<String> {
+
+		if (iframe == null) return null;
+
+		return iframe.contentDocument.location.origin;
+	}
+
 
 	///
 	// INTERNALS
@@ -352,12 +359,11 @@ class Application {
 		// select elements
 		rootElt = iframe.contentDocument.getElementById(ID_APPLICATION);
 
-		logoutBtn = rootElt.querySelector(SELECTOR_LOGOUT_BTN);
-		logoutContentTmpl = logoutBtn.textContent;
-		logoutBtn.addEventListener( "click", function(?_){ onLogoutClicked(); } );
+		logoutBtn = new Button(rootElt.querySelector(SELECTOR_LOGOUT_BTN));
+		logoutBtn.onClicked = onLogoutClicked;
 
-		closeBtn = rootElt.querySelector(SELECTOR_CLOSE_BTN);
-		closeBtn.addEventListener( "click", function(?_){ onCloseClicked(); } );
+		closeBtn = new Button(rootElt.querySelector(SELECTOR_CLOSE_BTN));
+		closeBtn.onClicked = onCloseClicked;
 
 		breadcrumb = new Breadcrumb(rootElt.querySelector(SELECTOR_BREADCRUMB));
 		breadcrumb.onNavBtnClicked = function(srv : String, path : String) { onNavBtnClicked(srv, path); }
@@ -386,11 +392,14 @@ class Application {
 
 		alertPopup = new AlertPopup(rootElt.querySelector(SELECTOR_ALERT_POPUP));
 
-		var newFolderBtnElt : Element = rootElt.querySelector(SELECTOR_NEW_FOLDER_BTN);
-		newFolderBtnElt.addEventListener("click", function(?_){ onNewFolderClicked(); });
+		newFolderBtn = new Button(rootElt.querySelector(SELECTOR_NEW_FOLDER_BTN));
+		newFolderBtn.onClicked = onNewFolderClicked;
 
-		var deleteBtnElt : Element = rootElt.querySelector(SELECTOR_DELETE_BTN);
-		deleteBtnElt.addEventListener("click", function(?_){ onDeleteClicked(); });
+		parentFolderBtn = new Button(rootElt.querySelector(SELECTOR_PARENT_FOLDER_BTN));
+		parentFolderBtn.onClicked = onParentFolderClicked;
+
+		deleteBtn = new Button(rootElt.querySelector(SELECTOR_DELETE_BTN));
+		deleteBtn.onClicked = onDeleteClicked;
 
 		rootElt.addEventListener("click", function(?_){ onClicked(); });
 

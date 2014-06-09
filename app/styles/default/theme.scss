@@ -1,43 +1,13 @@
 ul { margin: 0; padding: 0; list-style: none; }
 
 *, *:before, *:after { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+
 body, input[type="text"] {
 	font-family: 'Roboto', arial, sans-serif; font-size: 14px; color: #727271;
 }
 
-@font-face {
-	font-family: 'icomoon';
-	src:url('../fonts/icomoon.eot?-s81k15');
-	src:url('../fonts/icomoon.eot?#iefix-s81k15') format('embedded-opentype'),
-		url('../fonts/icomoon.woff?-s81k15') format('woff'),
-		url('../fonts/icomoon.ttf?-s81k15') format('truetype'),
-		url('../fonts/icomoon.svg?-s81k15#icomoon') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-[class^="icon-"], [class*=" icon-"] {
-	font-family: 'icomoon';
-	speak: none;font-style: normal;font-weight: normal;font-variant: normal;text-transform: none;line-height: 1;
-	/* Better Font Rendering =========== */
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-.icon-folder:before {content: "\e601";}
-.icon-add_folder:before {content: "\e602";}
-.icon-cloud:before {content: "\e603";}
-.icon-suppr:before {content: "\e604";}
-.icon-import:before {content: "\e605";}
-.icon-export:before {content: "\e606";}
-.icon-cloudexplorer:before {content: "\e600";}
-
-.clearfix:before, .clearfix:after { content: " "; display: table; }
-.clearfix:after { clear: both; }
-/* IE6/7 support */
-.clearfix { *zoom: 1; }
-
 .explorer-bg {
+
 	background-color: black; opacity: .5;
 	position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
 }
@@ -46,7 +16,8 @@ body, input[type="text"] {
 
 	position: relative; top: 50%; margin: auto; margin-top: -330px;
 	height: 660px; width: 80%; min-width: 640px;
-	background-color: white; opacity: 1; border-radius: 15px;
+	background-color: white; opacity: 1; border-radius: 5px;
+	overflow: hidden;
 
 	.loader, .alertPopup {
 
@@ -77,8 +48,11 @@ body, input[type="text"] {
 		}
 	}
 	.alertPopup {
+
 		div.txt {
+
 			height: 160px; margin-top: -80px;
+
 			.choice {
 			 	padding: 6px; margin: 2px;
 				cursor: pointer;
@@ -100,12 +74,16 @@ body, input[type="text"] {
 		}
 	}
 	.alertPopup.warning {
+
 		div.txt {
+
 			background-color: orange;
 		}
 	}
 	.alertPopup.error {
+
 		div.txt {
+
 			background-color: red;
 		}
 	}
@@ -123,69 +101,99 @@ body, input[type="text"] {
 			margin: auto; margin-top: 15px;
 			li {
 				display: inline-block;
-				width: 100px; height: 100px;
+				width: 110px; height: 110px;
 				vertical-align: top;
-				margin: 4px;
-				border-radius: 10px;
+				margin: 10px;
 				cursor: pointer;
 				user-select: none;
+				background: {
+					repeat: no-repeat;
+					size: auto 110px;
+					position: 0px 0px;
+				}
+			}
+			li:hover {
+				background-position: -110px 0px;
+			}
+			li:active {
+				background-position: -220px 0px;
 			}
 			li.dropbox {
-				padding-top: 5px;
-				color: white;
-				font: {
-					size: 18px;
-					weight: 500;
-				}
-				background: #007ee5 url('../images/default/dropbox-white.png') no-repeat 50% 70% / 70% auto;
+				background-image: url('../images/default/home-dropbox.png');
 			}
 			li.www {
-				background: url('../images/default/www.png') no-repeat 50% 70% / 60% auto;
-				border: 2px solid #333333;
-				color: #333333;
-				padding-top: 5px;
-				font: {
-					size: 15px;
-					weight: 600;
-				}
+				background-image: url('../images/default/home-www.png');
 			}
 			li.ftp {
-				background: url('../images/default/ftp.png') no-repeat 50% 70% / 60% auto;
+				background-image: url('../images/default/home-ftp.png');
 			}
 		}
 	}
 
 	.header {
 
-		background: #282828;
-		border-radius: 15px 15px 0px 0px;
-		color: #fff;
-		padding: 10px;
-		font-size: 20px;
-
-		img {
-			display: block;
-			margin-left: 25%;
+		position: relative; z-index: 2;
+		height: 104px;
+		background: {
+			color: #282828;
+			image: url('../images/default/ce-header.png');
+			repeat: no-repeat;
+			size: auto 70%;
+			position: 20px 50%;
 		}
-		button {
-			border: 0; padding: 0; margin-left: 15px;
-			float: right;
-			height: 30px;
-			cursor: pointer;
-			background: #282828;
-			color: #fff;
-		}
-		.closeBtn {
-			background: url("../images/default/close.png") no-repeat center center;
-			background-size: 11px 11px; width: 30px;
-			border: 2px solid #fff;
-			border-radius: 15px;
-		}
-	}
+		.controls {
 
-	.logoutBtn {
+			position: absolute; top: 26px; right: 10px;
+			width: 310px; height: 52px;
 
-		font-size: 16px;
+			button {
+
+				float:left;
+				width: 52px; height: 52px;
+				padding: 0; border: 0; margin: 0;
+				background-repeat: no-repeat;
+				background-position: 0px 0px;
+				background-color: transparent;
+				cursor: pointer;
+			}
+			button:hover {
+
+				background-position: -52px 0px;
+			}
+			button:active {
+
+				background-position: -104px 0px;
+			}
+			button:disabled {
+
+				background-position: -208px 0px;
+				cursor: not-allowed;
+			}
+			button.parentFolderBtn {
+
+				background-image: url('../images/default/btn-parent-folder.png');
+				margin-right: 10px;
+			}
+			button.newFolderBtn {
+
+				background-image: url('../images/default/btn-new-folder.png');
+				margin-right: 20px;
+			}
+			button.listItemsBtn {
+
+				background-image: url('../images/default/btn-list-items.png');
+				margin-right: 10px;
+			}
+			button.iconItemsBtn {
+
+				background-image: url('../images/default/btn-icon-items.png');
+				margin-right: 10px;
+			}
+			button.closeBtn {
+
+				background-image: url('../images/default/btn-close.png');
+			}
+		}
 	}
 	
 	.authPopup {
@@ -213,82 +221,90 @@ body, input[type="text"] {
 
 	.breadcrumb {
 
-		padding: 10px; padding-bottom: 0px;
+		padding: 6px; padding-left: 50px;
 		font-size: 14px;
+		background: url("../images/default/breadcrumb.png") no-repeat 10px 50% / auto 65%;
 
-		.path {
-
-			.pathIt {
-				font-style: italic;
-				cursor: pointer;
-				color: #727271;
-			}
-			.pathIt:hover {
-				text-decoration: underline;
-			}
+		.pathIt {
+			font-style: italic;
+			cursor: pointer;
+			color: #727271;
 		}
-		.title {
-			font-size: 22px;
-			color: #222;
-			padding: 10px 0 0 10px;
-
-			.icon-folder {
-
-				font-size: 32px;
-				color: #dd4b39;
-				vertical-align: middle;
-				margin-right: 5px;
-			}
+		.pathIt:hover {
+			text-decoration: underline;
 		}
 	}
 
 	.fileBrowser {
 
-		position: relative; width : 100%; height: 600px;
+		position: relative; width: 100%; height: 100%;
+		margin-top: -104px;
+		padding-top: 104px; padding-bottom: 52px;
 
 		.services, .files {
 
 			float: left;
 			overflow: hidden;
-			height: 557px;
+			height: 100%;
 		}
 		.services {
 
-			width: 15%; overflow-y: auto;
-			border-right: 1px solid rgb(229, 229, 229);
+			position: relative; width: 52px; z-index: 10;
+			border-right: 1px solid #282828;
 
 			ul {
-				height: 100%; overflow-y: auto;
+				height: 100%; width: 100%;
 
 				li {
-
-					height: 36px; padding-left: 30px; padding-top: 10px; padding-bottom: 10px;
-					user-select: none;
+					display: block; float: left;
+					height: 52px; width: 52px;
+					border-bottom: 1px solid #666666;
 					cursor: pointer;
+					background-repeat: no-repeat, no-repeat;
+					background-position: 32px 9px, 0px 0px;
+					background-size: 11px 11px, auto 52px;
+				}
+				li:hover {
+					background-position: 32px 9px, -52px 0px;
+				}
+				li:active {
+					background-position: 32px 9px, -104px 0px;
 				}
 				li.dropbox {
-
-					background: url("../images/default/dropbox.png") no-repeat 6px 50% / auto 50%;
+					background-image: url("../images/default/srv-state-disconnected.png"), url("../images/default/srv-dropbox.png");
+				}
+				li.dropbox.connected {
+					background-image: url("../images/default/srv-state-connected.png"), url("../images/default/srv-dropbox.png");
 				}
 				li.www {
-					background: url('../images/default/www.png') no-repeat 8px 50% / auto 40%;
+					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-www.png');
+				}
+				li.www.connected {
+					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-www.png');
 				}
 				li.ftp {
-					background: url('../images/default/ftp.png') no-repeat 8px 50% / auto 40%;
+					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-ftp.png');
+				}
+				li.ftp.connected {
+					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-ftp.png');
 				}
 			}
 		}
 		.files {
 
-			width: 85%;
+			position: absolute; width: 100%; top: 104px; left: 0;
+			padding-left: 52px;
 
 			.list {
 
-				display: block; height: 336px;
+				padding-left: 10px; padding-right: 10px;
+				display: block; height: 388px;
 
 				.titles {
 
-					color: #dd4b39; font-size: 14px; padding-top: 6px; padding-bottom: 10px;
+					color: #34B8EB; font-size: 14px; padding-top: 6px; padding-bottom: 6px;
+					border-top: 1px solid #34B8EB; border-bottom: 1px solid #34B8EB;
+
 					span {
 						display: inline-block;
 						cursor: pointer; user-select: none;
@@ -310,139 +326,124 @@ body, input[type="text"] {
 						float: right; text-align: center;
 					}
 				}
-				ul {
+				div.items {
+					height: 100%; padding-bottom: 30px;
+					ul {
+						height: 100%; overflow-y: auto;
+						user-select: none;
 
-					height: 304px; overflow-y: auto; border-top: 1px solid rgb(229, 229, 229);
-
-					li .fileName {
-						cursor: pointer;
-						-ms-text-overflow: ellipsis; /* Required for IE8 */ -o-text-overflow: ellipsis; /* Required for Opera */ text-overflow: ellipsis;
-					}
-					li .fileType {
-						width: 60px;
-					}
-					li .lastUpdate {
-						width: 150px;
-					}
-					li .fileType, li .lastUpdate {
-						float: right; text-align: center;
-					}
-					li span {
-						display: inline-block; overflow: hidden;
-						white-space: nowrap;
-					}
-					li {
-						clear: both; height: 36px; padding-top: 10px; padding-bottom: 10px;
-						border-bottom: 1px solid rgb(229, 229, 229);
-						input {
-							vertical-align: top;
-						}
-						input[type="text"] {
-							border: 0; margin: 0;
-						}
-						button {
-							display: none;
-							width: 16px; height: 16px;
-							border: 0; padding: 0; margin-left: 10px;
+						li .fileName {
 							cursor: pointer;
 						}
-						button.select {
-							background: url("../images/default/select.png") no-repeat;
-							background-size: auto 100%;
+						li .fileType {
+							width: 60px;
 						}
-						button.rename, button.delete {
-							background: url("../images/default/editortoolbar.png") no-repeat;
+						li .lastUpdate {
+							width: 150px;
 						}
-						button.rename {
-							background-position: -336px 0;
+						li .fileType, li .lastUpdate {
+							float: right; text-align: center;
 						}
-						button.delete {
-							background-position: -528px 0;
+						li span {
+							display: inline-block; overflow: hidden;
+							white-space: nowrap;
 						}
-					}
-					li.nosel {
-						input[type="checkbox"] {
-							display: none;
-						}
-						.fileName {
-							margin-left: 25px;
-						}
-					}
-					li:hover {
-						button.rename, button.delete {
-							display: inline-block;
-						}
-					}
-					.folder {
+						li {
+							clear: both; height: 35px; line-height: 35px;
+							border-bottom: 1px solid rgb(229, 229, 229);
+							-ms-text-overflow: ellipsis; -o-text-overflow: ellipsis; text-overflow: ellipsis;
 
-						span.fileName, input[type="text"] {
-
-							background: url('../images/default/folder.png') no-repeat;
-							padding-left: 20px;
-							cursor: pointer;
-						}
-						&.new {
-
+							span.icon {
+								width: 34px; height: 34px;
+								background: {
+									repeat: no-repeat;
+									size: auto 34px;
+									position: 0px 0px;
+								}
+							}
+							input, button, span {
+								vertical-align: middle;
+							}
+							span.fileName, input[type="text"] {
+								cursor: pointer;
+							}
 							input[type="text"] {
-
-								margin-left: 20px;
+								border: 0; margin: 0;
+							}
+							button {
+								display: none;
+								width: 16px; height: 16px;
+								border: 0; padding: 0; margin-left: 10px;
+								cursor: pointer;
+							}
+							button.select {
+								background: url("../images/default/select.png") no-repeat;
+								background-size: auto 100%;
+							}
+							button.rename, button.delete {
+								background: url("../images/default/editortoolbar.png") no-repeat;
+							}
+							button.rename {
+								background-position: -336px 0;
+							}
+							button.delete {
+								background-position: -528px 0;
 							}
 						}
-					}
-					.file {
-
-						span.fileName, input[type="text"] {
-
-							background: url('../images/default/file.png') no-repeat;
-							padding-left: 20px;
-							cursor: pointer;
+						li.nosel {
+							input[type="checkbox"] {
+								display: none;
+							}
+							.fileName {
+								margin-left: 25px;
+							}
 						}
-					}
-					li.filteredOut {
-						display: none;
-					}
-				}
-			}
-			.controls {
-
-				min-height: 60px;
-				padding: 10px 10px 10px 10px;
-				background: #b4dff8;
-				font-size: 18px;
-
-				button.newFolderBtn, button.deleteBtn, div.export .saveBtn, div.export .overwriteBtn {
-
-					border-radius: 5px; background: #fff; height: 40px; padding: 10px;
-					border: 0;
-					font: {
-						weight: 300;
-						size: 18px;
-					}
-					color: #444; text-transform: lowercase;
-				}
-				button.deleteBtn {
-
-					float: right;
-				}
-				button.newFolderBtn {
-
-					.icon-add_folder {
-
-						vertical-align: middle;
-						position: relative;
-						top: -2px;
-					}
-				}
-				div.export {
-
-					.saveBtn, .overwriteBtn {
-						color: #FFF;
-					}
-					.overwriteBtn {
-						background: orange;
-					}
-					.saveBtn {
-						background: green;
+						li:hover {
+							span.icon {
+								background-position: -34px 0px;
+							}
+							button.rename, button.delete {
+								display: inline-block;
+							}
+						}
+						li:active {
+							span.icon {
+								background-position: -68px 0px;
+							}
+						}
+						li.folder {
+							span.icon {
+								background-image: url('../images/default/icon-folder.png');
+							}
+							&.new {
+								input[type="text"] {
+									margin-left: 20px;
+								}
+							}
+						}
+						li.file {
+							span.icon {
+								background-image: url('../images/default/icon-file.png');
+							}
+						}
+						li.file.image {
+							span.icon {
+								background-image: url('../images/default/icon-image.png');
+							}
+						}
+						li.file.sound {
+							span.icon {
+								background-image: url('../images/default/icon-sound.png');
+							}
+						}
+						li.file.video {
+							span.icon {
+								background-image: url('../images/default/icon-video.png');
+							}
+						}
+						li.filteredOut {
+							display: none;
+						}
 					}
 				}
 			}
@@ -463,29 +464,79 @@ body, input[type="text"] {
 	}
 
 	.dropzone {
-		position: relative; height: 92px;
-		border-top: 1px solid rgb(229, 229, 229);
-		background: url("../images/default/dragzone.png") no-repeat center / auto 90%;
+
+		position: relative; height: 92px; z-index: 10;
+		border-top: 1px dashed #34B8EB;
+		background: url("../images/default/dropzone.png") no-repeat center / auto 50%;
 		text-align: center;
+		color: #34B7EA;
+
 		h2 {
-			top: 37px;
+			margin-top: 6px; margin-bottom: 10px;
 			position: relative;
 			font: {
 				weight: 300;
-				size: 115%;
+				size: 14pt;
 			}
-			color: #ccc;
-		}
-		div {
-			position: absolute; top: 0; left: 0; right: 0;
 		}
 		div, div button {
-			height: 100%; width: 100%;
-			opacity: 0; filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-			cursor: pointer;
+			position: absolute; top: 0; left: 0;
+			height: 100%; width: 100%; padding: 0; margin: 0; border: 0;
 		}
 		div button {
-			position: absolute; top: 0; left: 0;
+			background: transparent;
+			color: #34B7EA;
+			line-height : 150px;
+			font: {
+				weight: 300;
+				size: 11pt;
+			}
+			cursor: pointer;
+		}
+		div button:hover {
+			text-decoration: underline;
+		}
+		div input {
+			opacity: 0;
+		}
+	}
+
+	.footer {
+
+		position: relative; height: 52px;
+		margin-top: -52px;
+		background: #34B8EB;
+		border-top: 1px solid #282828;
+		text-align: center;
+
+		button.deleteBtn, div.export .saveBtn, div.export .overwriteBtn {
+
+			background: #fff; height: 40px; padding: 8px;
+			border: 0;
+			font: {
+				weight: 300;
+				size: 18px;
+			}
+			color: #444; text-transform: lowercase;
+		}
+		button.deleteBtn, div.export {
+			margin-top: 6px;
+		}
+		button.deleteBtn {
+
+			float: right; margin-right: 10px;
+		}
+		div.export {
+
+			.saveBtn, .overwriteBtn {
+				color: #FFF;
+			}
+			.overwriteBtn {
+				background: orange;
+			}
+			.saveBtn {
+				background: green;
+			}
 		}
 	}
 
@@ -493,6 +544,13 @@ body, input[type="text"] {
 	/*
 		STYLING BY STATE
 	*/
+
+	&.starting {
+		.header .controls {
+
+			width: 52px;
+		}
+	}
 
 	&.browsing.single-file-exp-mode {
 		.dropzone {

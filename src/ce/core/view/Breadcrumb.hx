@@ -17,31 +17,23 @@ using StringTools;
 
 class Breadcrumb {
 
-	static inline var SELECTOR_PATH : String = "span.path";
 	static inline var SELECTOR_PATH_ITEM_TMPL : String = "span.pathIt";
 	static inline var SELECTOR_PATH_SEP_TMPL : String = "span.sep";
-	static inline var SELECTOR_TITLE : String = ".title span";
 
 	public function new(elt : Element) {
 
 		this.elt = elt;
 
-		this.pathElt = elt.querySelector(SELECTOR_PATH);
-		this.pathItemTmpl = pathElt.querySelector(SELECTOR_PATH_ITEM_TMPL);
-		pathElt.removeChild(pathItemTmpl);
-		this.pathSepTmpl = pathElt.querySelector(SELECTOR_PATH_SEP_TMPL);
-		pathElt.removeChild(pathSepTmpl);
-	
-		this.titleElt = elt.querySelector(SELECTOR_TITLE);
+		this.pathItemTmpl = elt.querySelector(SELECTOR_PATH_ITEM_TMPL);
+		elt.removeChild(pathItemTmpl);
+		this.pathSepTmpl = elt.querySelector(SELECTOR_PATH_SEP_TMPL);
+		elt.removeChild(pathSepTmpl);
 	}
 
 	var elt : Element;
 
-	var pathElt : Element;
 	var pathItemTmpl : Element;
 	var pathSepTmpl : Element;
-
-	var titleElt : Element;
 
 
 	///
@@ -55,22 +47,17 @@ class Breadcrumb {
 	// API
 	//
 
-	public function setTitle(v : String) : Void {
-
-		titleElt.textContent = v;
-	}
-
 	public function setBreadcrumbPath(srv : String, path : String) : Void {
 
-		while (pathElt.childNodes.length > 0) {
+		while (elt.childNodes.length > 0) {
 
-			pathElt.removeChild(pathElt.firstChild);
+			elt.removeChild(elt.firstChild);
 		}
 		var srvIt : Element = cast pathItemTmpl.cloneNode(true);
 		srvIt.addEventListener("click", function(?_){ onNavBtnClicked(srv, "/"); });
 		srvIt.textContent = srv;
 
-		pathElt.appendChild(srvIt);
+		elt.appendChild(srvIt);
 
 		var pathItems : Array<Element> = [];
 
@@ -95,8 +82,8 @@ class Breadcrumb {
 		}
 		while (pathItems.length > 0) {
 
-			pathElt.appendChild(pathSepTmpl.cloneNode(true));
-			pathElt.appendChild(pathItems.pop());
+			elt.appendChild(pathSepTmpl.cloneNode(true));
+			elt.appendChild(pathItems.pop());
 		}
 	}
 }

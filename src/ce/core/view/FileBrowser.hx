@@ -19,6 +19,7 @@ import haxe.ds.StringMap;
 
 using ce.util.HtmlTools;
 using ce.util.FileTools;
+using StringTools;
 
 class FileBrowser {
 
@@ -38,6 +39,7 @@ class FileBrowser {
 	static inline var CLASS_SORT_ORDER_DESC : String = "desc";
 	static inline var CLASS_SELECT_FOLDER : String = "selectFolders";
 	static inline var CLASS_PREFIX_SORTBY : String = "sortby-";
+	static inline var CLASS_SRV_CONNECTED : String = "connected";
 
 	public function new(elt : Element) {
 
@@ -184,17 +186,24 @@ class FileBrowser {
 		srvListElt.removeChild(srvItemElts.get(name));
 	}
 
-	public function addService(name : String, displayName : String) : Void {
+	public function addService(name : String, displayName : String, ? connected : Bool) : Void {
 
 		var newItem : Element = cast srvItemTmpl.cloneNode(true);
 		newItem.className = name;
-		newItem.textContent = displayName;
+		newItem.setAttribute("title", newItem.getAttribute("title").replace("{srvName}", displayName));
 
 		newItem.addEventListener( "click", function(?_){ onServiceClicked(name); } );
 
 		srvListElt.appendChild(newItem);
 
 		srvItemElts.set(name, newItem);
+
+		if (connected) setSrvConnected(name , connected);
+	}
+
+	public function setSrvConnected(name : String, connected : Bool) : Void {
+
+		srvItemElts.get(name).toggleClass(CLASS_SRV_CONNECTED , connected);
 	}
 
 	public function resetFileList() : Void {
@@ -352,22 +361,9 @@ class FileBrowser {
 
 			});
 
-		var parentFolderItem : Null<FileListItem> = null;
-
 		for (fit in fileListItems) {
 
-			if (fit.name == "..") {
-			
-				parentFolderItem = fit;
-			
-			} else {
-			
-				fileListElt.insertBefore(fit.elt, newFolderItem);
-			}
-		}
-		if (parentFolderItem != null && fileListItems[0] != parentFolderItem) {
-
-			fileListElt.insertBefore(parentFolderItem.elt, fileListItems[0].elt);
+			fileListElt.insertBefore(fit.elt, newFolderItem);
 		}
 	}
 }
@@ -378,6 +374,9 @@ class FileListItem {
 	static inline var CLASS_NOT_SELECTABLE : String = "nosel";
 	static inline var CLASS_FILTERED_OUT : String = "filteredOut";
 	static inline var CLASS_FOLDER : String = "folder"; // not ideal we have this in 3 constants FIXME
+	static inline var CLASS_IMAGE : String = "image";
+	static inline var CLASS_SOUND : String = "sound";
+	static inline var CLASS_VIDEO : String = "video";
 
 	public function new(elt : Element) {
 
@@ -502,6 +501,10 @@ class FileListItem {
 	public function set_type(v : String) : String {
 
 		typeElt.textContent = v;
+
+		elt.toggleClass(CLASS_IMAGE, v.indexOf("image/") == 0);
+		elt.toggleClass(CLASS_SOUND, v.indexOf("audio/") == 0);
+		elt.toggleClass(CLASS_VIDEO, v.indexOf("video/") == 0);
 
 		return v;
 	}

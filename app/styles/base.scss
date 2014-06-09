@@ -30,6 +30,11 @@ html, body {
 	.fileBrowser,
 	.alertPopup,
 	.authPopup,
+	.footer,
+	.parentFolderBtn,
+	.newFolderBtn,
+	.listItemsBtn,
+	.iconItemsBtn,
 	.fileBrowser .files ul .folder.new
 	{
 		display: none;
@@ -65,7 +70,7 @@ html, body {
 		}
 		.closeBtn {
 
-			display: block;
+			display: inline-block;
 		}
 	}
 
@@ -75,9 +80,13 @@ html, body {
 
 			display: block;
 		}
+		.parentFolderBtn,
+		.newFolderBtn,
+		.listItemsBtn,
+		.iconItemsBtn,
 		.closeBtn {
 
-			display: block;
+			display: inline-block;
 		}
 		.breadcrumb {
 
@@ -103,6 +112,10 @@ html, body {
 
 			display: inline-block;
 
+			.footer {
+
+				display: none;
+			}
 			.saveBtn {
 
 				display: inline-block;

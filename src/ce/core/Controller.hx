@@ -275,46 +275,44 @@ trace("ERROR HAPPENED");
 					}
 			}
 
+		application.onParentFolderClicked = function() {
+
+				cpd(state.currentLocation.service, state.currentLocation.path);
+			}
+
 		application.onFileClicked = function(id : String) {
 
-				if (id == "..") {
+				var f : ce.core.model.unifile.File = state.currentFileList.get(id);
 
-					cpd(state.currentLocation.service, state.currentLocation.path);
+				if (state.currentMode == null) {
 
-				} else {
+					if (f.isDir) {
 
-					var f : ce.core.model.unifile.File = state.currentFileList.get(id);
-
-					if (state.currentMode == null) {
-
-						if (f.isDir) {
-
-							state.currentLocation.path += state.currentFileList.get(id).name + "/";
-						}
-						return;
+						state.currentLocation.path += state.currentFileList.get(id).name + "/";
 					}
+					return;
+				}
 
-					switch (state.currentMode) {
+				switch (state.currentMode) {
 
-						case SingleFileSelection(onSuccess, onError, options) if (!f.isDir):
+					case SingleFileSelection(onSuccess, onError, options) if (!f.isDir):
 
-							onSuccess({
-									url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, f.name),
-									filename: f.name,
-									mimetype: f.name.getMimeType(),
-									size: f.bytes,
-									key: null, // FIXME not supported yet
-									container: null, // FIXME not supported yet
-									isWriteable: true, // FIXME not managed yet
-									path: state.currentLocation.path
-								});
+						onSuccess({
+								url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, f.name),
+								filename: f.name,
+								mimetype: f.name.getMimeType(),
+								size: f.bytes,
+								key: null, // FIXME not supported yet
+								container: null, // FIXME not supported yet
+								isWriteable: true, // FIXME not managed yet
+								path: state.currentLocation.path
+							});
 
-							hide();
+						hide();
 
-						default:
+					default:
 
-							state.currentLocation.path += state.currentFileList.get(id).name + "/";
-					}
+						state.currentLocation.path += state.currentFileList.get(id).name + "/";
 				}
 			}
 
@@ -550,8 +548,7 @@ trace("ERROR HAPPENED");
 
 						lastConnectedService = s.name;
 					}
-
-					application.fileBrowser.addService(s.name, s.displayName);
+					application.fileBrowser.addService(s.name, s.displayName, s.isLoggedIn);
 				}
 				if (lastConnectedService != null) {
 
@@ -559,7 +556,6 @@ trace("ERROR HAPPENED");
 
 						state.currentLocation = new Location(lastConnectedService, "/");
 					}
-
 					application.setLogoutButtonDisplayed(true);
 
 					application.setFileBrowserDisplayed(true);
@@ -583,6 +579,8 @@ trace("ERROR HAPPENED");
 			}
 
 		state.onServiceLoginStateChanged = function(srvName) {
+
+				application.fileBrowser.setSrvConnected(srvName, state.serviceList.get(srvName).isLoggedIn);
 
 				if (!state.serviceList.get(srvName).isLoggedIn) {
 
@@ -615,7 +613,7 @@ trace("ERROR HAPPENED");
 
 		state.onServiceAccountChanged = function(srvName) {
 
-				setLogoutBtnContent(srvName);
+				
 			}
 
 		state.onCurrentLocationChanged = function() {
@@ -634,16 +632,7 @@ trace("ERROR HAPPENED");
 					var p = state.currentLocation.path;
 					while (p.length > 0 && p.lastIndexOf("/") == p.length - 1) p = p.substr(0, p.length - 1);
 	
-					application.breadcrumb.setTitle(p.length > 1 ? p.substr(p.lastIndexOf('/')+1) : state.currentLocation.service);
-
 					application.breadcrumb.setBreadcrumbPath(state.currentLocation.service, state.currentLocation.path);
-
-					if (state.serviceList.get(state.currentLocation.service).isLoggedIn) {
-
-						setLogoutBtnContent(state.currentLocation.service);
-
-						application.setLogoutButtonDisplayed(true);
-					}
 
 					cd(state.currentLocation.service , state.currentLocation.path );
 				}
@@ -665,9 +654,12 @@ trace("ERROR HAPPENED");
 
 					if (state.currentLocation.path != "/") {
 
-						application.fileBrowser.addFolder("..", "..", null, false);
-					}
+						application.parentFolderBtn.enabled = true;
 
+					} else {
+
+						application.parentFolderBtn.enabled = false;
+					}
 					for (fid in state.currentFileList.keys()) {
 
 						if (state.currentFileList.get(fid).isDir) {
@@ -774,18 +766,6 @@ trace("ERROR HAPPENED");
 
 				application.setModeState(state.currentMode);
 			}
-	}
-
-	private function setLogoutBtnContent(srvName) : Void {
-
-		var logoutStr : String = state.serviceList.get(srvName).displayName;
-
-		if (state.serviceList.get(srvName).account != null && 
-			state.serviceList.get(srvName).account.displayName != null) {
-
-			logoutStr += " - " + state.serviceList.get(srvName).account.displayName;
-		}
-		application.setLogoutButtonContent(logoutStr);
 	}
 
 	private function deleteSelectedFiles() : Void {
