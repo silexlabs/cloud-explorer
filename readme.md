@@ -31,10 +31,10 @@ Discussions
 
 GPL license
 
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot1.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot2.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot3.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot4.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/v0.1.x/screenshot1.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/v0.1.x/screenshot2.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/v0.1.x/screenshot3.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/v0.1.x/screenshot4.png)
 
 Main contributors
 
