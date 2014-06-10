@@ -13,6 +13,7 @@ package ce.core.view;
 
 import ce.core.model.SortField;
 import ce.core.model.SortOrder;
+import ce.core.model.Service;
 
 import ce.core.model.oauth.OAuthResult;
 import ce.core.parser.oauth.Str2OAuthResult;
@@ -60,6 +61,7 @@ class Application {
 	static inline var CLASS_ITEMS_ICONS : String = "items-icons";
 
 	static inline var CLASS_PREFIX_SORTEDBY : String = "sortedby-";
+	static inline var CLASS_PREFIX_SERVICE : String = "srv-";
 
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
@@ -179,6 +181,15 @@ class Application {
 	public var deleteBtn (default, null) : Button;
 
 	public var logoutBtn (default, null) : Button;
+
+	public function setCurrentService(s : Service) : Void {
+
+		rootElt.toggleClass(CLASS_PREFIX_SERVICE + Service.Dropbox, false);
+		rootElt.toggleClass(CLASS_PREFIX_SERVICE + Service.Ftp, false);
+		rootElt.toggleClass(CLASS_PREFIX_SERVICE + Service.Www, false);
+
+		rootElt.toggleClass(CLASS_PREFIX_SERVICE + s, true);
+	}
 
 	public function setSortField(v : String) : Void {
 

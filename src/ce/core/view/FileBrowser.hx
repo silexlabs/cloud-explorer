@@ -110,47 +110,6 @@ class FileBrowser {
 
 
 	///
-	// GETTERS / SETTERS
-	//
-
-	public function get_newFolderName() : Null<String> {
-
-		return newFolderInput.value;
-	}
-
-	public function set_newFolderName(v : Null<String>) : Null<String> {
-
-		newFolderInput.value = v;
-
-		return v;
-	}
-
-
-	public function set_filters(v : Null<Array<String>>) : Null<Array<String>> {
-
-		if (filters == v) {
-
-			return v;
-		}
-		filters = v;
-
-		if (filters != null && filters.indexOf(ce.util.FileTools.DIRECTORY_MIME_TYPE) > -1) {
-
-			elt.toggleClass(CLASS_SELECT_FOLDER, true);
-		
-		} else {
-
-			elt.toggleClass(CLASS_SELECT_FOLDER, false);
-		}
-		for (f in fileListItems) {
-
-			applyFilters(f);
-		}
-		return filters;
-	}
-
-
-	///
 	// CALLBACKS
 	//
 
@@ -288,6 +247,47 @@ class FileBrowser {
 
 			fileListElt.insertBefore(fit.elt, newFolderItem);
 		}
+	}
+
+
+	///
+	// GETTERS / SETTERS
+	//
+
+	public function get_newFolderName() : Null<String> {
+
+		return newFolderInput.value;
+	}
+
+	public function set_newFolderName(v : Null<String>) : Null<String> {
+
+		newFolderInput.value = v;
+
+		return v;
+	}
+
+
+	public function set_filters(v : Null<Array<String>>) : Null<Array<String>> {
+
+		if (filters == v) {
+
+			return v;
+		}
+		filters = v;
+
+		if (filters != null && filters.indexOf(ce.util.FileTools.DIRECTORY_MIME_TYPE) > -1) {
+
+			elt.toggleClass(CLASS_SELECT_FOLDER, true);
+		
+		} else {
+
+			elt.toggleClass(CLASS_SELECT_FOLDER, false);
+		}
+		for (f in fileListItems) {
+
+			applyFilters(f);
+		}
+		return filters;
 	}
 
 	///

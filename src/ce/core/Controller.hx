@@ -675,6 +675,7 @@ trace("ERROR HAPPENED");
 					while (p.length > 0 && p.lastIndexOf("/") == p.length - 1) p = p.substr(0, p.length - 1);
 	
 					application.breadcrumb.setBreadcrumbPath(state.currentLocation.service, state.currentLocation.path);
+					application.setCurrentService(state.currentLocation.service);
 
 					cd(state.currentLocation.service , state.currentLocation.path );
 				}

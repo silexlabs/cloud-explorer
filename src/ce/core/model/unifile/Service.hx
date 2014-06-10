@@ -13,7 +13,7 @@ package ce.core.model.unifile;
 
 class Service {
 
-	public function new(n : String, dn : String, is : String, d : String, v : Bool, il : Bool, ic : Bool, ioa : Bool, ? a : Null<Account>) {
+	public function new(n : ce.core.model.Service, dn : String, is : String, d : String, v : Bool, il : Bool, ic : Bool, ioa : Bool, ? a : Null<Account>) {
 
 		this.name = n;
 		this.displayName = dn;
@@ -26,7 +26,7 @@ class Service {
 		this.account = a;
 	}
 
-	public var name (default, null) : String;
+	public var name (default, null) : ce.core.model.Service;
 	public var displayName (default, null) : String;
 	public var imageSmall (default, null) : String;
 	public var description (default, null) : String;

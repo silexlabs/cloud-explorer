@@ -13,13 +13,13 @@ package ce.core.model;
 
 class Location {
 
-	public function new(s : String, p : String) {
+	public function new(s : Service, p : String) {
 
 		this.service = s;
 		this.path = p;
 	}
 	
-	public var service (default, set) : String;
+	public var service (default, set) : Service;
 
 	public var path (default, set) : String;
 
@@ -35,7 +35,7 @@ class Location {
 	// GETTERS / SETTERS
 	//
 
-	public function set_service(v : String) : String {
+	public function set_service(v : Service) : Service {
 
 		if (v == service) {
 

@@ -727,4 +727,31 @@ body, input[type="text"] {
 			}
 		}
 	}
+	&.srv-dropbox {
+		.fileBrowser {
+			.services {
+				li.dropbox {
+					background-position: 32px 9px, -156px 0px;
+				}
+			}
+		}
+	}
+	&.srv-ftp {
+		.fileBrowser {
+			.services {
+				li.ftp {
+					background-position: 32px 9px, -156px 0px;
+				}
+			}
+		}
+	}
+	&.srv-www {
+		.fileBrowser {
+			.services {
+				li.www {
+					background-position: 32px 9px, -156px 0px;
+				}
+			}
+		}
+	}
 }
