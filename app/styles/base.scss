@@ -35,6 +35,7 @@ html, body {
 	.newFolderBtn,
 	.listItemsBtn,
 	.iconItemsBtn,
+	.deleteBtn,
 	.fileBrowser .files ul .folder.new
 	{
 		display: none;
@@ -108,14 +109,14 @@ html, body {
 
 	&.browsing.single-file-exp-mode {
 
+		.footer {
+
+			display: block;
+		}
 		.export {
 
 			display: inline-block;
 
-			.footer {
-
-				display: none;
-			}
 			.saveBtn {
 
 				display: inline-block;
@@ -217,30 +218,18 @@ html, body {
 					}
 				}
 			}
-			.controls {
-
-				button.deleteBtn {
-
-					display: none;
-				}
-			}
 		}
 	}
 
 	&.selecting {
 
-		.fileBrowser {
+		.footer {
 
-			.files {
+			display: block;
+		}
+		button.deleteBtn {
 
-				.controls {
-
-					button.deleteBtn {
-
-						display: inline-block;
-					}
-				}
-			}
+			display: inline-block;
 		}
 	}
 }
