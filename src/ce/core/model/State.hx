@@ -16,6 +16,8 @@ import ce.core.model.unifile.File;
 import ce.core.model.Location;
 import ce.core.model.Mode;
 import ce.core.model.DisplayMode;
+import ce.core.model.SortField;
+import ce.core.model.SortOrder;
 
 import haxe.ds.StringMap;
 
@@ -39,6 +41,10 @@ class State {
 
 	public var currentMode (default, set) : Null<Mode> = null;
 
+	public var currentSortField (default, set) : Null<SortField> = null;
+
+	public var currentSortOrder (default, set) : Null<SortOrder> = null;
+
 
 	///
 	// CALLBACKS
@@ -60,6 +66,10 @@ class State {
 
 	public dynamic function onDisplayModeChanged() { }
 
+	public dynamic function onCurrentSortFieldChanged() { }
+
+	public dynamic function onCurrentSortOrderChanged() { }
+
 	public dynamic function onServiceLoginStateChanged(srvName : String) { }
 
 	public dynamic function onServiceAccountChanged(srvName : String) { }
@@ -68,6 +78,33 @@ class State {
 	///
 	// SETTERS
 	//
+
+	public function set_currentSortField(v : Null<SortField>) : Null<SortField> {
+
+		if (v == currentSortField) {
+
+			return currentSortField;
+		}
+		currentSortField = v;
+		currentSortOrder = Asc; // setting new sort field also reset the order
+
+		onCurrentSortFieldChanged();
+
+		return currentSortField;
+	}
+
+	public function set_currentSortOrder(v : Null<SortOrder>) : Null<SortOrder> {
+
+		if (v == currentSortOrder) {
+
+			return currentSortOrder;
+		}
+		currentSortOrder = v;
+
+		onCurrentSortOrderChanged();
+
+		return currentSortOrder;
+	}
 
 	public function set_newFolderMode(v : Bool) : Bool {
 
@@ -126,6 +163,9 @@ class State {
 			return v;
 		}
 		currentFileList = v;
+		// reset both sort field and sort order
+		currentSortField = Name;
+		currentSortOrder = Asc;
 		
 		onCurrentFileListChanged();
 

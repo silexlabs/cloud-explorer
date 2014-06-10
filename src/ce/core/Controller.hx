@@ -20,6 +20,8 @@ import ce.core.model.CEError;
 import ce.core.model.State;
 import ce.core.model.Location;
 import ce.core.model.Mode;
+import ce.core.model.SortField;
+import ce.core.model.SortOrder;
 
 import ce.core.model.oauth.OAuthResult;
 import ce.core.model.api.PickOptions;
@@ -155,6 +157,8 @@ trace("ERROR HAPPENED");
 		application.onViewReady = function() {
 
 				state.displayMode = List;
+
+				state.currentSortField = Name;
 
 				state.readyState = true;
 			}
@@ -546,6 +550,18 @@ trace("ERROR HAPPENED");
 				state.displayMode = Icons;
 			}
 
+		application.onSortBtnClicked = function(field : SortField) {
+
+				if (state.currentSortField == field) {
+
+					state.currentSortOrder = state.currentSortOrder == Asc ? Desc : Asc;
+				
+				} else {
+
+					state.currentSortField = field;
+				}
+			}
+
 		state.onServiceListChanged = function() {
 
 				var lastConnectedService : Null<String> = null;
@@ -669,6 +685,9 @@ trace("ERROR HAPPENED");
 				application.fileBrowser.resetFileList();
 
 				application.setSelecting(false);
+
+				application.setSortField(state.currentSortField);
+				application.setSortOrder(state.currentSortOrder);
 
 				if (state.currentFileList == null) {
 
@@ -795,8 +814,21 @@ trace("ERROR HAPPENED");
 
 		state.onNewFolderModeChanged = function() {
 
-			application.setNewFolderDisplayed(state.newFolderMode);
-		}
+				application.setNewFolderDisplayed(state.newFolderMode);
+			}
+
+		state.onCurrentSortOrderChanged = function() {
+
+				application.setSortOrder(state.currentSortOrder);
+				application.fileBrowser.sort(state.currentSortField, state.currentSortOrder);
+			}
+
+		state.onCurrentSortFieldChanged = function() {
+
+				application.setSortField(state.currentSortField);
+				application.setSortOrder(state.currentSortOrder);
+				application.fileBrowser.sort(state.currentSortField, state.currentSortOrder);
+			}
 	}
 
 	private function deleteSelectedFiles() : Void {

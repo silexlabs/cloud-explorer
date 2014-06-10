@@ -11,6 +11,9 @@
  */
 package ce.core.view;
 
+import ce.core.model.SortField;
+import ce.core.model.SortOrder;
+
 import ce.core.model.oauth.OAuthResult;
 import ce.core.parser.oauth.Str2OAuthResult;
 
@@ -56,6 +59,8 @@ class Application {
 	static inline var CLASS_ITEMS_LIST : String = "items-list";
 	static inline var CLASS_ITEMS_ICONS : String = "items-icons";
 
+	static inline var CLASS_PREFIX_SORTEDBY : String = "sortedby-";
+
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
 	static inline var SELECTOR_HOME : String = ".home";
@@ -93,6 +98,8 @@ class Application {
 	//
 
 	public dynamic function onClicked() : Void { }
+
+	public dynamic function onSortBtnClicked(f : SortField) : Void { }
 
 	public dynamic function onViewReady() : Void { }
 
@@ -172,6 +179,23 @@ class Application {
 	public var deleteBtn (default, null) : Button;
 
 	public var logoutBtn (default, null) : Button;
+
+	public function setSortField(v : String) : Void {
+
+		rootElt.toggleClass(CLASS_PREFIX_SORTEDBY + SortField.Name, false);
+		rootElt.toggleClass(CLASS_PREFIX_SORTEDBY + SortField.Type, false);
+		rootElt.toggleClass(CLASS_PREFIX_SORTEDBY + SortField.LastUpdate, false);
+
+		rootElt.toggleClass(CLASS_PREFIX_SORTEDBY + v, true);
+	}
+
+	public function setSortOrder(v : String) : Void {
+
+		rootElt.toggleClass(SortOrder.Asc, false);
+		rootElt.toggleClass(SortOrder.Desc, false);
+
+		rootElt.toggleClass(v, true);
+	}
 
 	public function setListDisplayMode() : Void {
 		
@@ -409,6 +433,7 @@ class Application {
 		fileBrowser.onFileCheckedStatusChanged = function(id : String) { onFileCheckedStatusChanged(id); }
 		fileBrowser.onFileRenameRequested = function(id : String, value : String) { onFileRenameRequested(id, value); }
 		fileBrowser.onNewFolderName = function() { onNewFolderName(); }
+		fileBrowser.onSortBtnClicked = function(f:SortField) { onSortBtnClicked(f); }
 
 		dropzone = new DropZone(rootElt.querySelector(SELECTOR_DROPZONE));
 		dropzone.onInputFilesChanged = function() { onInputFilesChanged(); }

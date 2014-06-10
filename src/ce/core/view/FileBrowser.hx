@@ -17,6 +17,9 @@ import js.html.KeyboardEvent;
 
 import haxe.ds.StringMap;
 
+import ce.core.model.SortField;
+import ce.core.model.SortOrder;
+
 using ce.util.HtmlTools;
 using ce.util.FileTools;
 using StringTools;
@@ -35,10 +38,7 @@ class FileBrowser {
 	static inline var SELECTOR_TYPE_BTN : String = ".titles .fileType";
 	static inline var SELECTOR_DATE_BTN : String = ".titles .lastUpdate";
 
-	static inline var CLASS_SORT_ORDER_ASC : String = "asc";
-	static inline var CLASS_SORT_ORDER_DESC : String = "desc";
 	static inline var CLASS_SELECT_FOLDER : String = "selectFolders";
-	static inline var CLASS_PREFIX_SORTBY : String = "sortby-";
 	static inline var CLASS_SRV_CONNECTED : String = "connected";
 
 	public function new(elt : Element) {
@@ -74,11 +74,11 @@ class FileBrowser {
 		fileListElt.removeChild(folderItemTmpl);
 
 		var nameBtn = elt.querySelector(SELECTOR_NAME_BTN);
-		nameBtn.addEventListener("click", function(?_){ toggleSort("name"); });
+		nameBtn.addEventListener("click", function(?_){ onSortBtnClicked(Name); });
 		var typeBtn = elt.querySelector(SELECTOR_TYPE_BTN);
-		typeBtn.addEventListener("click", function(?_){ toggleSort("type"); });
+		typeBtn.addEventListener("click", function(?_){ onSortBtnClicked(Type); });
 		var dateBtn = elt.querySelector(SELECTOR_DATE_BTN);
-		dateBtn.addEventListener("click", function(?_){ toggleSort("lastUpdate"); });
+		dateBtn.addEventListener("click", function(?_){ onSortBtnClicked(LastUpdate); });
 
 		this.fileListItems = [];
 
@@ -169,6 +169,8 @@ class FileBrowser {
 	public dynamic function onFileRenameRequested(id : String, value : String) : Void { }
 
 	public dynamic function onNewFolderName() : Void { }
+
+	public dynamic function onSortBtnClicked(field : SortField) : Void { }
 
 
 	///
@@ -266,6 +268,28 @@ class FileBrowser {
 		newFolderInput.focus();
 	}
 
+	public function sort(byField : SortField, order : SortOrder) : Void {
+
+		fileListItems.sort(function(a:FileListItem,b:FileListItem){
+
+				switch (order) {
+
+					case Asc:
+
+						return Reflect.getProperty(a, byField) > Reflect.getProperty(b, byField) ? 1 : -1;
+
+					case Desc:
+
+						return Reflect.getProperty(a, byField) < Reflect.getProperty(b, byField) ? 1 : -1;
+				}
+			});
+
+		for (fit in fileListItems) {
+
+			fileListElt.insertBefore(fit.elt, newFolderItem);
+		}
+	}
+
 	///
 	// INTERNALS
 	//
@@ -282,88 +306,6 @@ class FileBrowser {
 
 				f.filteredOut = true;
 			}
-		}
-	}
-
-	private function currentSortBy() : Null<String> {
-
-		for (c in elt.className.split(" ")) {
-
-			if( Lambda.has([CLASS_PREFIX_SORTBY + "name", CLASS_PREFIX_SORTBY + "type", CLASS_PREFIX_SORTBY + "lastupdate"], c) ) {
-
-				return c;
-			}
-		}
-		return null;
-	}
-
-	private function currentSortOrder() : Null<String> {
-
-		for (c in elt.className.split(" ")) {
-
-			if( Lambda.has([CLASS_SORT_ORDER_ASC, CLASS_SORT_ORDER_DESC], c) ) {
-
-				return c;
-			}
-		}
-		return null;
-	}
-
-	private function toggleSort(? by : String = "name") : Void {
-
-		var csb : Null<String> = currentSortBy();
-		var cso : Null<String> = currentSortOrder();
-
-		if (csb == CLASS_PREFIX_SORTBY + by.toLowerCase()) {
-
-			if (cso == CLASS_SORT_ORDER_ASC) {
-
-				elt.toggleClass(CLASS_SORT_ORDER_ASC , false);
-				elt.toggleClass(CLASS_SORT_ORDER_DESC , true);
-
-				sort(by, false);
-
-			} else {
-
-				elt.toggleClass(CLASS_SORT_ORDER_ASC , true);
-				elt.toggleClass(CLASS_SORT_ORDER_DESC , false);
-
-				sort(by, true);
-			}
-			
-		} else {
-
-			if (csb != null) {
-				elt.toggleClass(csb , false);
-			}
-			if (cso != null) {
-				elt.toggleClass(cso , false);
-			}
-			elt.toggleClass(CLASS_PREFIX_SORTBY + by , true);
-			elt.toggleClass(CLASS_SORT_ORDER_ASC , true);
-
-			sort(by, true);
-		}
-	}
-
-	private function sort(? by : String = "name", ? ascOrder : Bool = true) : Void {
-
-		fileListItems.sort(function(a:FileListItem,b:FileListItem){
-
-				if (ascOrder) {
-
-					return Reflect.getProperty(a,by) > Reflect.getProperty(b,by) ? 1 : -1;
-
-				} else {
-
-					return Reflect.getProperty(a,by) < Reflect.getProperty(b,by) ? 1 : -1;
-				}
-
-			});
-
-		for (fit in fileListItems) {
-
-			fileListElt.insertBefore(fit.elt, newFolderItem);
 		}
 	}
 }

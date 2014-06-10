@@ -309,8 +309,25 @@ body, input[type="text"] {
 						display: inline-block;
 						cursor: pointer; user-select: none;
 					}
+					span.sortArrow {
+						width: 6px; height: 6px; margin-right: 6px;
+						background: {
+							image: url("../images/default/btn-sort.png");
+							size: auto 6px;
+							position: 0px 0px;
+							repeat: no-repeat;
+						}
+					}
 					span:hover {
 						text-decoration: underline;
+						.sortArrow {
+							background-position: -6px 0px;
+						}
+					}
+					span:active {
+						.sortArrow {
+							background-position: -12px 0px;
+						}
 					}
 					.lastUpdate {
 						width: 150px;
@@ -626,6 +643,87 @@ body, input[type="text"] {
 
 			.newFolderBtn, .newFolderBtn:hover {
 				background-position: -156px 0px;
+			}
+		}
+	}
+	&.sortedby-name.asc {
+		.files {
+			.list {
+				.titles {
+					.fileName {
+						span.sortArrow {
+							background-position: -18px 0px;
+						}
+					}
+				}
+			}
+		}
+	}
+	&.sortedby-name.desc {
+		.files {
+			.list {
+				.titles {
+					.fileName {
+						span.sortArrow {
+							background-position: -18px 0px;
+							transform: rotate(0.5turn)
+						}
+					}
+				}
+			}
+		}
+	}
+	&.sortedby-type.asc {
+		.files {
+			.list {
+				.titles {
+					.fileType {
+						span.sortArrow {
+							background-position: -18px 0px;
+						}
+					}
+				}
+			}
+		}
+	}
+	&.sortedby-type.desc {
+		.files {
+			.list {
+				.titles {
+					.fileType {
+						span.sortArrow {
+							background-position: -18px 0px;
+							transform: rotate(0.5turn)
+						}
+					}
+				}
+			}
+		}
+	}
+	&.sortedby-lastUpdate.asc {
+		.files {
+			.list {
+				.titles {
+					.lastUpdate {
+						span.sortArrow {
+							background-position: -18px 0px;
+						}
+					}
+				}
+			}
+		}
+	}
+	&.sortedby-lastUpdate.desc {
+		.files {
+			.list {
+				.titles {
+					.lastUpdate {
+						span.sortArrow {
+							background-position: -18px 0px;
+							transform: rotate(0.5turn)
+						}
+					}
+				}
 			}
 		}
 	}
