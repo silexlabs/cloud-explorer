@@ -154,6 +154,8 @@ trace("ERROR HAPPENED");
 
 		application.onViewReady = function() {
 
+				state.displayMode = List;
+
 				state.readyState = true;
 			}
 
@@ -489,7 +491,7 @@ trace("ERROR HAPPENED");
 
 		application.onNewFolderClicked = function() {
 
-				application.setNewFolderDisplayed(true);
+				state.newFolderMode = !state.newFolderMode;
 			}
 
 		application.onDeleteClicked = function() {
@@ -510,7 +512,7 @@ trace("ERROR HAPPENED");
 
 				if (name.trim() == "") {
 
-					application.setNewFolderDisplayed(false);
+					state.newFolderMode = false;
 
 				} else {
 
@@ -520,18 +522,28 @@ trace("ERROR HAPPENED");
 
 					unifileSrv.mkdir(state.currentLocation.service, mkDirPath, function(){
 
-							application.setNewFolderDisplayed(false);
+							state.newFolderMode = false;
 
 							refreshFilesList();
 
 						}, function(e : String){ 
 
-							application.setNewFolderDisplayed(false);
+							state.newFolderMode = false;
 
 							setError(e);
 
 						});
 				}
+			}
+
+		application.onItemsListClicked = function() {
+
+				state.displayMode = List;
+			}
+
+		application.onItemsIconClicked = function() {
+
+				state.displayMode = Icons;
 			}
 
 		state.onServiceListChanged = function() {
@@ -614,6 +626,20 @@ trace("ERROR HAPPENED");
 		state.onServiceAccountChanged = function(srvName) {
 
 				
+			}
+
+		state.onDisplayModeChanged = function() {
+
+				switch(state.displayMode) {
+
+					case List:
+
+						application.setListDisplayMode();
+
+					case Icons:
+
+						application.setIconDisplayMode();
+				}				
 			}
 
 		state.onCurrentLocationChanged = function() {
@@ -766,6 +792,11 @@ trace("ERROR HAPPENED");
 
 				application.setModeState(state.currentMode);
 			}
+
+		state.onNewFolderModeChanged = function() {
+
+			application.setNewFolderDisplayed(state.newFolderMode);
+		}
 	}
 
 	private function deleteSelectedFiles() : Void {

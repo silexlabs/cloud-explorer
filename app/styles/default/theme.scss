@@ -602,4 +602,31 @@ body, input[type="text"] {
 			}
 		}
 	}
+	&.items-list {
+
+		.header {
+
+			.listItemsBtn, .listItemsBtn:hover {
+				background-position: -156px 0px;
+			}
+		}
+	}
+	&.items-icons {
+
+		.header {
+
+			.iconItemsBtn, .iconItemsBtn:hover {
+				background-position: -156px 0px;
+			}
+		}
+	}
+	&.browsing.making-new-folder {
+
+		.header {
+
+			.newFolderBtn, .newFolderBtn:hover {
+				background-position: -156px 0px;
+			}
+		}
+	}
 }

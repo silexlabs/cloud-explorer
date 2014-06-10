@@ -15,6 +15,7 @@ import ce.core.model.unifile.Service;
 import ce.core.model.unifile.File;
 import ce.core.model.Location;
 import ce.core.model.Mode;
+import ce.core.model.DisplayMode;
 
 import haxe.ds.StringMap;
 
@@ -25,6 +26,10 @@ class State {
 	public var readyState (default, set) : Bool = false;
 
 	public var displayState (default, set) : Bool = false;
+
+	public var newFolderMode (default, set) : Bool = false;
+
+	public var displayMode (default, set) : Null<DisplayMode> = null;
 
 	public var serviceList (default, set) : Null<StringMap<Service>> = null;
 
@@ -51,6 +56,10 @@ class State {
 
 	public dynamic function onCurrentModeChanged() { }
 
+	public dynamic function onNewFolderModeChanged() { }
+
+	public dynamic function onDisplayModeChanged() { }
+
 	public dynamic function onServiceLoginStateChanged(srvName : String) { }
 
 	public dynamic function onServiceAccountChanged(srvName : String) { }
@@ -59,6 +68,32 @@ class State {
 	///
 	// SETTERS
 	//
+
+	public function set_newFolderMode(v : Bool) : Bool {
+
+		if (v == newFolderMode) {
+
+			return newFolderMode;
+		}
+		newFolderMode = v;
+
+		onNewFolderModeChanged();
+
+		return newFolderMode;
+	}
+
+	public function set_displayMode(v : DisplayMode) : DisplayMode {
+
+		if (v == displayMode) {
+
+			return displayMode;
+		}
+		displayMode = v;
+
+		onDisplayModeChanged();
+
+		return displayMode;
+	}
 
 	public function set_serviceList(v : Null<StringMap<Service>>) : Null<StringMap<Service>> {
 

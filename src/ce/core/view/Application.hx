@@ -53,6 +53,9 @@ class Application {
 	static inline var CLASS_MODE_SINGLE_FILE_SELECTION : String = "single-file-sel-mode";
 	static inline var CLASS_MODE_SINGLE_FILE_EXPORT : String = "single-file-exp-mode";
 
+	static inline var CLASS_ITEMS_LIST : String = "items-list";
+	static inline var CLASS_ITEMS_ICONS : String = "items-icons";
+
 	static inline var SELECTOR_LOGOUT_BTN : String = ".logoutBtn";
 	static inline var SELECTOR_CLOSE_BTN : String = ".closeBtn";
 	static inline var SELECTOR_HOME : String = ".home";
@@ -65,6 +68,8 @@ class Application {
 	static inline var SELECTOR_NEW_FOLDER_BTN : String = ".newFolderBtn";
 	static inline var SELECTOR_PARENT_FOLDER_BTN : String = ".parentFolderBtn";
 	static inline var SELECTOR_DELETE_BTN : String = ".deleteBtn";
+	static inline var SELECTOR_ITEMS_LIST_BTN : String = ".listItemsBtn";
+	static inline var SELECTOR_ITEMS_ICON_BTN : String = ".iconItemsBtn";
 
 	public function new(iframe : js.html.IFrameElement, config : Config) {
 
@@ -125,6 +130,10 @@ class Application {
 
 	public dynamic function onParentFolderClicked() : Void { }
 
+	public dynamic function onItemsListClicked() : Void { }
+
+	public dynamic function onItemsIconClicked() : Void { }
+
 	public dynamic function onDeleteClicked() : Void { }
 
 	public dynamic function onNewFolderName() : Void { }
@@ -156,9 +165,25 @@ class Application {
 
 	public var parentFolderBtn (default, null) : Button;
 
+	public var itemsListBtn (default, null) : Button;
+
+	public var itemsIconBtn (default, null) : Button;
+
 	public var deleteBtn (default, null) : Button;
 
 	public var logoutBtn (default, null) : Button;
+
+	public function setListDisplayMode() : Void {
+		
+		this.rootElt.toggleClass(CLASS_ITEMS_LIST, true);
+		this.rootElt.toggleClass(CLASS_ITEMS_ICONS, false);
+	}
+
+	public function setIconDisplayMode() : Void {
+
+		this.rootElt.toggleClass(CLASS_ITEMS_ICONS, true);
+		this.rootElt.toggleClass(CLASS_ITEMS_LIST, false);
+	}
 
 	public function setDisplayed(v : Bool) : Void {
 
@@ -397,6 +422,12 @@ class Application {
 
 		parentFolderBtn = new Button(rootElt.querySelector(SELECTOR_PARENT_FOLDER_BTN));
 		parentFolderBtn.onClicked = onParentFolderClicked;
+
+		itemsListBtn = new Button(rootElt.querySelector(SELECTOR_ITEMS_LIST_BTN));
+		itemsListBtn.onClicked = onItemsListClicked;
+
+		itemsIconBtn = new Button(rootElt.querySelector(SELECTOR_ITEMS_ICON_BTN));
+		itemsIconBtn.onClicked = onItemsIconClicked;
 
 		deleteBtn = new Button(rootElt.querySelector(SELECTOR_DELETE_BTN));
 		deleteBtn.onClicked = onDeleteClicked;
