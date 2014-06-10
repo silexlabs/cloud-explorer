@@ -249,11 +249,16 @@ body, input[type="text"] {
 		}
 		.services {
 
-			position: relative; width: 52px; z-index: 10;
+			position: relative; width: 53px; z-index: 10;
 			border-right: 1px solid #282828;
 
+			.logoutBtn {
+				height: 52px; margin: 0px; padding: 0px;
+				cursor: pointer;
+			}
+
 			ul {
-				height: 100%; width: 100%;
+				height: 100%; width: 100%; padding-bottom: 52px;
 
 				li {
 					display: block; float: left;
