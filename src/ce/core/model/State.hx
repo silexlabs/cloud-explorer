@@ -72,8 +72,6 @@ class State {
 
 	public dynamic function onServiceLoginStateChanged(srvName : String) { }
 
-	public dynamic function onServiceAccountChanged(srvName : String) { }
-
 
 	///
 	// SETTERS
@@ -143,12 +141,6 @@ class State {
 		for (s in serviceList) {
 
 			s.onLoginStateChanged = function() { onServiceLoginStateChanged(s.name); }
-			s.onAccountChanged = function() { onServiceAccountChanged(s.name); }
-
-			if (s.account != null) {
-
-				onServiceAccountChanged(s.name);
-			}
 		}
 		
 		onServiceListChanged();

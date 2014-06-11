@@ -165,24 +165,33 @@ trace("ERROR HAPPENED");
 
 		application.onLogoutClicked = function() {
 
-				if (state.currentLocation != null && state.serviceList.get(state.currentLocation.service).isLoggedIn) {
-
-					unifileSrv.logout(state.currentLocation.service, function(lr : ce.core.model.unifile.LogoutResult){
-
-							state.serviceList.get(state.currentLocation.service).isLoggedIn = false;
-
-							if (!lr.success) {
-
-								setError(lr.message);
-							}
-
-						}, setError);
-				}	
+				logoutAll();
 			}
 
 		application.onCloseClicked = function() {
 
 				hide();
+			}
+
+		application.onServiceLoginRequest = function(name : String) {
+
+				if (state.serviceList.get(name).isLoggedIn) {
+
+					throw "unexpected call to login "+name;
+				
+				} else {
+
+					connect(name);
+				}
+			}
+
+		application.onServiceLogoutRequest = function(name : String) {
+
+				if (!state.serviceList.get(name).isLoggedIn) {
+
+					throw "unexpected call to logout "+name;
+				}
+				logout(name);
 			}
 
 		application.onServiceClicked = function(name : String) {
@@ -193,64 +202,7 @@ trace("ERROR HAPPENED");
 				
 				} else {
 
-					application.setLoaderDisplayed(true);
-
-					unifileSrv.connect(name, function(cr : ce.core.model.unifile.ConnectResult) {
-
-							if (cr.success) {
-
-								state.serviceList.get(name).isConnected = true;
-
-								application.authPopup.setServerName(state.serviceList.get(name).displayName);
-
-								application.authPopup.onClicked = function() {
-
-										application.onAuthorizationWindowBlocked = function() {
-
-												application.setAuthPopupDisplayed(false);
-
-												setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
-											}
-
-										application.onServiceAuthorizationDone = function(? result : Null<OAuthResult>) {
-
-												application.setAuthPopupDisplayed(false);
-
-												if (state.serviceList.get(name).isOAuth) {
-
-													if (result != null && result.notApproved != true) {
-
-														login(name);
-
-													} else {
-
-														application.setLoaderDisplayed(false);
-													}
-
-												} else {
-
-													login(name);
-												}
-											}
-
-										var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
-																	+ 'oauth_callback=' + StringTools.urlEncode(application.location
-																	+ (!application.location.endsWith('/') && !config.path.startsWith('/') ? '/' : '') + 
-																	config.path + (!config.path.endsWith('/') && config.path.length > 0 ? '/' : '') + 'oauth-cb.html');
-
-										application.openAuthorizationWindow(authUrl);
-									}
-
-								application.setAuthPopupDisplayed(true);
-
-							} else {
-
-								state.serviceList.get(name).isConnected = false;
-
-								setError(cr.message);
-							}
-
-						}, setError);
+					connect(name);
 				}
 			}
 
@@ -627,6 +579,8 @@ trace("ERROR HAPPENED");
 
 				} else {
 
+					application.setLogoutButtonDisplayed(true);
+
 					if (state.serviceList.get(srvName).account == null) {
 
 						unifileSrv.account(srvName, function(a : ce.core.model.unifile.Account){
@@ -637,11 +591,6 @@ trace("ERROR HAPPENED");
 					}
 					state.currentLocation = new Location(srvName, "/");
 				}
-			}
-
-		state.onServiceAccountChanged = function(srvName) {
-
-				
 			}
 
 		state.onDisplayModeChanged = function() {
@@ -957,29 +906,180 @@ trace("ERROR HAPPENED");
 			}, setError);
 	}
 
-	private function login(srvName : String) : Void {
+	private function connect(srv : ce.core.model.Service) : Void {
 
-		if (!state.serviceList.get(srvName).isLoggedIn) {
+		if (state.serviceList.get(srv).isLoggedIn) {
+
+			trace("unexpected call to connect "+srv);
+			return;
+		}
+		application.setLoaderDisplayed(true);
+
+		unifileSrv.connect(srv, function(cr : ce.core.model.unifile.ConnectResult) {
+
+				if (cr.success) {
+
+					state.serviceList.get(srv).isConnected = true;
+
+					application.authPopup.setServerName(state.serviceList.get(srv).displayName);
+
+					application.authPopup.onClicked = function() {
+
+							application.onAuthorizationWindowBlocked = function() {
+
+									application.setAuthPopupDisplayed(false);
+
+									setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
+								}
+
+							application.onServiceAuthorizationDone = function(? result : Null<OAuthResult>) {
+
+									application.setAuthPopupDisplayed(false);
+
+									if (state.serviceList.get(srv).isOAuth) {
+
+										if (result != null && result.notApproved != true) {
+
+											login(srv);
+
+										} else {
+
+											application.setLoaderDisplayed(false);
+										}
+
+									} else {
+
+										login(srv);
+									}
+								}
+
+							var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
+														+ 'oauth_callback=' + StringTools.urlEncode(application.location
+														+ (!application.location.endsWith('/') && !config.path.startsWith('/') ? '/' : '') + 
+														config.path + (!config.path.endsWith('/') && config.path.length > 0 ? '/' : '') + 'oauth-cb.html');
+
+							application.openAuthorizationWindow(authUrl);
+						}
+
+					application.setAuthPopupDisplayed(true);
+
+				} else {
+
+					state.serviceList.get(srv).isConnected = false;
+
+					setError(cr.message);
+				}
+
+			}, setError);
+	}
+
+	private function login(srv : ce.core.model.Service) : Void {
+
+		if (!state.serviceList.get(srv).isLoggedIn) {
 
 			application.setLoaderDisplayed(true);
 
-			unifileSrv.login(srvName, function(lr : ce.core.model.unifile.LoginResult){
+			unifileSrv.login(srv, function(lr : ce.core.model.unifile.LoginResult){
 
 					if (lr.success) {
 
-						state.serviceList.get(srvName).isLoggedIn = true;
+						state.serviceList.get(srv).isLoggedIn = true;
 					
 					} else {
 
-						state.serviceList.get(srvName).isLoggedIn = false;
+						state.serviceList.get(srv).isLoggedIn = false;
 						setError('Could not login. Please try again.');
 					}
 
 					application.setLoaderDisplayed(false);
 
 				}, setError);
+		
+		} else {
+
+			trace("can't log into "+srv+" as user already logged in!");
 		}
-		else trace("WON'T LOGIN "+srvName+" AS ALREADY LOGGED IN !!!");
+	}
+
+	private function logout(srv : ce.core.model.Service) : Void {
+
+		if (state.serviceList.get(srv).isLoggedIn) {
+
+			application.setLoaderDisplayed(true);
+
+			unifileSrv.logout(srv, function(lr : ce.core.model.unifile.LogoutResult){
+		
+					application.setLoaderDisplayed(false);
+
+					if (!lr.success) {
+
+						setError(lr.message);
+					
+					} else {
+
+						state.serviceList.get(srv).isLoggedIn = false;
+					}
+
+				}, setError);
+		
+		} else {
+
+			trace("can't log out from "+srv+" as user not yet logged in!");
+		}
+	}
+
+	private function logoutAll() : Void {
+		
+		application.setLoaderDisplayed(true);
+
+		var loggedInSrvs : Array<String> = [];
+
+		for (srv in state.serviceList) {
+
+			if (srv.isLoggedIn) {
+
+				loggedInSrvs.push(srv.name);
+			}
+		}
+		for (srv in loggedInSrvs) {
+
+			//logout(srv.name); don't do that or it will try to do stuff on state updates
+
+			var s = srv;
+
+			unifileSrv.logout(s, function(lr : ce.core.model.unifile.LogoutResult){
+
+					if (!lr.success) {
+
+						setError(lr.message);
+					
+					} else {
+
+						loggedInSrvs.remove(s);
+
+						if (loggedInSrvs.length == 0) {
+
+							application.setLoaderDisplayed(false);
+
+							listServices();
+						}
+					}
+
+				}, setError);
+		}
+	}
+
+	private function listServices() : Void {
+
+		application.setLoaderDisplayed(true);
+
+		unifileSrv.listServices(function(slm : StringMap<ce.core.model.unifile.Service>) {
+
+				application.setLoaderDisplayed(false);
+
+				state.serviceList = slm;
+
+			}, setError);
 	}
 
 	private function hide() : Void {
@@ -1004,15 +1104,7 @@ trace("ERROR HAPPENED");
 		}
 		if (goHome || state.currentFileList == null) {
 
-			application.setLoaderDisplayed(true);
-
-			unifileSrv.listServices(function(slm : StringMap<ce.core.model.unifile.Service>) {
-
-					application.setLoaderDisplayed(false);
-
-					state.serviceList = slm;
-
-				}, setError);
+			listServices();
 
 		} else {
 

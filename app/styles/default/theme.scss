@@ -26,7 +26,7 @@ body, input[type="text"] {
 		
 		div.bg {
 			position: absolute; top: 0; left: 0; z-index: -1;
-			width: 100%; height: 100%; border-radius: 15px;
+			width: 100%; height: 100%;
 			background-color: black; opacity: .5;
 		}
 		div.txt {
@@ -201,7 +201,7 @@ body, input[type="text"] {
 		position: absolute; z-index: 110;
 		top: 0; left: 0;
 		width: 100%; height: 100%;
-		background-color: rgba(0,0,0,.4); border-radius: 15px;
+		background-color: rgba(0,0,0,.4);
 
 		div {
 			position: absolute;
@@ -245,7 +245,7 @@ body, input[type="text"] {
 
 			float: left;
 			height: 100%;
-			overflow: hidden;
+			/* overflow: hidden; */
 		}
 		.services {
 
@@ -257,10 +257,10 @@ body, input[type="text"] {
 				cursor: pointer;
 			}
 
-			ul {
+			> ul {
 				height: 100%; width: 100%; padding-bottom: 52px;
 
-				li {
+				> li {
 					display: block; float: left;
 					height: 52px; width: 52px;
 					border-bottom: 1px solid #666666;
@@ -269,29 +269,81 @@ body, input[type="text"] {
 					background-position: 32px 9px, 0px 0px;
 					background-size: 11px 11px, auto 52px;
 				}
-				li:hover {
+				> li:hover {
 					background-position: 32px 9px, -52px 0px;
+
+					ul.contextMenu {
+						display: block;
+					}
 				}
-				li:active {
+				> li:active {
 					background-position: 32px 9px, -104px 0px;
 				}
-				li.dropbox {
+				> li.dropbox {
 					background-image: url("../images/default/srv-state-disconnected.png"), url("../images/default/srv-dropbox.png");
 				}
-				li.dropbox.connected {
+				> li.dropbox.connected {
 					background-image: url("../images/default/srv-state-connected.png"), url("../images/default/srv-dropbox.png");
 				}
-				li.www {
+				> li.www {
 					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-www.png');
 				}
-				li.www.connected {
+				> li.www.connected {
 					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-www.png');
 				}
-				li.ftp {
+				> li.ftp {
 					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-ftp.png');
 				}
-				li.ftp.connected {
+				> li.ftp.connected {
 					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-ftp.png');
+				}
+
+				ul.contextMenu {
+
+					position: absolute; z-index: 20;
+					width: 170px; left: 50px; margin-top: 4px;
+					display: none;
+					padding: 0px;
+					background: {
+						color: #fcf6d6;
+					}
+					border: {
+						left: 1px solid black;
+						top: 1px solid black;
+						right: 1px solid black;
+					}
+
+					li {
+						height: 27px; line-height: 26px;
+						margin: 0px; padding: 0px; padding-left: 6px;
+						border-bottom: 1px solid black;
+					}
+					li:hover {
+						text-decoration: underline;
+					}
+					li.logout {
+						display: none;
+					}
+				}
+				ul.contextMenu::before {
+
+					content: "";
+					position: absolute;
+					width: 0; height: 0;
+					margin-left: -12px; margin-top: 8px;
+					border: {
+						width: 6px;
+						style: solid;
+						color: transparent black transparent transparent;
+					}
+				}
+				li.connected {
+					li.login {
+						display: none;
+					}
+					li.logout {
+						display: block;
+					}
 				}
 			}
 		}

@@ -109,6 +109,10 @@ class Application {
 
 	public dynamic function onCloseClicked() : Void { }
 
+	public dynamic function onServiceLoginRequest(name : String) : Void { }
+
+	public dynamic function onServiceLogoutRequest(name : String) : Void { }
+
 	public dynamic function onServiceClicked(name : String) : Void { }
 
 	public dynamic function onFileClicked(id : String) : Void { }
@@ -437,6 +441,8 @@ class Application {
 		home.onServiceClicked = function(name : String) { onServiceClicked(name); }
 
 		fileBrowser = new FileBrowser(rootElt.querySelector(SELECTOR_FILE_BROWSER));
+		fileBrowser.onServiceLogoutRequest = function(name : String) { onServiceLogoutRequest(name); }
+		fileBrowser.onServiceLoginRequest = function(name : String) { onServiceLoginRequest(name); }
 		fileBrowser.onServiceClicked = function(name : String) { onServiceClicked(name); }
 		fileBrowser.onFileClicked = function(id : String) { onFileClicked(id); }
 		fileBrowser.onFileSelectClicked = function(id : String) { onFileSelectClicked(id); }

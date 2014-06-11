@@ -14,6 +14,7 @@ package ce.core.view;
 import js.html.Element;
 import js.html.InputElement;
 import js.html.KeyboardEvent;
+import js.html.NodeList;
 
 import haxe.ds.StringMap;
 
@@ -33,6 +34,7 @@ class FileBrowser {
 	static inline var SELECTOR_NEW_FOLDER_ITEM : String = ".folder.new";
 	static inline var SELECTOR_FOLDER_ITEM_TMPL : String = ".folder:nth-last-child(-n+1)";
 	static inline var SELECTOR_FILE_ITEM_TMPL : String = ".file";
+	static inline var SELECTOR_CONTEXT_MENU_ITEMS : String = "ul.contextMenu li";
 
 	static inline var SELECTOR_NAME_BTN : String = ".titles .fileName";
 	static inline var SELECTOR_TYPE_BTN : String = ".titles .fileType";
@@ -113,6 +115,10 @@ class FileBrowser {
 	// CALLBACKS
 	//
 
+	public dynamic function onServiceLoginRequest(name : String) : Void { }
+
+	public dynamic function onServiceLogoutRequest(name : String) : Void { }
+
 	public dynamic function onServiceClicked(name : String) : Void { }
 
 	public dynamic function onFileSelected(id : String) : Void { }
@@ -151,9 +157,32 @@ class FileBrowser {
 
 		var newItem : Element = cast srvItemTmpl.cloneNode(true);
 		newItem.className = name;
-		newItem.setAttribute("title", newItem.getAttribute("title").replace("{srvName}", displayName));
+		//newItem.setAttribute("title", newItem.getAttribute("title").replace("{srvName}", displayName));
 
-		newItem.addEventListener( "click", function(?_){ onServiceClicked(name); } );
+		newItem.addEventListener("click", function(?_){ onServiceClicked(name); });
+
+		var lis : NodeList = newItem.querySelectorAll(SELECTOR_CONTEXT_MENU_ITEMS);
+
+		for (i in 0...lis.length) {
+
+			var li : Element = cast lis[i];
+
+			li.textContent = li.textContent.replace("{srvName}", displayName);
+			li.addEventListener("click", function(e:js.html.MouseEvent){
+
+					e.stopPropagation();
+
+					if (li.classList.contains("login")) {
+
+						onServiceLoginRequest(name);
+
+					} else if (li.classList.contains("logout")) {
+
+						onServiceLogoutRequest(name);
+					}
+
+				});
+		}
 
 		srvListElt.appendChild(newItem);
 
