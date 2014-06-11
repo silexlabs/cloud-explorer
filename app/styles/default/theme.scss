@@ -106,17 +106,24 @@ body, input[type="text"] {
 				margin: 10px;
 				cursor: pointer;
 				user-select: none;
+				padding-top: 90px;
 				background: {
 					repeat: no-repeat;
 					size: auto 110px;
-					position: 0px 0px;
+					position: 0px -8px;
+				}
+				border: 1px solid 34b7ea;
+				font: {
+					size: 16;
 				}
 			}
 			li:hover {
-				background-position: -110px 0px;
+				background-position: -110px -8px;
+				border: 1px solid 288cb3;
 			}
 			li:active {
-				background-position: -220px 0px;
+				background-position: -220px -8px;
+				border: 1px solid 195a73;
 			}
 			li.dropbox {
 				background-image: url('../images/default/home-dropbox.png');
