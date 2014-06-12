@@ -74,7 +74,7 @@ module.exports = function (grunt) {
                 options: {
                     open : true,
                     keepalive:true,
-                    base: ['test/bin']  
+                    base: ['test/bin']
                 }
             },
             dist: {
@@ -380,6 +380,25 @@ module.exports = function (grunt) {
       console.log('Start Silex', server);
   });
 */
+    // run haxe and build Cloud Explorer
+    grunt.registerTask('npmHaxeBuild', 'Run haxe to build Cloud Explorer', function () {
+        var buildCommand = 'node node_modules/haxe/bin/haxe-cli.js build.hxml';
+        console.log('Run haxe and build Cloud Explorer');
+        console.log('Executing', buildCommand);
+        var cp = require('child_process')
+        cp.exec(buildCommand);
+
+        grunt.task.run([
+            'clean:dist',
+            'useminPrepare',
+            'concurrent:dist',
+            'autoprefixer',
+            'concat',
+            'copy:dist',
+            'clean:native',
+            'copy:native'
+        ]);
+    });
 
     grunt.registerTask('server', function (target) {
 
