@@ -519,6 +519,8 @@ trace("ERROR HAPPENED");
 				var lastConnectedService : Null<String> = null;
 
 				application.home.resetList();
+				application.fileBrowser.resetList();
+				application.fileBrowser.resetFileList();
 
 				for (s in state.serviceList) {
 

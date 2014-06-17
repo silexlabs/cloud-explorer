@@ -148,6 +148,14 @@ class FileBrowser {
 	}
 */
 
+	public function resetList() : Void {
+
+		while(srvListElt.childNodes.length > 0) {
+
+			srvListElt.removeChild(srvListElt.childNodes.item(0));
+		}
+	}
+
 	public function removeService(name : String) : Void {
 
 		srvListElt.removeChild(srvItemElts.get(name));
