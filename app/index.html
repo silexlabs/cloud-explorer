@@ -58,7 +58,7 @@
                 
                     $('.pickImageBtn').click(function(){
 
-                            cloudExplorer.pick({ extension: "jpg" }, function(b){
+                            cloudExplorer.pick({ extensions: ["jpg", "png", "bmp", "gif"] }, function(b){
 
                                     currentBlob = b;
 

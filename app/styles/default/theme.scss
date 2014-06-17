@@ -531,7 +531,21 @@ body, input[type="text"] {
 							}
 						}
 						li.filteredOut {
-							display: none;
+							/* display: none; */
+							color: grey;
+							font-style: italic;
+							cursor: not-allowed;
+							span.fileName {
+								cursor: not-allowed;
+							}
+						}
+						li.filteredOut:hover {
+							span.icon {
+								background-position: 0px 0px;
+							}
+							button.rename, button.delete {
+								display: none;
+							}
 						}
 					}
 				}

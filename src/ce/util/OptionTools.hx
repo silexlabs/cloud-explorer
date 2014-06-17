@@ -18,10 +18,12 @@ import ce.core.model.api.WriteOptions;
 
 class OptionTools {
 
-	static public function normalizePickOptions(o : PickOptions) : PickOptions {
+	static public function normalizePickOptions(o : Null<PickOptions>) : Null<PickOptions> {
+
+		if (o == null) return o;
 
 		if (o.mimetype != null) o.mimetype = o.mimetype.toLowerCase();
-		if (o.extension != null) o.mimetype = o.mimetype.toLowerCase();
+		if (o.extension != null) o.extension = o.extension.toLowerCase();
 
 		if (o.mimetypes != null) {
 			for (mi in 0...o.mimetypes.length) {
@@ -37,22 +39,24 @@ class OptionTools {
 		return o;
 	}
 
-	static public function normalizeExportOptions(o : ExportOptions) : ExportOptions {
+	static public function normalizeExportOptions(o : Null<ExportOptions>) : Null<ExportOptions> {
+
+		if (o == null) return o;
 
 		if (o.mimetype != null) o.mimetype = o.mimetype.toLowerCase();
-		if (o.extension != null) o.mimetype = o.mimetype.toLowerCase();
+		if (o.extension != null) o.extension = o.extension.toLowerCase();
 
 		return o;
 	}
 
-	static public function normalizeReadOptions(o : ReadOptions) : ReadOptions {
+	static public function normalizeReadOptions(o : Null<ReadOptions>) : Null<ReadOptions> {
 
 		// nothing
 
 		return o;
 	}
 
-	static public function normalizeWriteOptions(o : WriteOptions) : WriteOptions {
+	static public function normalizeWriteOptions(o : Null<WriteOptions>) : Null<WriteOptions> {
 
 		// nothing
 

@@ -365,7 +365,12 @@ class FileListItem {
 		checkBoxElt.addEventListener("change", function(?_){ onCheckedStatusChanged(); });
 
 		this.nameElt = elt.querySelector("span.fileName");
-		nameElt.addEventListener( "click", function(?_){ onClicked(); } );
+		nameElt.addEventListener( "click", function(?_){
+
+				if (filteredOut) return;
+
+				onClicked();
+			} );
 
 		this.renameInput = cast elt.querySelector("input[type='text']");
 		renameInput.addEventListener("keydown", function(e : KeyboardEvent){
@@ -401,7 +406,12 @@ class FileListItem {
 
 		this.selectBtn = elt.querySelector("button.select");
 		if (selectBtn != null) {
-			selectBtn.addEventListener( "click", function(?_){ onSelectClicked(); } );
+			selectBtn.addEventListener( "click", function(?_){
+
+					if (filteredOut) return;
+
+					onSelectClicked();
+				} );
 		}
 	}
 
