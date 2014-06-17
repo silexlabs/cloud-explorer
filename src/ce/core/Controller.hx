@@ -37,6 +37,7 @@ import ce.core.service.FileSrv;
 import haxe.ds.StringMap;
 
 using ce.util.FileTools;
+using ce.util.OptionTools;
 using StringTools;
 
 class Controller {
@@ -70,6 +71,8 @@ class Controller {
 
 	public function pick(? options : Null<PickOptions>, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
 
+		options.normalizePickOptions();
+
 		state.currentMode = SingleFileSelection(onSuccess, onError, options);
 
 		show();
@@ -84,6 +87,8 @@ class Controller {
 	public function read(input : CEBlob, options : Null<ReadOptions>, onSuccess : String -> Void, onError : CEError -> Void, 
 			onProgress : Int -> Void) {
 
+		options.normalizeReadOptions();
+
 		fileSrv.get(input.url, onSuccess, setError);
 	}
 
@@ -92,6 +97,8 @@ class Controller {
 	 * 	- support url inputs
 	 */
 	public function exportFile(input : CEBlob, options : Null<ExportOptions>, onSuccess : CEBlob -> Void, onError : CEError -> Void) {
+
+		options.normalizeExportOptions();
 
 		state.currentMode = SingleFileExport(onSuccess, onError, input, options);
 
@@ -103,6 +110,8 @@ class Controller {
 	 *  - data => Can be raw data, a CEBlob, a DOM File Object, or an <input type="file"/>.
 	 */
 	public function write(target : CEBlob, data : Dynamic, options : Null<WriteOptions>, onSuccess : CEBlob -> Void, onError : CEError -> Void, onProgress : Null<Int -> Void>) : Void {
+
+		options.normalizeWriteOptions();
 
 		var explodedUrl : { srv : String, path : String, filename : String } = unifileSrv.explodeUrl(target.url);
 
