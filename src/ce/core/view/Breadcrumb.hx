@@ -67,7 +67,7 @@ class Breadcrumb {
 
 			while (parr.length > 0) {
 
-				var itPath : String = "/" + parr.join("/");
+				var itPath : String = "/" + parr.join("/") + "/";
 				var pit : String = parr.pop();
 
 				if (pit.trim() != "") {
