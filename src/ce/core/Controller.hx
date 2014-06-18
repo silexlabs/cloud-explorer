@@ -34,6 +34,8 @@ import ce.core.parser.oauth.Str2OAuthResult;
 import ce.core.service.UnifileSrv;
 import ce.core.service.FileSrv;
 
+import ce.core.ctrl.ErrorCtrl;
+
 import haxe.ds.StringMap;
 
 using ce.util.FileTools;
@@ -53,11 +55,15 @@ class Controller {
 
 		this.application = new Application(iframe, config);
 
+		this.errorCtrl = new ErrorCtrl(state, application);
+
 		initMvc();
 	}
 
 	var config : Config;
 	var state : State;
+
+	var errorCtrl : ErrorCtrl;
 
 	var application : Application;
 	
@@ -89,7 +95,7 @@ class Controller {
 
 		options.normalizeReadOptions();
 
-		fileSrv.get(input.url, onSuccess, setError);
+		fileSrv.get(input.url, onSuccess, errorCtrl.setError); // FIXME
 	}
 
 	/**
@@ -126,7 +132,58 @@ class Controller {
 
 				onSuccess(target);
 
-			}, setError);
+			}, errorCtrl.setError); // FIXME
+	}
+
+	public function isLoggedIn(srvName : String, onSuccess : Bool -> Void, onError : CEError -> Void) : Void {
+
+		state.currentMode = IsLoggedIn(onSuccess, onError, srvName);
+		
+		if (state.serviceList == null) {
+
+			listServices();
+
+		} else {
+
+			if (state.serviceList.get(srvName) == null) {
+
+				trace("unknown service "+srvName);
+				onError(new CEError(CEError.CODE_BAD_PARAMETERS));
+			
+			} else {
+
+				onSuccess(state.serviceList.get(srvName).isLoggedIn);
+			}
+		}
+	}
+
+	public function requestAuthorize(srvName : String, onSuccess : Void -> Void, onError : CEError -> Void) : Void {
+
+		state.currentMode = RequestAuthorize(onSuccess, onError, srvName);
+
+		if (state.serviceList == null) {
+
+			listServices();
+
+		} else {
+
+			if (state.serviceList.get(srvName) == null) {
+
+				trace("unknown service "+srvName);
+				onError(new CEError(CEError.CODE_BAD_PARAMETERS));
+			
+			} else if (state.serviceList.get(srvName).isLoggedIn) {
+
+				trace("user already logged into "+srvName);
+				onSuccess();
+
+			} else {
+
+				state.displayState = true;
+
+				connect(srvName);
+			}
+		}
 	}
 
 	public function setAlert(msg : String, ? level : Int = 2, ? choices : Array<{ msg : String, cb : Void -> Void }>) : Void {
@@ -144,15 +201,6 @@ class Controller {
 		}
 
 		application.alertPopup.setMsg(msg, level, choices);
-
-		application.setAlertPopupDisplayed(true);
-	}
-
-	public function setError(msg : String) : Void {
-
-		application.setLoaderDisplayed(false); // FIXME should this be there ?
-trace("ERROR HAPPENED");
-		application.alertPopup.setMsg(msg, 0, [{ msg: "Continue", cb: function() { application.setAlertPopupDisplayed(false); }}]);
 
 		application.setAlertPopupDisplayed(true);
 	}
@@ -345,7 +393,7 @@ trace("ERROR HAPPENED");
 
 							refreshFilesList();
 
-						}, setError);
+						}, errorCtrl.setError); // FIXME
 				}
 			}
 
@@ -446,7 +494,7 @@ trace("ERROR HAPPENED");
 
 					refreshFilesList();
 
-				}, setError);
+				}, errorCtrl.setError); // FIXME
 			}
 
 		application.onNavBtnClicked = function(srv : String, path : String) {
@@ -495,7 +543,7 @@ trace("ERROR HAPPENED");
 
 							state.newFolderMode = false;
 
-							setError(e);
+							errorCtrl.setError(e); // FIXME
 
 						});
 				}
@@ -524,6 +572,21 @@ trace("ERROR HAPPENED");
 			}
 
 		state.onServiceListChanged = function() {
+
+				switch (state.currentMode) {
+
+					case IsLoggedIn(onSuccess, onError, srvName) :
+
+						isLoggedIn(srvName, onSuccess, onError);
+
+					case RequestAuthorize(onSuccess, onError, srvName):
+
+						requestAuthorize(srvName, onSuccess, onError);
+
+					case SingleFileSelection(_), SingleFileExport(_):
+
+						// nothing in particular
+				}
 
 				var lastConnectedService : Null<String> = null;
 
@@ -573,6 +636,22 @@ trace("ERROR HAPPENED");
 
 				application.fileBrowser.setSrvConnected(srvName, state.serviceList.get(srvName).isLoggedIn);
 
+				switch (state.currentMode) {
+
+					case SingleFileSelection(_), SingleFileExport(_):
+
+						// nothing
+
+					case IsLoggedIn(_):
+
+						throw "unexpected mode: " + state.currentMode;
+
+					case RequestAuthorize(onSuccess, _, _):
+
+						onSuccess();
+						hide();
+				}
+
 				if (!state.serviceList.get(srvName).isLoggedIn) {
 
 					if (state.currentLocation.service == srvName) {
@@ -598,7 +677,7 @@ trace("ERROR HAPPENED");
 
 								state.serviceList.get(srvName).account = a;
 
-							}, setError);
+							}, errorCtrl.setError); // FIXME
 					}
 					state.currentLocation = new Location(srvName, "/");
 				}
@@ -688,6 +767,10 @@ trace("ERROR HAPPENED");
 					application.fileBrowser.filters = null;
 
 					switch (state.currentMode) {
+
+						case IsLoggedIn(_), RequestAuthorize(_):
+
+							// nothing...
 
 						case SingleFileSelection(onSuccess, onError, options):
 
@@ -819,7 +902,7 @@ trace("ERROR HAPPENED");
 							refreshFilesList();
 						}
 
-					}, setError);
+					}, errorCtrl.setError); // FIXME
 			}
 		}
 	}
@@ -840,7 +923,7 @@ trace("ERROR HAPPENED");
 
 				refreshFilesList();
 
-			}, setError);
+			}, errorCtrl.setError); // FIXME
 	}
 
 	/**
@@ -914,7 +997,7 @@ trace("ERROR HAPPENED");
 
 				application.setLoaderDisplayed(false);
 
-			}, setError);
+			}, errorCtrl.setError); // FIXME
 	}
 
 	private function connect(srv : ce.core.model.Service) : Void {
@@ -978,10 +1061,10 @@ trace("ERROR HAPPENED");
 
 					state.serviceList.get(srv).isConnected = false;
 
-					setError(cr.message);
+					errorCtrl.manageConnectError(cr.message);
 				}
 
-			}, setError);
+			}, function(msg:String) { errorCtrl.manageConnectError(msg); });
 	}
 
 	private function login(srv : ce.core.model.Service) : Void {
@@ -992,6 +1075,8 @@ trace("ERROR HAPPENED");
 
 			unifileSrv.login(srv, function(lr : ce.core.model.unifile.LoginResult){
 
+					application.setLoaderDisplayed(false);
+
 					if (lr.success) {
 
 						state.serviceList.get(srv).isLoggedIn = true;
@@ -999,12 +1084,11 @@ trace("ERROR HAPPENED");
 					} else {
 
 						state.serviceList.get(srv).isLoggedIn = false;
-						setError('Could not login. Please try again.');
+						
+						errorCtrl.manageLoginError('Could not login. Please try again.');
 					}
 
-					application.setLoaderDisplayed(false);
-
-				}, setError);
+				}, function(msg:String){ errorCtrl.manageLoginError(msg); });
 		
 		} else {
 
@@ -1024,14 +1108,14 @@ trace("ERROR HAPPENED");
 
 					if (!lr.success) {
 
-						setError(lr.message);
+						errorCtrl.setError(lr.message); // FIXME
 					
 					} else {
 
 						state.serviceList.get(srv).isLoggedIn = false;
 					}
 
-				}, setError);
+				}, errorCtrl.setError); // FIXME
 		
 		} else {
 
@@ -1062,7 +1146,7 @@ trace("ERROR HAPPENED");
 
 					if (!lr.success) {
 
-						setError(lr.message);
+						errorCtrl.setError(lr.message); // FIXME
 					
 					} else {
 
@@ -1076,7 +1160,7 @@ trace("ERROR HAPPENED");
 						}
 					}
 
-				}, setError);
+				}, errorCtrl.setError); // FIXME
 		}
 	}
 
@@ -1090,7 +1174,7 @@ trace("ERROR HAPPENED");
 
 				state.serviceList = slm;
 
-			}, setError);
+			}, function(msg:String){ errorCtrl.manageListSrvError(msg); });
 	}
 
 	private function hide() : Void {

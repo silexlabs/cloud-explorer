@@ -105,6 +105,30 @@ trace("options: "+options+"  onSuccess: "+onSuccess+"  onError: "+onError);
 		ctrl.write(target, data, options, onSuccess, onError, onProgress);
 	}
 
+	/**
+	 * Non-Ink API method to check if the user is currently logged into a service.
+	 */
+	public function isLoggedIn(arg1 : Dynamic, ? arg2 : Dynamic, ? arg3 : Dynamic) : Void {
+		
+		var srvName : String = arg1;
+		var onSuccess : Bool -> Void = arg2;
+		var onError : CEError -> Void = arg3;
+
+		return ctrl.isLoggedIn(srvName, onSuccess, onError);
+	}
+
+	/**
+	 * Non-Ink API method to ask the user to authorize a service.
+	 */
+	public function requestAuthorize(arg1 : Dynamic, ? arg2 : Dynamic, ? arg3 : Dynamic) : Void {
+		
+		var srvName : String = arg1;
+		var onSuccess : Void -> Void = arg2;
+		var onError : CEError -> Void = arg3;
+
+		ctrl.requestAuthorize(srvName, onSuccess, onError);
+	}
+
 
 	///
 	// INTERNALS

@@ -56,6 +56,8 @@ class Application {
 
 	static inline var CLASS_MODE_SINGLE_FILE_SELECTION : String = "single-file-sel-mode";
 	static inline var CLASS_MODE_SINGLE_FILE_EXPORT : String = "single-file-exp-mode";
+	static inline var CLASS_MODE_IS_LOGGED_IN : String = "is-logged-in-mode";
+	static inline var CLASS_MODE_REQUEST_AUTHORIZE : String = "request-authorize-mode";
 
 	static inline var CLASS_ITEMS_LIST : String = "items-list";
 	static inline var CLASS_ITEMS_ICONS : String = "items-icons";
@@ -339,6 +341,14 @@ class Application {
 				case SingleFileExport(_):
 
 					rootElt.toggleClass(CLASS_MODE_SINGLE_FILE_EXPORT , true);
+
+				case IsLoggedIn(_):
+
+					rootElt.toggleClass(CLASS_MODE_IS_LOGGED_IN , true);
+
+				case RequestAuthorize(_):
+
+					rootElt.toggleClass(CLASS_MODE_REQUEST_AUTHORIZE , true);
 			}
 		}
 	}

@@ -30,6 +30,8 @@
         <button class="storeBtn">Store</button>
         <button class="convertBtn">Convert</button>
         <button class="removeBtn">Remove</button>
+        <button class="isLoggedIntoWww">Is logged into www ?</button>
+        <button class="authorizeWww">authorize www</button>
 
         <textarea class="console"></textarea>
 
@@ -44,6 +46,33 @@
                     window.cloudExplorer = ce.api.CloudExplorer.get();
 
                     textarea.val("Cloud Explorer ready");
+                
+                    $('.isLoggedIntoWww').click(function(){
+
+                            cloudExplorer.isLoggedIn("www", function(ret){
+
+                                    if (ret)
+                                        textarea.val(textarea.val() + "\nUser logged into www.");
+                                    else
+                                        textarea.val(textarea.val() + "\nUser not logged into www.");
+                                
+                                }, function(e){ 
+
+                                    textarea.val(textarea.val() + "\nError while checking if user not logged into www: "+e);
+                                });
+                        });
+                
+                    $('.authorizeWww').click(function(){
+
+                            cloudExplorer.requestAuthorize("www", function(){
+
+                                    textarea.val(textarea.val() + "\nUser successfully logged into www.");
+
+                                }, function(e) {
+
+                                    textarea.val(textarea.val() + "\nError while user tried to log into www: "+e);
+                                });
+                        });
                 
                     $('.pickBtn').click(function(){
 

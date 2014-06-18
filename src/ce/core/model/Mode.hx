@@ -18,4 +18,6 @@ enum Mode {
 
 	SingleFileSelection(onSuccess : CEBlob -> Void, onError : CEError -> Void, options : Null<PickOptions>);
 	SingleFileExport(onSuccess : CEBlob -> Void, onError : CEError -> Void, input : CEBlob, options : Null<ExportOptions>);
+	IsLoggedIn(onSuccess : Bool -> Void, onError : CEError -> Void, srvName : String);
+	RequestAuthorize(onSuccess : Void -> Void, onError : CEError -> Void, srvName : String);
 }
