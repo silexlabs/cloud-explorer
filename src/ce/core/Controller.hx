@@ -325,6 +325,21 @@ class Controller {
 
 						hide();
 
+					case SingleFileExport(onSuccess, onError, input, options) if (!f.isDir):
+
+						onSuccess({
+								url: unifileSrv.generateUrl(state.currentLocation.service, state.currentLocation.path, f.name),
+								filename: f.name,
+								mimetype: f.name.getMimeType(),
+								size: f.bytes,
+								key: null, // FIXME not supported yet
+								container: null, // FIXME not supported yet
+								isWriteable: true, // FIXME not managed yet
+								path: state.currentLocation.path
+							});
+
+						hide();
+
 					default:
 
 						state.currentLocation.path += state.currentFileList.get(id).name + "/";
