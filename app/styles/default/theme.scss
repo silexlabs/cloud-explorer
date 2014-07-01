@@ -6,6 +6,8 @@ body, input[type="text"] {
 	font-family: 'Roboto', arial, sans-serif; font-size: 14px; color: #727271;
 }
 
+button:focus { outline: 0; } /* avoid default blue outline on chrome */
+
 .explorer-bg {
 
 	background-color: black; opacity: .5;
