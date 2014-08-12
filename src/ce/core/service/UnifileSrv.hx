@@ -20,6 +20,7 @@ import ce.core.parser.unifile.Json2Account;
 import ce.core.parser.unifile.Json2File;
 import ce.core.parser.unifile.Json2LogoutResult;
 import ce.core.parser.unifile.Json2UploadResult;
+import ce.core.parser.unifile.Json2UnifileError;
 
 import ce.core.model.unifile.Service;
 import ce.core.model.unifile.ConnectResult;
@@ -28,9 +29,11 @@ import ce.core.model.unifile.Account;
 import ce.core.model.unifile.File;
 import ce.core.model.unifile.LogoutResult;
 import ce.core.model.unifile.UploadResult;
+import ce.core.model.unifile.UnifileError;
 
 import js.html.Blob;
 import js.html.DOMFormData;
+import js.html.XMLHttpRequest;
 
 import haxe.Http;
 
@@ -103,139 +106,249 @@ class UnifileSrv {
 		return { 'srv': srv, 'path': path, 'filename': filename };
 	}
 
-	public function listServices(onSuccess : StringMap<Service> -> Void, onError : String -> Void) : Void {
+	public function listServices(onSuccess : StringMap<Service> -> Void, onError : UnifileError -> Void) : Void {
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LIST_SERVICES);
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(data : String) {
+		req.onload = function(?_) {
 
-				var sl : Array<Service> = Json2Service.parseServiceCollection(data);
+				if (req.status != 200) {
 
-				var slm : StringMap<Service> = new StringMap();
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
 
-				for (s in sl) {
+					onError(err);
 
-					slm.set(s.name, s);
+				} else {
+
+					var sl : Array<Service> = Json2Service.parseServiceCollection(req.responseText);
+
+					var slm : StringMap<Service> = new StringMap();
+
+					for (s in sl) {
+
+						slm.set(s.name, s);
+					}
+
+					onSuccess(slm);
 				}
-
-				onSuccess(slm);
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
-	}
-
-	public function connect(srv : String, onSuccess : ConnectResult -> Void, onError : String -> Void) : Void {
-
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_CONNECT.replace("{srv}", srv));
-
-		http.onData = function(data : String) {
-
-				onSuccess(Json2ConnectResult.parse(data));
+				onError({ success: false, code: 0, message: "The request has failed." });
 			}
 
-		http.onError = onError;
-
-		http.request(false);
+		req.open("GET", config.unifileEndpoint + ENDPOINT_LIST_SERVICES);
+		
+		req.send();
 	}
 
-	public function login(srv : String, onSuccess : LoginResult -> Void, onError : String -> Void) : Void {
+	public function connect(srv : String, onSuccess : ConnectResult -> Void, onError : UnifileError -> Void) : Void {
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LOGIN.replace("{srv}", srv));
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(data : String) {
+		req.onload = function(?_) {
 
-				onSuccess(Json2LoginResult.parse(data));
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess(Json2ConnectResult.parse(req.responseText));
+				}
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
-	}
-
-	public function account(srv : String, onSuccess : Account -> Void, onError : String -> Void) : Void {
-
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_ACCOUNT.replace("{srv}", srv));
-
-		http.onData = function(data : String) {
-
-				onSuccess(Json2Account.parseAccount(data));
+				onError({ success: false, code: 0, message: "The request has failed." });
 			}
 
-		http.onError = onError;
-
-		http.request(true);
+		req.open("GET", config.unifileEndpoint + ENDPOINT_CONNECT.replace("{srv}", srv));
+		
+		req.send();
 	}
 
-	public function logout(srv : String, onSuccess : LogoutResult -> Void, onError : String -> Void) : Void {
+	public function login(srv : String, onSuccess : LoginResult -> Void, onError : UnifileError -> Void) : Void {
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LOGOUT.replace("{srv}", srv));
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(data : String) {
+		req.onload = function(?_) {
 
-				onSuccess(Json2LogoutResult.parse(data));
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess(Json2LoginResult.parse(req.responseText));
+				}
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", config.unifileEndpoint + ENDPOINT_LOGIN.replace("{srv}", srv));
+		
+		req.send();
 	}
 
-	public function ls(srv : String, path : String, onSuccess : StringMap<File> -> Void, onError : String -> Void) : Void {
+	public function account(srv : String, onSuccess : Account -> Void, onError : UnifileError -> Void) : Void {
+
+		var req : XMLHttpRequest = new XMLHttpRequest();
+
+		req.onload = function(?_) {
+
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess(Json2Account.parseAccount(req.responseText));
+				}
+			}
+
+		req.onerror = function(?_) {
+
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("POST", config.unifileEndpoint + ENDPOINT_ACCOUNT.replace("{srv}", srv));
+		
+		req.send();
+	}
+
+	public function logout(srv : String, onSuccess : LogoutResult -> Void, onError : UnifileError -> Void) : Void {
+
+		var req : XMLHttpRequest = new XMLHttpRequest();
+
+		req.onload = function(?_) {
+
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess(Json2LogoutResult.parse(req.responseText));
+				}
+			}
+
+		req.onerror = function(?_) {
+
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", config.unifileEndpoint + ENDPOINT_LOGOUT.replace("{srv}", srv));
+		
+		req.send();
+	}
+
+	public function ls(srv : String, path : String, onSuccess : StringMap<File> -> Void, onError : UnifileError -> Void) : Void {
 
 		// on FF, ls// throws an error
 		path = path == '/' ? '' : path;
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_LS.replace("{srv}", srv).replace("{path}", path));
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(data : String) {
+		req.onload = function(?_) {
 
-				var fa : Array<File> = Json2File.parseFileCollection(data);
+				if (req.status != 200) {
 
-				var fsm : StringMap<File> = new StringMap();
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
 
-				for (f in fa) {
+					onError(err);
 
-					fsm.set(f.name, f);
+				} else {
+
+					var fa : Array<File> = Json2File.parseFileCollection(req.responseText);
+
+					var fsm : StringMap<File> = new StringMap();
+
+					for (f in fa) {
+
+						fsm.set(f.name, f);
+					}
+
+					onSuccess(fsm);
 				}
-
-				onSuccess(fsm);
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", config.unifileEndpoint + ENDPOINT_LS.replace("{srv}", srv).replace("{path}", path), true);
+		
+		req.send();
 	}
 
-	public function rm(srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
+	public function rm(srv : String, path : String, onSuccess : Void -> Void, onError : UnifileError -> Void) : Void {
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_RM.replace("{srv}", srv).replace("{path}", path));
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(?_) {
+		req.onload = function(?_) {
 
-				onSuccess();
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess();
+				}
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", config.unifileEndpoint + ENDPOINT_RM.replace("{srv}", srv).replace("{path}", path), true);
+		
+		req.send();
 	}
 
-	public function mkdir(srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
+	public function mkdir(srv : String, path : String, onSuccess : Void -> Void, onError : UnifileError -> Void) : Void {
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_MKDIR.replace("{srv}", srv).replace("{path}", path));
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(data : String) {
+		req.onload = function(?_) {
 
-				trace("data= "+data);
+				if (req.status != 200) {
 
-				onSuccess();
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess();
+				}
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", config.unifileEndpoint + ENDPOINT_MKDIR.replace("{srv}", srv).replace("{path}", path));
+		
+		req.send();
 	}
 
 	public function cp() : Void {
@@ -243,21 +356,35 @@ class UnifileSrv {
 		
 	}
 
-	public function mv(srv : String, oldPath : String, newPath : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
+	public function mv(srv : String, oldPath : String, newPath : String, onSuccess : Void -> Void, onError : UnifileError -> Void) : Void {
 
-		var http : Http = new Http(config.unifileEndpoint + ENDPOINT_MV.replace("{srv}", srv).replace("{path}", oldPath + ":" + newPath));
+		var req : XMLHttpRequest = new XMLHttpRequest();
 
-		http.onData = function(?_) {
+		req.onload = function(?_) {
 
-				onSuccess();
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess();
+				}
 			}
 
-		http.onError = onError;
+		req.onerror = function(?_) {
 
-		http.request(false);
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", config.unifileEndpoint + ENDPOINT_MV.replace("{srv}", srv).replace("{path}", oldPath + ":" + newPath));
+		
+		req.send();
 	}
 
-	public function upload(? blobs : StringMap<Blob>, ? files : js.html.FileList, srv : String, path : String, onSuccess : Void -> Void, onError : String -> Void) : Void {
+	public function upload(? blobs : StringMap<Blob>, ? files : js.html.FileList, srv : String, path : String, onSuccess : Void -> Void, onError : UnifileError -> Void) : Void {
 
 		// enforce path as a folder path
 		if (path != "" && path.lastIndexOf('/') != path.length - 1) { // TODO check in unifile if it's not a bug
@@ -288,7 +415,7 @@ class UnifileSrv {
 			}
 		}
 
-		var xhttp : js.html.XMLHttpRequest = new js.html.XMLHttpRequest();
+		var xhttp : XMLHttpRequest = new XMLHttpRequest();
 
 		xhttp.open("POST", config.unifileEndpoint + ENDPOINT_PUT.replace("{srv}", srv).replace("{path}", path));
 
@@ -303,13 +430,15 @@ class UnifileSrv {
 				
 				} else {
 				
-					onError("Error " + xhttp.status + " occurred uploading your file(s)");
+					var err : UnifileError = Json2UnifileError.parseUnifileError(xhttp.responseText);
+
+					onError(err);
 				}
 			};
 
 		xhttp.onerror = function(?_) {
 
-				onError("Error " + xhttp.status + " occurred uploading your file(s)");
+				onError({ success: false, code: 0, message: "The request has failed." });
 			}
 
 		xhttp.send(formData);

@@ -15,6 +15,7 @@ import ce.core.view.Application;
 
 import ce.core.model.State;
 import ce.core.model.CEError;
+import ce.core.model.unifile.UnifileError;
 
 class ErrorCtrl {
 
@@ -90,6 +91,14 @@ class ErrorCtrl {
 
 				throw "unexpected mode " + state.currentMode;
 		}
+	}
+
+	/**
+	 * FIXME UnifileError should probably be converted to a generic error in service layer
+	 */
+	public function setUnifileError(err : UnifileError) : Void {
+
+		setError(err.message);
 	}
 
 

@@ -34,6 +34,7 @@ import ce.core.parser.oauth.Str2OAuthResult;
 import ce.core.service.UnifileSrv;
 import ce.core.service.FileSrv;
 
+import ce.core.model.unifile.UnifileError;
 import ce.core.ctrl.ErrorCtrl;
 
 import haxe.ds.StringMap;
@@ -132,7 +133,7 @@ class Controller {
 
 				onSuccess(target);
 
-			}, errorCtrl.setError); // FIXME
+			}, errorCtrl.setUnifileError);
 	}
 
 	public function isLoggedIn(srvName : String, onSuccess : Bool -> Void, onError : CEError -> Void) : Void {
@@ -148,6 +149,7 @@ class Controller {
 			if (state.serviceList.get(srvName) == null) {
 
 				trace("unknown service "+srvName);
+
 				onError(new CEError(CEError.CODE_BAD_PARAMETERS));
 			
 			} else {
@@ -408,7 +410,7 @@ class Controller {
 
 							refreshFilesList();
 
-						}, errorCtrl.setError); // FIXME
+						}, errorCtrl.setUnifileError);
 				}
 			}
 
@@ -509,7 +511,7 @@ class Controller {
 
 					refreshFilesList();
 
-				}, errorCtrl.setError); // FIXME
+				}, errorCtrl.setUnifileError);
 			}
 
 		application.onNavBtnClicked = function(srv : String, path : String) {
@@ -554,11 +556,11 @@ class Controller {
 
 							refreshFilesList();
 
-						}, function(e : String){ 
+						}, function(e : UnifileError){ 
 
 							state.newFolderMode = false;
 
-							errorCtrl.setError(e); // FIXME
+							errorCtrl.setUnifileError(e);
 
 						});
 				}
@@ -692,7 +694,7 @@ class Controller {
 
 								state.serviceList.get(srvName).account = a;
 
-							}, errorCtrl.setError); // FIXME
+							}, errorCtrl.setUnifileError);
 					}
 					state.currentLocation = new Location(srvName, "/");
 				}
@@ -917,7 +919,7 @@ class Controller {
 							refreshFilesList();
 						}
 
-					}, errorCtrl.setError); // FIXME
+					}, errorCtrl.setUnifileError);
 			}
 		}
 	}
@@ -938,7 +940,7 @@ class Controller {
 
 				refreshFilesList();
 
-			}, errorCtrl.setError); // FIXME
+			}, errorCtrl.setUnifileError);
 	}
 
 	/**
@@ -1012,7 +1014,7 @@ class Controller {
 
 				application.setLoaderDisplayed(false);
 
-			}, errorCtrl.setError); // FIXME
+			}, errorCtrl.setUnifileError);
 	}
 
 	private function connect(srv : ce.core.model.Service) : Void {
@@ -1026,60 +1028,57 @@ class Controller {
 
 		unifileSrv.connect(srv, function(cr : ce.core.model.unifile.ConnectResult) {
 
-				if (cr.success) {
+				state.serviceList.get(srv).isConnected = true;
 
-					state.serviceList.get(srv).isConnected = true;
+				application.authPopup.setServerName(state.serviceList.get(srv).displayName);
 
-					application.authPopup.setServerName(state.serviceList.get(srv).displayName);
+				application.authPopup.onClicked = function() {
 
-					application.authPopup.onClicked = function() {
+						application.onAuthorizationWindowBlocked = function() {
 
-							application.onAuthorizationWindowBlocked = function() {
+								application.setAuthPopupDisplayed(false);
 
-									application.setAuthPopupDisplayed(false);
+								setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
+							}
 
-									setAlert("Popup Blocker is enabled! Please add this site to your exception list and reload the page.", 0);
-								}
+						application.onServiceAuthorizationDone = function(? result : Null<OAuthResult>) {
 
-							application.onServiceAuthorizationDone = function(? result : Null<OAuthResult>) {
+								application.setAuthPopupDisplayed(false);
 
-									application.setAuthPopupDisplayed(false);
+								if (state.serviceList.get(srv).isOAuth) {
 
-									if (state.serviceList.get(srv).isOAuth) {
+									if (result != null && result.notApproved != true) {
 
-										if (result != null && result.notApproved != true) {
-
-											login(srv);
-
-										} else {
-
-											application.setLoaderDisplayed(false);
-										}
+										login(srv);
 
 									} else {
 
-										login(srv);
+										application.setLoaderDisplayed(false);
 									}
+
+								} else {
+
+									login(srv);
 								}
+							}
 
-							var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
-														+ 'oauth_callback=' + StringTools.urlEncode(application.location
-														+ (!application.location.endsWith('/') && !config.path.startsWith('/') ? '/' : '') + 
-														config.path + (!config.path.endsWith('/') && config.path.length > 0 ? '/' : '') + 'oauth-cb.html');
+						var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
+													+ 'oauth_callback=' + StringTools.urlEncode(application.location
+													+ (!application.location.endsWith('/') && !config.path.startsWith('/') ? '/' : '') + 
+													config.path + (!config.path.endsWith('/') && config.path.length > 0 ? '/' : '') + 'oauth-cb.html');
 
-							application.openAuthorizationWindow(authUrl);
-						}
+						application.openAuthorizationWindow(authUrl);
+					}
 
-					application.setAuthPopupDisplayed(true);
+				application.setAuthPopupDisplayed(true);
 
-				} else {
+			}, function(e : UnifileError) {
 
-					state.serviceList.get(srv).isConnected = false;
+				state.serviceList.get(srv).isConnected = false;
 
-					errorCtrl.manageConnectError(cr.message);
-				}
+				errorCtrl.manageConnectError(e.message);
 
-			}, function(msg:String) { errorCtrl.manageConnectError(msg); });
+			});
 	}
 
 	private function login(srv : ce.core.model.Service) : Void {
@@ -1092,18 +1091,15 @@ class Controller {
 
 					application.setLoaderDisplayed(false);
 
-					if (lr.success) {
+					state.serviceList.get(srv).isLoggedIn = true;
 
-						state.serviceList.get(srv).isLoggedIn = true;
+				}, function(e:UnifileError){
+
+					state.serviceList.get(srv).isLoggedIn = false;
 					
-					} else {
+					errorCtrl.manageLoginError(e.message);
 
-						state.serviceList.get(srv).isLoggedIn = false;
-						
-						errorCtrl.manageLoginError('Could not login. Please try again.');
-					}
-
-				}, function(msg:String){ errorCtrl.manageLoginError(msg); });
+				});
 		
 		} else {
 
@@ -1121,16 +1117,13 @@ class Controller {
 		
 					application.setLoaderDisplayed(false);
 
-					if (!lr.success) {
+					state.serviceList.get(srv).isLoggedIn = false;
 
-						errorCtrl.setError(lr.message); // FIXME
-					
-					} else {
+				}, function(e:UnifileError) {
 
-						state.serviceList.get(srv).isLoggedIn = false;
-					}
+					errorCtrl.setUnifileError(e);
 
-				}, errorCtrl.setError); // FIXME
+				});
 		
 		} else {
 
@@ -1159,23 +1152,19 @@ class Controller {
 
 			unifileSrv.logout(s, function(lr : ce.core.model.unifile.LogoutResult){
 
-					if (!lr.success) {
+					loggedInSrvs.remove(s);
 
-						errorCtrl.setError(lr.message); // FIXME
-					
-					} else {
+					if (loggedInSrvs.length == 0) {
 
-						loggedInSrvs.remove(s);
+						application.setLoaderDisplayed(false);
 
-						if (loggedInSrvs.length == 0) {
-
-							application.setLoaderDisplayed(false);
-
-							listServices();
-						}
+						listServices();
 					}
 
-				}, errorCtrl.setError); // FIXME
+				}, function(e:UnifileError) {
+
+					errorCtrl.setUnifileError(e);
+				});
 		}
 	}
 
@@ -1189,7 +1178,11 @@ class Controller {
 
 				state.serviceList = slm;
 
-			}, function(msg:String){ errorCtrl.manageListSrvError(msg); });
+			}, function(e:UnifileError){
+
+				errorCtrl.manageListSrvError(e.message);
+
+			});
 	}
 
 	private function hide() : Void {
