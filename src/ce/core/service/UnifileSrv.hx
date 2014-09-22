@@ -35,8 +35,6 @@ import js.html.Blob;
 import js.html.DOMFormData;
 import js.html.XMLHttpRequest;
 
-import haxe.Http;
-
 import haxe.ds.StringMap;
 
 using StringTools;
@@ -442,5 +440,36 @@ class UnifileSrv {
 			}
 
 		xhttp.send(formData);
+	}
+
+	/**
+	 * Requests a file from a Unifile endpoint.
+	 */
+	public function get(url : String, onSuccess : String -> Void, onError : UnifileError -> Void) : Void {
+
+		var req : XMLHttpRequest = new XMLHttpRequest();
+
+		req.onload = function(?_) {
+
+				if (req.status != 200) {
+
+					var err : UnifileError = Json2UnifileError.parseUnifileError(req.responseText);
+
+					onError(err);
+
+				} else {
+
+					onSuccess(req.responseText);
+				}
+			}
+
+		req.onerror = function(?_) {
+
+				onError({ success: false, code: 0, message: "The request has failed." });
+			}
+
+		req.open("GET", url);
+		
+		req.send();
 	}
 }

@@ -19,8 +19,9 @@ import ce.core.model.unifile.UnifileError;
 
 class ErrorCtrl {
 
-	public function new(state : State, application : Application) {
+	public function new(parent : Controller, state : State, application : Application) {
 
+		this.parent = parent;
 		this.state = state;
 		this.application = application;
 	}
@@ -28,6 +29,8 @@ class ErrorCtrl {
 	var state : State;
 
 	var application : Application;
+
+	var parent : Controller;
 
 	///
 	// API
@@ -98,7 +101,18 @@ class ErrorCtrl {
 	 */
 	public function setUnifileError(err : UnifileError) : Void {
 
-		setError(err.message);
+		if (err.code == CEError.CODE_UNAUTHORIZED) {
+
+			var srv = state.currentLocation.service;
+
+			state.serviceList.get(srv).isLoggedIn = false;
+
+			parent.connect(srv);
+		
+		} else {
+
+			setError(err.message);
+		}
 	}
 
 

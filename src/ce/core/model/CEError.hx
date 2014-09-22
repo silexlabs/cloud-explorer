@@ -22,6 +22,8 @@ class CEError {
 	 */
 	static public inline var CODE_BAD_PARAMETERS : Int = 400;
 
+	static public inline var CODE_UNAUTHORIZED : Int = 401;
+
 	/**
 	 * The policy and/or signature don't allow you to make this request.
 	 * @see https://developers.inkfilepicker.com/docs/security/

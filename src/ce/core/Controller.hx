@@ -32,7 +32,6 @@ import ce.core.model.api.WriteOptions;
 import ce.core.parser.oauth.Str2OAuthResult;
 
 import ce.core.service.UnifileSrv;
-import ce.core.service.FileSrv;
 
 import ce.core.model.unifile.UnifileError;
 import ce.core.ctrl.ErrorCtrl;
@@ -52,11 +51,10 @@ class Controller {
 		this.state = new State();
 
 		this.unifileSrv = new UnifileSrv(config);
-		this.fileSrv = new FileSrv();
 
 		this.application = new Application(iframe, config);
 
-		this.errorCtrl = new ErrorCtrl(state, application);
+		this.errorCtrl = new ErrorCtrl(this, state, application);
 
 		initMvc();
 	}
@@ -69,7 +67,6 @@ class Controller {
 	var application : Application;
 	
 	var unifileSrv : UnifileSrv;
-	var fileSrv : FileSrv;
 
 
 	///
@@ -96,7 +93,11 @@ class Controller {
 
 		options.normalizeReadOptions();
 
-		fileSrv.get(input.url, onSuccess, errorCtrl.setError); // FIXME
+		unifileSrv.get(input.url, onSuccess, function(e:UnifileError){
+
+				onError(new ce.core.model.CEError(e.code));
+
+			});
 	}
 
 	/**
@@ -133,7 +134,10 @@ class Controller {
 
 				onSuccess(target);
 
-			}, errorCtrl.setUnifileError);
+			}, function(e:UnifileError) {
+
+				onError(new CEError(e.code));
+			});
 	}
 
 	public function isLoggedIn(srvName : String, onSuccess : Bool -> Void, onError : CEError -> Void) : Void {
@@ -1017,7 +1021,7 @@ class Controller {
 			}, errorCtrl.setUnifileError);
 	}
 
-	private function connect(srv : ce.core.model.Service) : Void {
+	public function connect(srv : ce.core.model.Service) : Void {
 
 		if (state.serviceList.get(srv).isLoggedIn) {
 
