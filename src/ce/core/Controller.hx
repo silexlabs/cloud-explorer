@@ -507,7 +507,22 @@ class Controller {
 				}
 			}
 
+		application.onFilesDropped = function(files : js.html.FileList) {
+
+				application.setLoaderDisplayed(true);
+
+				unifileSrv.upload(files, state.currentLocation.service, state.currentLocation.path, function() {
+
+					//trace("file(s) uploaded with success");
+
+					refreshFilesList();
+
+				}, errorCtrl.setUnifileError);
+			}
+
 		application.onInputFilesChanged = function() {
+
+				application.setLoaderDisplayed(true);
 
 				unifileSrv.upload(application.dropzone.inputElt.files, state.currentLocation.service, state.currentLocation.path, function() {
 

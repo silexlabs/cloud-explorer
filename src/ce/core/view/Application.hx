@@ -141,6 +141,8 @@ class Application {
 
 	public dynamic function onInputFilesChanged() : Void { }
 
+	public dynamic function onFilesDropped(files : js.html.FileList) : Void { }
+
 	public dynamic function onNewFolderClicked() : Void { }
 
 	public dynamic function onParentFolderClicked() : Void { }
@@ -464,6 +466,7 @@ class Application {
 
 		dropzone = new DropZone(rootElt.querySelector(SELECTOR_DROPZONE));
 		dropzone.onInputFilesChanged = function() { onInputFilesChanged(); }
+		dropzone.onFilesDropped = function(files : js.html.FileList) { onFilesDropped(files); }
 
 		authPopup = new AuthPopup(rootElt.querySelector(SELECTOR_AUTH_POPUP));
 

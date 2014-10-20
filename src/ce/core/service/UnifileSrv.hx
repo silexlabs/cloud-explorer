@@ -396,7 +396,7 @@ class UnifileSrv {
 			for (f in files) {
 
 				if (Reflect.isObject(f)) { // raw data from drop event or input[type=file] contains methods we need to filter
-
+trace("appended "+f.name);
 					untyped __js__("formData.append('data', f, f.name);"); // @see https://github.com/HaxeFoundation/haxe/issues/2867
 				}
 			}

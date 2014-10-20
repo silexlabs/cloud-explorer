@@ -13,11 +13,16 @@ package ce.core.view;
 
 import js.html.Element;
 import js.html.InputElement;
+import js.html.FileList;
+
+using ce.util.HtmlTools;
 
 class DropZone {
 
 	static inline var SELECTOR_INPUT : String = "div input";
 	static inline var SELECTOR_BUTTON : String = "div button";
+
+	static inline var CLASS_DRAGGINGOVER : String = "draggingover";
 
 	public function new(elt : Element) {
 
@@ -28,6 +33,40 @@ class DropZone {
 
 		this.btnElt = elt.querySelector(SELECTOR_BUTTON);
 		btnElt.addEventListener("click", function(?_){ onBtnClicked(); });
+
+		this.elt.addEventListener('dragover', function(e) {
+
+				e.preventDefault();
+
+				e.dataTransfer.dropEffect = 'copy';
+
+				return false;
+			});
+
+		this.elt.addEventListener('dragenter', function(e) {
+
+				this.elt.toggleClass(CLASS_DRAGGINGOVER, true);
+			});
+
+		this.elt.addEventListener('dragleave', function(e) {
+
+				this.elt.toggleClass(CLASS_DRAGGINGOVER, false);
+			});
+
+		this.elt.addEventListener('drop', function(e) {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				this.elt.toggleClass(CLASS_DRAGGINGOVER, false); // useful ?
+
+				var fileList : FileList = e.dataTransfer.files;
+
+				if (fileList.length > 0) {
+
+					onFilesDropped(fileList);
+				}
+			});
 	}
 
 	var elt : Element;
@@ -41,6 +80,8 @@ class DropZone {
 	//
 
 	public dynamic function onInputFilesChanged() : Void { }
+
+	public dynamic function onFilesDropped(files : FileList) : Void { }
 
 
 	///
