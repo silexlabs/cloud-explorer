@@ -26,17 +26,6 @@ Cloud Explorer is also skinable with CSS and hostable in house.
 * Twitter https://twitter.com/silexlabs
 * Google plus https://plus.google.com/communities/107373636457908189681
 
-###Licensing
-
-Cloud Explorer is licensed under the MIT license.
-
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot01.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot02.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot03.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot04.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot05.png)
-![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot06.png)
-
 ##Setup
 
 ### Development or Test
@@ -257,5 +246,16 @@ Feel free to contact us through twitter or linkedin
 ![Thomas Fétiveau](https://media.licdn.com/mpr/mpr/shrink_200_200/p/1/005/093/2f0/2330672.jpg) Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) [Web & mobile Developer](https://www.linkedin.com/in/thomasfetiveau)
 
 ![Alex Hoyau](http://m.c.lnkd.licdn.com/mpr/mpr/shrink_200_200/p/2/005/099/3b6/06c77af.jpg) Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
+
+###Licensing
+
+Cloud Explorer is licensed under the MIT license.
+
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot01.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot02.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot03.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot04.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot05.png)
+![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot06.png)
 
 
