@@ -1,9 +1,12 @@
 #Cloud Explorer, file picker for the cloud
+
 Cloud Explorer enables your application or website users with picking their files from the cloud.
+
+Here is [cloud explorer official website](http://cloud-explorer.org/).
 
 Cloud Explorer is a free and open source project [powered by Silex Labs](http://www.silexlabs.org/).
 
-Authored by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alexandre Hoyau [@lexoyo](https://twitter.com/lexoyo).
+Authored by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alex Hoyau [@lexoyo](https://twitter.com/lexoyo).
 
 ##About Cloud Explorer
 
@@ -227,6 +230,8 @@ Current version is 1.0. It is a complete refactoring of the previous 0.1 version
 
 The goals of version 1.1 are simple: implement the full Ink File Picker API (web version).
 
+Then we will probably make SDKs for Android and iOS apps.
+
 ## Contributions
 
 We love contributions and consider all kind of pull requests:
@@ -236,5 +241,16 @@ We love contributions and consider all kind of pull requests:
 * additions to the documentation
 * bug reports, fixes
 * any idea or suggestion
+
+You can also contribute to the [unifile library](https://github.com/silexlabs/unifile#developer-guide) in order to add more cloud services to Cloud Explorer
+
+> See the [instructions to contribute to unifile](https://github.com/silexlabs/unifile#developer-guide)
+
+## Contributors
+
+Feel free to contact us through twitter or linkedin
+
+* Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) [Web & mobile Developer](https://www.linkedin.com/in/thomasfetiveau)
+* Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
 
 
