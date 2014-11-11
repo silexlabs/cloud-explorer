@@ -247,9 +247,11 @@ Feel free to contact us through twitter or linkedin
 
 ![Alex Hoyau](http://m.c.lnkd.licdn.com/mpr/mpr/shrink_200_200/p/2/005/099/3b6/06c77af.jpg) Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
 
-###Licensing
+##Licensing
 
 Cloud Explorer is licensed under the MIT license.
+
+##Screenshots
 
 ![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot01.png)
 ![Cloud explorer user interface](https://raw.github.com/silexlabs/cloud-explorer/master/screenshot02.png)
