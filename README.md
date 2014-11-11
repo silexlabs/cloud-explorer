@@ -248,9 +248,14 @@ You can also contribute to the [unifile library](https://github.com/silexlabs/un
 
 ## Contributors
 
+We are all members of [Silex Labs foundation](http://www.silexlabs.org).
+
+![Silex Labs](http://www.silexlabs.org/wp-content/themes/parallelus-salutation/assets/images/logo-silexlabs-grey.png)
+
 Feel free to contact us through twitter or linkedin
 
-* Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) [Web & mobile Developer](https://www.linkedin.com/in/thomasfetiveau)
-* Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
+![Thomas Fétiveau](https://media.licdn.com/mpr/mpr/shrink_200_200/p/1/005/093/2f0/2330672.jpg) Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) [Web & mobile Developer](https://www.linkedin.com/in/thomasfetiveau)
+
+![Alex Hoyau](http://m.c.lnkd.licdn.com/mpr/mpr/shrink_200_200/p/2/005/099/3b6/06c77af.jpg) Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
 
 
