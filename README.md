@@ -245,7 +245,11 @@ Feel free to contact us through twitter or linkedin
 
 ![Thomas Fétiveau](https://media.licdn.com/mpr/mpr/shrink_200_200/p/1/005/093/2f0/2330672.jpg) Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) [Web & mobile Developer](https://www.linkedin.com/in/thomasfetiveau)
 
-![Alex Hoyau](http://m.c.lnkd.licdn.com/mpr/mpr/shrink_200_200/p/2/005/099/3b6/06c77af.jpg) Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
+![Alex Hoyau, javascript developer](http://m.c.lnkd.licdn.com/mpr/mpr/shrink_200_200/p/2/005/099/3b6/06c77af.jpg) Alex Hoyau [@lexoyo](https://twitter.com/lexoyo) [Front end architect](https://www.linkedin.com/in/webappdev/)
+
+![Pol Goasdoué, freelance UI designer](https://media.licdn.com/mpr/mpr/shrink_200_200/p/4/005/04b/36b/164e5af.jpg) Pol Goasdoué [@superwup](https://twitter.com/superwup) [freelance UI designer](http://superwup.me)
+
+
 
 ##Licensing
 
