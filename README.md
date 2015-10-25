@@ -10,13 +10,13 @@ Authored by Thomas Fétiveau [@zab0jad](https://twitter.com/zab0jad) and Alex Ho
 
 ##About Cloud Explorer
 
-Cloud Explorer aims to provide an open source client library that exposes the same API as the [Ink File Picker API](https://developers.inkfilepicker.com/docs/web/).
+Cloud Explorer aims to provide an open source client library that exposes the same API as the [File Picker API](https://www.filepicker.com/documentation/file-ingestion/javascript-api).
 
 Cloud Explorer is the front end client of the [unifile](https://github.com/silexlabs/unifile) backend, a nodejs server which provides a unified access to cloud services. This project uses nodejs and those modules: express, dbox, express, googleapis, logger, node-oauth, oauth, path.
 
 The backend is in node.js and the front end is in Javascript. Cloud Explorer is written with [Haxe](http://www.haxe.org), enabling a modern and elegant syntax as well as a strong typed and more reliable javascript source code.
 
-The project is not mature yet and doesn't provide half of what is provided by Ink File Picker. It's however under constant development and will provide more and more of the IPF API every week plus some extra features we've found useful for our projects but that were not offered by IPF.
+The project is not mature yet and doesn't provide half of what is provided by File Picker. It's however under constant development and will provide more and more of the IPF API every week plus some extra features we've found useful for our projects but that were not offered by IPF.
 
 Cloud Explorer is also skinable with CSS and hostable in house.
 
@@ -115,7 +115,7 @@ Note that you can also precise the iframe element id that will be used by Cloud 
 </script>
 ```
 
-* You will then be able to call it like you would call Ink File Picker:
+* You will then be able to call it like you would call File Picker:
 ```
 cloudExplorer.pick(function(b){
 
@@ -154,13 +154,13 @@ More to come soon...
 
 The currently implemented part of the IPF API in Cloud Explorer consists of:
 
-* [CEBlob](https://developers.inkfilepicker.com/docs/web/#inkblob)
+* [CEBlob](https://www.filepicker.com/documentation/file-ingestion/javascript-api/blob)
 
 Supported fields: url, filename, mimetype, size
 
 Other fields will return null.
 
-* [Pick Files](https://developers.inkfilepicker.com/docs/web/#pick)
+* [Pick Files](https://www.filepicker.com/documentation/file-ingestion/javascript-api/pick)
 ```
 cloudExplorer.pick(function(b){
 
@@ -174,7 +174,7 @@ cloudExplorer.pick(function(b){
 No option supported yet. Will just pick a file from your favorite cloud service and give back a CEBlob instance.
 
 
-* [Export](https://developers.inkfilepicker.com/docs/web/#export)
+* [Export](https://www.filepicker.com/documentation/file-export/javascript-api/export)
 ```
 cloudExplorer.exportFile(currentBlob, { mimetype: "text/html" }, function(b){
 
@@ -189,7 +189,7 @@ Supported options are: mimetype, extension.
 
 This function doesn't work exactly like the IFP yet as it will need a call to write() after the call to export() to actually write the file. For now, it will just generate a CEBlob instance corresponding to the new file you want to create/store.
 
-* [Write back to a file](https://developers.inkfilepicker.com/docs/web/#write)
+* [Write back to a file](https://www.filepicker.com/documentation/file-ingestion/javascript-api/write)
 ```
 cloudExplorer.write(currentBlob, "write() test succeeded", function(ceb){
 
@@ -201,7 +201,7 @@ cloudExplorer.write(currentBlob, "write() test succeeded", function(ceb){
 ```
 
 No option supported yet.
-* [Read Files](https://developers.inkfilepicker.com/docs/web/#read)
+* [Read Files](https://www.filepicker.com/documentation/file-ingestion/javascript-api/read)
 
 ```
 cloudExplorer.read(currentBlob, function(d){
@@ -215,9 +215,9 @@ No option supported yet.
 
 ### Roadmap
 
-Current version is 1.0. It is a complete refactoring of the previous 0.1 version that was dependant on JQuery and AngularJS. Version 1.0 has no client side dependency and is implemented with Haxe, allowing future ports of the basecode to native mobile/desktop, Flash/AIR, ...
+Current version is 1.0. It is a complete refactoring of the previous 0.1 version that was dependant on JQuery and AngularJS. Version 1.0 has no client side dependency and is implemented with Haxe javascript, allowing future ports of the basecode to native mobile/desktop, Flash/AIR, ...
 
-The goals of version 1.1 are simple: implement the full Ink File Picker API (web version).
+The goals of version 1.1 are simple: implement the full File Picker API (web version).
 
 Then we will probably make SDKs for Android and iOS apps.
 
