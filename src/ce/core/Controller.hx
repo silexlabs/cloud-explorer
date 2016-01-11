@@ -1063,22 +1063,10 @@ class Controller {
 						application.onServiceAuthorizationDone = function(? result : Null<OAuthResult>) {
 
 								application.setAuthPopupDisplayed(false);
-
-								if (state.serviceList.get(srv).isOAuth) {
-
-									if (result != null && result.notApproved != true) {
-
-										login(srv);
-
-									} else {
-
-										application.setLoaderDisplayed(false);
-									}
-
-								} else {
-
-									login(srv);
-								}
+								// Will ask Unifile if the client is logged
+								login(srv);
+								// Unbind to prevent the timer to call it a second time
+								application.onServiceAuthorizationDone = null;
 							}
 
 						var authUrl : String = cr.authorizeUrl + (cr.authorizeUrl.indexOf('?') > -1 ? '&' : '?')
