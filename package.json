@@ -7,13 +7,17 @@
     "Alex Hoyau aka lexoyo"
   ],
   "dependencies": {
-    "unifile": "0.0.x",
     "express": "3.4.x",
     "dbox": "0.6.x",
     "node-oauth": "0.1.x",
     "oauth": "",
     "haxe": "~0.1.9",
-    "path": ""
+    "path": "",
+    "connect-multiparty": "~2.0.0",
+    "body-parser": "~1.15.0",
+    "cookie-parser": "~1.4.1",
+    "express-session": "~1.13.0",
+    "unifile": "0.0.56"
   },
   "repository": {
     "type": "git",
@@ -53,7 +57,10 @@
     "grunt-concurrent": "~0.3.0",
     "load-grunt-tasks": "~0.1.0",
     "time-grunt": "~0.1.1",
-    "grunt-haxe": "~0.1.10"
+    "grunt-haxe": "~0.1.10",
+    "mocha": "~2.4.5",
+    "chai": "~3.5.0",
+    "supertest": "~1.2.0"
   },
   "license": "MIT",
   "engines": {
