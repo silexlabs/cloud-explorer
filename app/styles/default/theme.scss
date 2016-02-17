@@ -136,6 +136,12 @@ button:focus { outline: 0; } /* avoid default blue outline on chrome */
 			li.ftp {
 				background-image: url('../images/default/home-ftp.png');
 			}
+			li.github {
+				background-image: url('../images/default/home-github.png');
+			}
+			li.open-pages{
+				background-image: url('../images/default/home-open-pages.png');
+			}
 		}
 	}
 
@@ -305,6 +311,18 @@ button:focus { outline: 0; } /* avoid default blue outline on chrome */
 				}
 				> li.ftp.connected {
 					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-ftp.png');
+				}
+				> li.github {
+					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-github.png');
+				}
+				> li.github.connected {
+					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-github.png');
+				}
+				> li.open-pages {
+					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-open-pages.png');
+				}
+				> li.open-pages.connected {
+					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-open-pages.png');
 				}
 
 				ul.contextMenu {
