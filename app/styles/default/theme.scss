@@ -136,6 +136,9 @@ button:focus { outline: 0; } /* avoid default blue outline on chrome */
 			li.ftp {
 				background-image: url('../images/default/home-ftp.png');
 			}
+			li.webdav {
+				background-image: url('../images/default/home-webdav.png');
+			}
 			li.github {
 				background-image: url('../images/default/home-github.png');
 			}
@@ -317,6 +320,12 @@ button:focus { outline: 0; } /* avoid default blue outline on chrome */
 				}
 				> li.github.connected {
 					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-github.png');
+				}
+				> li.webdav {
+					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-webdav.png');
+				}
+				> li.webdav.connected {
+					background-image: url("../images/default/srv-state-connected.png"), url('../images/default/srv-webdav.png');
 				}
 				> li.open-pages {
 					background-image: url("../images/default/srv-state-disconnected.png"), url('../images/default/srv-open-pages.png');
